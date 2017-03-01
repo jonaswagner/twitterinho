@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class What2Think {
 
     public static void main(String[] args) {
-        String topic = "LastNightInSweden";
+        String topic = "Penrith";
         ArrayList<String> tweets = TweetManager.getTweets(topic);
         NLP.init();
         for(String tweet : tweets) {

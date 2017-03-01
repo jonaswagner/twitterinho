@@ -35,6 +35,7 @@ public class TweetManager {
                     tweetList.add(tweet.getText());
                 }
             } while ((query = result.nextQuery()) != null);
+
         } catch (TwitterException te) {
             te.printStackTrace();
             System.out.println("Failed to search tweets: " + te.getMessage());
