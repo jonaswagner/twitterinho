@@ -2,7 +2,7 @@ package ch.uzh.ase;
 
 import java.util.ArrayList;
 
-public class WhatThoThink {
+public class What2Think {
 
     public static void main(String[] args) {
         String topic = "LastNightInSweden";
