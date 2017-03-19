@@ -14,4 +14,6 @@ hs_err_pid*
 #other files
 .idea/*
 target/*
+mvc/target/*
+server/target/*
 *.iml
