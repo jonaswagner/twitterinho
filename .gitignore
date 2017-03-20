@@ -17,3 +17,5 @@ target/*
 mvc/target/*
 server/target/*
 *.iml
+tweets.txt
+_mvc/*

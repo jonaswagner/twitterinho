@@ -1,0 +1,11 @@
+<div class="col-md-3">
+  <p>its great!</p>
+  <p>{{title}}</p>
+  <button type="button" (click)="addTweet()">Add Tweet</button>
+  <p>{{trumpistan}}</p>
+  <p>Result: {{tweet|json}}</p>
+  <ul>
+    <li *ngFor="let t of tweet">Id: {{t.id}} / Name: {{t.name}}</li>
+  </ul>
+  <input [(ngModel)]="trumpistan" type="email">
+</div>
