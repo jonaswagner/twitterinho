@@ -7,15 +7,15 @@ import {Injectable} from "@angular/core";
  */
 
 @Injectable()
-export class TwitterService{
+export class PerformanceDisplayService{
 
   constructor(
     private http: Http
   ){
 
   }
-  getResources(): Observable<any[]> {
-    return this.http.get("/api/resources").map((response:Response) => response.json());
-  }
+  // getResources(): Observable<any[]> {
+  //   return this.http.get("/twt/sentiments").map((response:Response) => response.json());
+  // }
 
 }

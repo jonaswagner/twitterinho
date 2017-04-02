@@ -1,0 +1,12 @@
+.active-sentiments{
+  list-style: none;
+  padding-left: 10px;
+}
+.active-sentiments li{
+  padding: 5px;
+  margin: 5px 0;
+}
+.active-sentiments li:hover, .active-sentiments .active{
+  background: #ddd;
+  cursor: pointer;
+}

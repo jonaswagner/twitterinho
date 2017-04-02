@@ -1,7 +1,16 @@
-<!--<scheduler-component></scheduler-component>-->
-<div class="container">
-  <div class="row">
-    <twitterinho-component></twitterinho-component>
-    <div class="col-md-5">this is another grid element</div>
+<div class="text-center twt-header">twitterinho
+  <small> analyzing your sentiments elegantly and fast</small>
+</div>
+<div class="container twt-component-container">
+  <div class="row is-table-row">
+    <div class="col-sm-4 twt-panel">
+      <search-component></search-component>
+    </div>
+    <div class="col-sm-8 twt-panel">
+      <sentiment-display-component></sentiment-display-component>
+    </div>
+    <!--<div class="col-xs-4 twt-panel">
+      <performance-display-component></performance-display-component>
+    </div>-->
   </div>
 </div>

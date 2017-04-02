@@ -21,14 +21,18 @@
     "@angular/platform-browser-dynamic": "^2.4.3",
     "@angular/router": "^3.4.3",
     "bootstrap": "^3.3.7",
+    "chart.js": "^2.5.0",
     "core-js": "^2.4.1",
     "daypilot-pro-angular": "https://npm.daypilot.org/daypilot-pro-angular/trial/8.3.2721.tar.gz",
+    "font-awesome": "^4.7.0",
     "ng2-bootstrap": "^1.2.1",
+    "primeng": "^2.0.5",
     "rxjs": "^5.0.3",
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.7.5"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.4.2",
     "@types/jasmine": "2.5.38",
     "@types/node": "^6.0.42",
     "angular-cli": "1.0.0-beta.24",

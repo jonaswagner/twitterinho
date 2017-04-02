@@ -1,17 +1,17 @@
 package ch.uzh.ase.data;
 
 
-        import com.mongodb.*;
-        import com.mongodb.client.FindIterable;
-        import com.mongodb.client.MongoCollection;
-        import com.mongodb.client.MongoCursor;
-        import com.mongodb.client.MongoDatabase;
-        import org.bson.Document;
+import com.mongodb.*;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
-        import java.net.URI;
-        import java.util.List;
-        import java.util.Random;
-        import java.util.Set;
+import java.net.URI;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by jonas on 15.03.2017.
@@ -19,7 +19,7 @@ package ch.uzh.ase.data;
 public class DBDriver {
 
     public static void main(String[] args) {
-        MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
+        MongoClient mongoClient = new MongoClient("localhost", 27017);
         // DB db = mongoClient.getDB("testtweets");
         MongoDatabase mdb = mongoClient.getDatabase("testtweets");
 
@@ -42,7 +42,6 @@ public class DBDriver {
         Document doc2 = new Document("tweetID", "777")
                 .append("name", "dini mueter");
         mc.insertOne(doc2);
-
 
 
         //BasicDBObject query = new BasicDBObject("Tweet_ID", 777);

@@ -44,10 +44,10 @@ export class SchedulerComponent implements AfterViewInit {
         text: name,
         resource: args.resource
       };
-      this.ds.createEvent(params).subscribe(result => {
-        this.events.push(result);
-        this.scheduler.control.message("Event created");
-      } );
+      // this.ds.createEvent(params).subscribe(result => {
+      //   this.events.push(result);
+      //   this.scheduler.control.message("Event created");
+      // } );
     },
     onEventMove: args => {
       let params: MoveEventParams = {
@@ -56,20 +56,20 @@ export class SchedulerComponent implements AfterViewInit {
         end: args.newEnd.toString(),
         resource: args.newResource
       };
-      this.ds.moveEvent(params).subscribe(result => {
-        this.scheduler.control.message("Event moved");
-      });
+      // this.ds.moveEvent(params).subscribe(result => {
+      //   this.scheduler.control.message("Event moved");
+      // });
     }
   };
 
   constructor(private ds: DataService) {}
 
   ngAfterViewInit(): void {
-    this.ds.getResources().subscribe(result => this.config.resources = result);
+    // this.ds.getResources().subscribe(result => this.config.resources = result);
 
     var from = this.scheduler.control.visibleStart();
     var to = this.scheduler.control.visibleEnd();
-    this.ds.getEvents(from, to).subscribe(result => this.events = result);
+    // this.ds.getEvents(from, to).subscribe(result => this.events = result);
   }
 
 

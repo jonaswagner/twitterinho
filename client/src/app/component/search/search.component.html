@@ -1,0 +1,21 @@
+<div class="row">
+  <form>
+    <div class="col-xs-12">
+      <div class="form-group">
+        <label for="sentimentSearch">Analyze Sentiments for:</label>
+        <input name="sentimentSearch" id="sentimentSearch" [(ngModel)]="addedSentimentString" type="text" class="form-control">
+      </div>
+      <div class="form-group pull-right">
+        <label for="evalBtn"></label>
+        <button id="evalBtn" (click)="addSentiment()" class="btn btn-success form-control" >Evaluate</button>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="row">
+  <ul class="active-sentiments">
+    <li *ngFor="let s of activeSentiments">
+      <a (click)="sendToDisplay(s)">{{s.name}}</a></li>
+  </ul>
+</div>

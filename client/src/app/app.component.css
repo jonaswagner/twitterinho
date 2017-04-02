@@ -1,6 +1,28 @@
-.col-3{
-  width:200px;
+.twt-header{
+  color: #fff;
+  background-color: var(--twitterblue);
+  padding: 20px;
+  font-size: 30px;
+  border-bottom:1px solid var(--twitterborder);
+  -webkit-box-shadow:0px 1px 5px var(--twitterborder);
+  -moz-box-shadow:0px 1px 5px var(--twitterborder);
+  box-shadow:0px 1px 5px var(--twitterborder);
 }
-.red{
-  background-color: red;
+.twt-header small{
+  font-size: 16px;
+  margin-left: 50px;
+  vertical-align: middle;
+}
+.twt-component-container{
+  margin-top: 40px;
+}
+.twt-panel {
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 40px 20px;
+}
+
+.twt-panel:last-child {
+  border-right: 1px solid #ddd;
 }
