@@ -1,5 +1,9 @@
 <div class="text-center twt-header">twitterinho
   <small> analyzing your sentiments elegantly and fast</small>
+  <div class="pull-right">
+    <button *ngIf="showShowButton" (click)="toggleMenu()" class="btn btn-menu btn-default">Show Performance</button>
+    <button *ngIf="showHideButton" [@slideInOut]="showHideButton" (click)="toggleMenu()" class="btn btn-hide btn-default">&times;</button>
+  </div>
 </div>
 <div class="container twt-component-container">
   <div class="row is-table-row">
@@ -9,8 +13,6 @@
     <div class="col-sm-8 twt-panel">
       <sentiment-display-component></sentiment-display-component>
     </div>
-    <!--<div class="col-xs-4 twt-panel">
-      <performance-display-component></performance-display-component>
-    </div>-->
   </div>
+  <performance-display-component [@slideInOut]="menuState"></performance-display-component>
 </div>

@@ -1,8 +1,17 @@
-<div class="col-md-3">
-  <button type="button" (click)="addTweet()">Add Tweet</button>
-  <p>{{trumpistan}}</p>
-  <p>Result: {{tweet|json}}</p>
-  <ul>
-    <li *ngFor="let t of tweet">Id: {{t.id}} / Name: {{t.name}}</li>
-  </ul>
+<div class="performance-container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h3 class="performance-header">Current Performance of the cloud</h3>
+    </div>
+  </div>
+  <div class="performance-content">
+    <div class="row">
+      <div class="col-xs-6">
+        <p-chart type="doughnut" [data]="doughnutData"></p-chart>
+      </div>
+      <div class="col-xs-6">
+        <p-chart type="line" [data]="lineData"></p-chart>
+      </div>
+    </div>
+  </div>
 </div>

@@ -37,7 +37,7 @@ export class SentimentDisplayComponent implements OnInit, OnDestroy {
 
   // getSentiments() {
   //   this.sentimentService.getSentiments().subscribe(
-  //     data => {
+  //     doughnutData => {
   //     },
   //     err => {
   //       console.log(err);
