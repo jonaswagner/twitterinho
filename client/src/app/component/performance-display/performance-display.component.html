@@ -6,10 +6,17 @@
   </div>
   <div class="performance-content">
     <div class="row">
+      <div class="col-xs-12">
+        <p>number of nodes: </p>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-xs-6">
+        <p>Average load</p>
         <p-chart type="doughnut" [data]="doughnutData"></p-chart>
       </div>
       <div class="col-xs-6">
+        <p>Load over Time</p>
         <p-chart type="line" [data]="lineData"></p-chart>
       </div>
     </div>

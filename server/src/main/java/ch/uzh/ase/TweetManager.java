@@ -25,6 +25,7 @@ public class TweetManager {
         TwitterFactory tf = new TwitterFactory(cb.build());
         Twitter twitter = tf.getInstance();
         ArrayList<String> tweetList = new ArrayList<String>();
+        ArrayList<String> authorList = new ArrayList<String>();
         try {
             Query query = new Query(topic);
             QueryResult result;
@@ -32,6 +33,7 @@ public class TweetManager {
                 result = twitter.search(query);
                 List<Status> tweets = result.getTweets();
                 for (Status tweet : tweets) {
+                    authorList.add(tweet.getUser().getName());
                     tweetList.add(tweet.getText());
                 }
             } while ((query = result.nextQuery()) != null);

@@ -4,6 +4,7 @@ package ch.uzh.ase.controller;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import ch.uzh.ase.domain.Sentiment;
 import ch.uzh.ase.repository.EventRepository;
 import ch.uzh.ase.repository.ResourceRepository;
 import ch.uzh.ase.repository.SentimentRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -61,6 +63,17 @@ public class MainController {
         return new ResponseEntity<>(createSentiments(), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/twt/sentiment", method = RequestMethod.POST)
+    public ResponseEntity<Sentiment> addNewSentiment(@RequestBody String sentiment){
+        System.out.println(sentiment);
+        JSONObject obj = new JSONObject(sentiment);
+        String sentimentName = obj.getString("sentiment");
+
+        Sentiment s = new Sentiment(sentimentName);
+        s.setValues(createDummyValues());
+        return new ResponseEntity<Sentiment>(s, HttpStatus.CREATED);
+    }
 //    @PostMapping("/api/events/create")
 //    @JsonSerialize(using = LocalDateTimeSerializer.class)
 //    @Transactional
@@ -109,27 +122,32 @@ public class MainController {
 //        public LocalDateTime end;
 //        public Long resource;
 //    }
-
+    private List<Double> createDummyValues(){
+        List<Double> dummyValues = new ArrayList<>();
+        Random rand = new Random();
+        for (int j = 0; j < 15; j++) {
+            dummyValues.add((double) Math.round(rand.nextDouble() * 100d)/100d);
+        }
+        return dummyValues;
+    }
     private List<Sentiment> createSentiments() {
         List<Sentiment> sentiments;
         System.out.println("entering create");
-        Random rand = new Random();
         List<String> wordlist;
+        Random rand = new Random();
+
         try {
             wordlist = wordList();
             sentiments = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 Sentiment s = new Sentiment(wordlist.get(rand.nextInt(wordlist.size())));
-                List<Integer> dummyValues = new ArrayList<>();
                 System.out.println(s.getName());
-                for (int j = 0; j < 15; j++) {
-                    dummyValues.add(rand.nextInt(100));
-                }
-                s.setValues(dummyValues);
+                s.setValues(createDummyValues());
                 sentiments.add(s);
             }
         } catch (IOException e) {
             System.out.println("could not read file properly! Using standard words");
+            e.printStackTrace();
             sentiments = createStandardList();
         }
         return sentiments;

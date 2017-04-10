@@ -18,7 +18,7 @@ public class Sentiment {
     private String name;
     @Column
     @ElementCollection(targetClass=Integer.class)
-    private List<Integer> values;
+    private List<Double> values;
 
 
     public Sentiment(String name) {
@@ -34,11 +34,11 @@ public class Sentiment {
         this.name = name;
     }
 
-    public List<Integer> getValues() {
+    public List<Double> getValues() {
         return values;
     }
 
-    public void setValues(List<Integer> values) {
+    public void setValues(List<Double> values) {
         this.values = values;
     }
 }

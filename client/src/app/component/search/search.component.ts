@@ -26,10 +26,22 @@ export class SearchComponent implements OnInit {
   }
 
   addSentiment() {
+//TODO added tech stack: maven, git, primeng
     this.addedSentiment = {id: 1, name: this.addedSentimentString, values: []};
-    this.activeSentiments.push(this.addedSentiment);
+
+    this.sentimentService.addSentiment(this.addedSentimentString).subscribe(
+      data => {
+        this.activeSentiments.push(data);
+        this.sendToDisplay(data);
+      },
+      err => {
+        console.log(err);
+      },
+      () => console.log("done"))
+    ;
     this.addedSentimentString = "";
   }
+
 
   getSentiments() {
 
@@ -43,7 +55,8 @@ export class SearchComponent implements OnInit {
       () => console.log("done"))
 
   }
-  sendToDisplay(sentiment){
+
+  sendToDisplay(sentiment) {
     this.sentimentService.displaySentiment(sentiment);
   }
 }

@@ -9,7 +9,7 @@ public class What2Think {
 
     public static void main(String[] args) {
 
-        String topic = "Penrith";
+        String topic = "zurich";
         ArrayList<String> tweets = null;
 
         File file = new File("tweets.txt");
@@ -26,8 +26,9 @@ public class What2Think {
             bw = new BufferedWriter(fw);
             tweets = TweetManager.getTweets(topic);
 
-            for(String tweet : tweets) {
-                bw.write(tweet);
+            NLP.init();
+            for (String tweet : tweets) {
+                bw.write(NLP.findSentiment(tweet) + ": " + tweet);
                 bw.newLine();
             }
 
@@ -35,11 +36,10 @@ public class What2Think {
             bw.close();
             fw.close();
 
-            NLP.init();
 
-            for(String tweet : tweets) {
+            /*for (String tweet : tweets) {
                 System.out.println(tweet + " : " + NLP.findSentiment(tweet));
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
