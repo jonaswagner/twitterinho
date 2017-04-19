@@ -22,7 +22,7 @@ public class NLP {
         pipeline = new StanfordCoreNLP(properties);
     }
 
-    public static int findSentiment(String tweet) {
+    public static double findSentiment(String tweet) {
 
         int mainSentiment = 0;
         if (tweet != null && tweet.length() > 0) {
@@ -41,6 +41,16 @@ public class NLP {
 
             }
         }
-        return mainSentiment;
+        return  normalize(mainSentiment);
     }
+
+    //mapping of the sentiments (0-4) to a value between 0 and 1
+    private static double normalize(int sentiment){
+        double min = 0.0;
+        double max = 4.0;
+        double  normSentiment = (((double)sentiment-min)/(max-min));
+        return normSentiment;
+    }
+
+
 }
