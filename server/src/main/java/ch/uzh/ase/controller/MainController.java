@@ -1,33 +1,22 @@
 
 package ch.uzh.ase.controller;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import javax.transaction.Transactional;
-
-import ch.uzh.ase.domain.Event;
-import ch.uzh.ase.domain.Resource;
+import ch.uzh.ase.NLP;
+import ch.uzh.ase.TweetManager;
 import ch.uzh.ase.domain.Sentiment;
-import ch.uzh.ase.repository.EventRepository;
-import ch.uzh.ase.repository.ResourceRepository;
 import ch.uzh.ase.repository.SentimentRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @RestController
 public class MainController {
@@ -71,7 +60,19 @@ public class MainController {
         String sentimentName = obj.getString("sentiment");
 
         Sentiment s = new Sentiment(sentimentName);
-        s.setValues(createDummyValues());
+
+
+        ArrayList<String> tweets = TweetManager.getTweets(sentiment);
+        NLP.init();
+
+        List<Double> sentimentValues = new ArrayList<>();
+        for (String tweet : tweets) {
+            double sentimentValue =  NLP.findSentiment(tweet);
+            sentimentValues.add(sentimentValue);
+        }
+        s.setValues(sentimentValues);
+
+//        s.setValues(createDummyValues());
         return new ResponseEntity<Sentiment>(s, HttpStatus.CREATED);
     }
 //    @PostMapping("/api/events/create")
@@ -130,6 +131,7 @@ public class MainController {
         }
         return dummyValues;
     }
+
     private List<Sentiment> createSentiments() {
         List<Sentiment> sentiments;
         System.out.println("entering create");
