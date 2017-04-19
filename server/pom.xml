@@ -9,7 +9,7 @@
     <groupId>ch.uzh.ase</groupId>
     <artifactId>server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-
+    <packaging>war</packaging>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -45,7 +45,7 @@
 
 
         <!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp -->
-        <dependency>
+        <!--<dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>3.7.0</version>
@@ -56,7 +56,7 @@
             <artifactId>stanford-corenlp</artifactId>
             <version>3.7.0</version>
             <classifier>models-english</classifier>
-        </dependency>
+        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
