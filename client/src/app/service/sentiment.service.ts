@@ -34,7 +34,11 @@ export class SentimentService {
 
   getSentiments(): Observable<Sentiment[]> {
 
-    return this.http.get("/twt/sentiments").map((response: Response) => <Sentiment[]>response.json());
+    return this.http.get("/twt/sentiments")
+      .map((response: Response) => <Sentiment[]>response.json())
+      .catch(
+        (error: any) => Observable.throw(error.json().error || 'Server error')
+      );
     //return this.sentiments;
   }
 

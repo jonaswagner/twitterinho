@@ -26,6 +26,7 @@ export class TwitterinhoChartComponent implements OnChanges {
   @Input()
   currentSentiment: Sentiment = new Sentiment();
   data: any;
+  options: any;
   msgs: Message[];
 
   constructor() {
@@ -39,10 +40,23 @@ export class TwitterinhoChartComponent implements OnChanges {
           label: 'First Dataset',
           data: [],
           fill: false,
-          borderColor: twitterblue
-        }
+          borderColor: twitterblue,
+        }],
 
-      ]
+
+    };
+    this.options = {
+      scales: {
+        yAxes: [{
+          display: true,
+          ticks: {
+            beginAtZero: true,
+            steps: 20,
+            stepValue: 0.05,
+            max: 1.0
+          }
+        }]
+      }
     }
   }
 
