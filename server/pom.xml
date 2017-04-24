@@ -71,6 +71,13 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.4.1</version>
         </dependency>
+
+        <!-- Apache Language Codes-->
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>1.20</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
