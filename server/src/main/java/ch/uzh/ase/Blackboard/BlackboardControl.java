@@ -54,6 +54,7 @@ public class BlackboardControl {
                 }
             }
 
+            //TODO jwa handle discarded tweets
         }
     }
 

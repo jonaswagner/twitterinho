@@ -8,6 +8,7 @@ import ch.uzh.ase.Util.Tweet;
 public interface IKS {
     public boolean execCondition(Tweet tweet);
     public void execAction(Tweet tweet);
+    public void updateBlackboard();
 
 }
 

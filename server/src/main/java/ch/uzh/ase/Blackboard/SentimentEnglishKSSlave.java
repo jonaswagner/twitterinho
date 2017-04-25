@@ -10,13 +10,16 @@ import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by jonas on 25.04.2017.
  */
-public class SentimentEnglishKSSlave implements IKSSlave {
+public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
+    private final LinkedBlockingQueue<Tweet> taskQueue= new LinkedBlockingQueue<>();
     private final IKSMaster master;
     private final StanfordCoreNLP pipeline;
 
@@ -30,30 +33,47 @@ public class SentimentEnglishKSSlave implements IKSSlave {
     }
 
     @Override
-    public void subservice(Tweet tweet2) {
-        String tweet = tweet2.getText();
+    public void run() {
+        while(true) { //TODO jwa implement this
 
-        int mainSentiment = 0;
-        if (tweet != null && tweet.length() > 0) {
-            int longest = 0;
-            Annotation annotation = pipeline.process(tweet);
-            for (CoreMap sentence : annotation
-                    .get(CoreAnnotations.SentencesAnnotation.class)) {
-                Tree tree = sentence
-                        .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                String partText = sentence.toString();
-                if (partText.length() > longest) {
-                    mainSentiment = sentiment;
-                    longest = partText.length();
+            Tweet nextTweet = taskQueue.poll();
+            String tweetText = nextTweet.getText();
+
+            int mainSentiment = 0;
+            if (tweetText != null && tweetText.length() > 0) {
+                int longest = 0;
+                Annotation annotation = pipeline.process(tweetText);
+                for (CoreMap sentence : annotation
+                        .get(CoreAnnotations.SentencesAnnotation.class)) {
+                    Tree tree = sentence
+                            .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
+                    int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
+                    String partText = sentence.toString();
+                    if (partText.length() > longest) {
+                        mainSentiment = sentiment;
+                        longest = partText.length();
+                    }
                 }
             }
+
+            long normalizedSentiment = Math.round(normalize(mainSentiment));
+            Sentiment definitiveSentiment = Sentiment.assignSentiment((int) normalizedSentiment);
+
+            nextTweet.setSentiment(definitiveSentiment);
+
+            master.reportResult(nextTweet);
         }
 
-        long normalizedSentiment = Math.round(normalize(mainSentiment));
-        Sentiment definitiveSentiment = Sentiment.assignSentiment((int) normalizedSentiment);
+    }
 
+    @Override
+    public void subservice(List<Tweet> tasks) {
 
+    }
+
+    @Override
+    public int getUncompletedTasks() {
+        return taskQueue.size();
     }
 
     //mapping of the sentiments (0-4) to a value between 0 and 1
@@ -63,4 +83,5 @@ public class SentimentEnglishKSSlave implements IKSSlave {
         double  normSentiment = (((double)sentiment-min)/(max-min));
         return normSentiment;
     }
+
 }

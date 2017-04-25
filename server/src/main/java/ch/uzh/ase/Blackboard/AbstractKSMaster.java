@@ -14,8 +14,4 @@ public abstract class AbstractKSMaster implements IKSMaster {
         this.blackboard = blackboard;
     }
 
-    //This method could also be added in the Blackboard Pattern, but to prevent duplicate code, it is only stated here.
-    public void updateBlackboard(Tweet tweet, TweetStatus tweetStatus) {
-        this.blackboard.changeTweetStatus(tweet, tweetStatus);
-    }
 }
