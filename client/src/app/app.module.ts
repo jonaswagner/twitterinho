@@ -4,11 +4,9 @@ import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 
 import {AppComponent} from './app.component';
-import {SchedulerModule} from "./component/scheduler/scheduler.module";
 import {SearchComponent} from "./component/search/search.component";
 import {SentimentDisplayComponent} from "./component/sentiment-display/sentiment-display.component";
 import {PerformanceDisplayComponent} from "./component/performance-display/performance-display.component";
-import {SearchService} from "./component/search/search.service";
 import {SentimentDisplayService} from "./component/sentiment-display/sentiment-display.service";
 import {PerformanceDisplayService} from "./component/performance-display/performance-display.service";
 import {ModalModule} from "ng2-bootstrap";
@@ -29,7 +27,6 @@ import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterin
     BrowserModule,
     FormsModule,
     HttpModule,
-    SchedulerModule,
     ModalModule,
     ChartModule,
     GrowlModule
