@@ -1,17 +1,21 @@
 package ch.uzh.ase.Blackboard;
 
-import java.util.List;
+import ch.uzh.ase.Util.Tweet;
+import ch.uzh.ase.Util.TweetStatus;
 
 /**
  * Created by jonas on 25.04.2017.
  */
-public abstract class AbstractKSMaster {
+public abstract class AbstractKSMaster implements IKSMaster {
 
-    //TODO jwa init slave list
-    private List<IKSSlave> slaveList;
-    private final Blackboard blackboard;
+    protected final Blackboard blackboard;
 
     public AbstractKSMaster(Blackboard blackboard) {
         this.blackboard = blackboard;
+    }
+
+    //This method could also be added in the Blackboard Pattern, but to prevent duplicate code, it is only stated here.
+    public void updateBlackboard(Tweet tweet, TweetStatus tweetStatus) {
+        this.blackboard.changeTweetStatus(tweet, tweetStatus);
     }
 }

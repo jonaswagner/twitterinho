@@ -13,6 +13,7 @@ import java.util.Map;
 public class BlackboardControl {
     //TODO jwa init this somewhere
     private final Blackboard blackboard;
+    //TODO jwa init IKSList
     private List<IKS> iksList;
     //TODO jwa implement DB stuff
     private boolean shutdown = false;
@@ -61,6 +62,11 @@ public class BlackboardControl {
      *
      * */
     private void nextSource(Tweet tweet) {
+
+        if (tweet.getIso() != null && tweet.getSentiment() != null) {
+            blackboard.changeTweetStatus(tweet, TweetStatus.FINISHED);
+            return;
+        }
 
         for (IKS ks : iksList) {
             if (ks.execCondition(tweet)) {

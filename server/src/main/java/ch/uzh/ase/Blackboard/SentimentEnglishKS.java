@@ -1,19 +1,31 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Util.Tweet;
-import com.neovisionaries.i18n.CountryCode;
+import com.neovisionaries.i18n.LanguageCode;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by jonas on 25.04.2017.
  */
-public class SentimentEnglishKS implements IKS, IKSMaster {
+public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMaster {
+
+    //TODO jwa init slave list
+    protected List<IKSSlave> slaveList;
+    private final ConcurrentLinkedQueue<Tweet> tweets;
+
+    public SentimentEnglishKS(Blackboard blackboard) {
+        super(blackboard);
+        this.tweets = new ConcurrentLinkedQueue<Tweet>();
+    }
+
     @Override
     public boolean execCondition(Tweet tweet) {
 
-        //TODO jwa clarify which country code is used for english
-        if (tweet.getIso() != null && (tweet.getIso() == CountryCode.GB || tweet.getIso() == CountryCode.US)) {
+        if (tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.en))) {
             return true;
         } else {
             return false;
@@ -22,7 +34,7 @@ public class SentimentEnglishKS implements IKS, IKSMaster {
 
     @Override
     public void execAction(Tweet tweet) {
-
+        tweets.add(tweet);
     }
 
     @Override
