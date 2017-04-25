@@ -1,6 +1,6 @@
 package ch.uzh.ase.Blackboard;
 
-import ch.uzh.ase.Util.ITweet;
+import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 
 import java.util.ArrayList;
@@ -29,10 +29,10 @@ public class BlackboardControl {
      * */
     private void inspectBlackboard() {
         while(!shutdown) {
-            Map<ITweet, TweetStatus> map = blackboard.getTweetMap();
-            List<ITweet> discardedTweets = new ArrayList<>();
+            Map<Tweet, TweetStatus> map = blackboard.getTweetMap();
+            List<Tweet> discardedTweets = new ArrayList<>();
 
-            for(Map.Entry<ITweet, TweetStatus> element : map.entrySet()) {
+            for(Map.Entry<Tweet, TweetStatus> element : map.entrySet()) {
 
                 switch (element.getValue()) {
 
@@ -57,10 +57,10 @@ public class BlackboardControl {
     }
 
     /**
-     * This method determines the next responsible {@link IKS}. If no {@link IKS} is able to process the {@link ITweet}, the tweet is discarded.
+     * This method determines the next responsible {@link IKS}. If no {@link IKS} is able to process the {@link Tweet}, the tweet is discarded.
      *
      * */
-    private void nextSource(ITweet tweet) {
+    private void nextSource(Tweet tweet) {
 
         for (IKS ks : iksList) {
             if (ks.execCondition(tweet)) {
