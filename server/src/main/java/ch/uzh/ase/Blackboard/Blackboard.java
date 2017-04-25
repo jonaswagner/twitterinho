@@ -3,6 +3,7 @@ package ch.uzh.ase.Blackboard;
 import ch.uzh.ase.Util.ITweet;
 import ch.uzh.ase.Util.TweetStatus;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +18,14 @@ public class Blackboard {
         return tweetMap;
     }
 
-    public void setTweetMap(Map<ITweet, TweetStatus> tweetMap) {
-        this.tweetMap = tweetMap;
+    public synchronized void changeTweetStatus(ITweet tweet, TweetStatus status) {
+        tweetMap.put(tweet, status);
+    }
+
+    public synchronized void removeTweet(List<ITweet> tweetList) {
+        for (ITweet tweet: tweetList) {
+            tweetMap.remove(tweet);
+        }
     }
 }
+

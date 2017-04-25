@@ -16,3 +16,4 @@ public interface ITweet {
     public Sentiment getSentiment();
     public void setSentiment(Sentiment sentiment);
 }
+
