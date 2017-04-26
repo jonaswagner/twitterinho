@@ -58,13 +58,8 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
                     }
                 }
 
-                long normalizedSentiment = Math.round(normalize(mainSentiment));
-                Sentiment definitiveSentiment = Sentiment.assignSentiment((int) normalizedSentiment);
-
-                nextTweet.setSentiment(definitiveSentiment);
-
-                System.out.println("Another one bites the dust! " + nextTweet.getText());
-
+                nextTweet.setSentimentScore(normalize(mainSentiment));
+                System.out.println(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
                 master.reportResult(nextTweet);
             }
         }

@@ -3,6 +3,8 @@ package ch.uzh.ase.Blackboard;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,5 +42,15 @@ public class Blackboard {
         return shutdown;
     }
 
+    public List<Tweet> removeAndPassFinishedTweets() {
+        List<Tweet> finishedTweets = new ArrayList<>();
+        for (Map.Entry<Tweet, TweetStatus> element : tweetMap.entrySet()) {
+            if (element.getValue()==TweetStatus.FINISHED) {
+                removeTweet(Arrays.asList(element.getKey()));
+                finishedTweets.add(element.getKey());
+            }
+        }
+        return finishedTweets;
+    }
 }
 

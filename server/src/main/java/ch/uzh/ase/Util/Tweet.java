@@ -13,10 +13,10 @@ import java.util.Random;
 public class Tweet {
 
     public static final String TEST_SEARCH_TERM = "1234";
-    private static final Random RAND = new Random(DateTime.now().getMillisOfDay());
+    public static final double INIT_SENTIMENT_SCORE = -1d;
 
     private LanguageCode iso = null;
-    private Sentiment sentiment = null;
+    private double sentimentScore = INIT_SENTIMENT_SCORE;
     private String text = null;
     private String author = null;
     private DateTime date = null;
@@ -69,28 +69,12 @@ public class Tweet {
         this.iso = iso;
     }
 
-    public Sentiment getSentiment() {
-        return this.sentiment;
+    public double getSentimentScore() {
+        return sentimentScore;
     }
 
-    public void setSentiment(Sentiment sentiment) {
-        this.sentiment = sentiment;
-    }
-
-
-    public static List<Tweet> generateTweets(int numberOfTweets) throws IllegalArgumentException {
-
-        if (numberOfTweets < 1 || numberOfTweets > 100000) {
-            throw new IllegalArgumentException("Tweet generator can only generate tweets between 1 and 100000");
-        }
-
-        List<Tweet> tweetList = new ArrayList<>(numberOfTweets);
-
-        for (int i = 0; i<numberOfTweets; i++) {
-            tweetList.add(Sentiment.generateTweet(Sentiment.assignSentiment(RAND.nextInt(5))));
-        }
-
-        return tweetList;
+    public void setSentimentScore(double sentimentScore) {
+        this.sentimentScore = sentimentScore;
     }
 }
 

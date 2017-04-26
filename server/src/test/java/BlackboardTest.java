@@ -1,4 +1,5 @@
 import ch.uzh.ase.Blackboard.Blackboard;
+import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 import org.junit.After;
@@ -23,7 +24,7 @@ public class BlackboardTest {
 
     @Before
     public void before(){
-        List<Tweet> newTweets = Tweet.generateTweets(INITIAL_NUMBER_OF_TWEETS);
+        List<Tweet> newTweets = Sentiment.generateTweets(INITIAL_NUMBER_OF_TWEETS);
 
         for (Tweet tweet : newTweets) {
             blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
@@ -39,7 +40,7 @@ public class BlackboardTest {
     public void blackboardTest() {
 
         Assert.assertEquals(INITIAL_NUMBER_OF_TWEETS, blackboard.getTweetMap().size());
-        List<Tweet> testTweets = Tweet.generateTweets(20);
+        List<Tweet> testTweets = Sentiment.generateTweets(20);
         Map<Tweet, TweetStatus> testTweetStatusMap = new ConcurrentHashMap<>();
         for (Tweet tweet : testTweets) {
             testTweetStatusMap.put(tweet, TweetStatus.NEW);
@@ -47,7 +48,7 @@ public class BlackboardTest {
         blackboard.addNewTweets(testTweetStatusMap);
         Assert.assertEquals(ADDITIONAL_NUMBER_OF_TWEETS + INITIAL_NUMBER_OF_TWEETS, blackboard.getTweetMap().size());
 
-        Tweet testTweet = Tweet.generateTweets(1).get(0);
+        Tweet testTweet = Sentiment.generateTweets(1).get(0);
         blackboard.addNewTweet(testTweet, TweetStatus.EVALUATED);
         Assert.assertEquals(blackboard.getTweetMap().get(testTweet), TweetStatus.EVALUATED);
 

@@ -69,7 +69,7 @@ public class BlackboardControl extends Thread {
      */
     private void nextSource(Tweet tweet) {
 
-        if (tweet.getIso() != null && tweet.getSentiment() != null) {
+        if (tweet.getIso() != null && tweet.getSentimentScore() != Tweet.INIT_SENTIMENT_SCORE) {
             blackboard.changeTweetStatus(tweet, TweetStatus.FINISHED);
             return;
         }

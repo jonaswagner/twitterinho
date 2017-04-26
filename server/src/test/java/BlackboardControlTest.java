@@ -2,6 +2,7 @@ import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Blackboard.BlackboardControl;
 import ch.uzh.ase.Blackboard.IKS;
 import ch.uzh.ase.Blackboard.SentimentEnglishKS;
+import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 import com.neovisionaries.i18n.LanguageCode;
@@ -25,7 +26,7 @@ public class BlackboardControlTest {
 
     @Before
     public void before(){
-        List<Tweet> newTweets = Tweet.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
+        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
 
         for (Tweet tweet : newTweets) {
             tweet.setIso(LanguageCode.en);
@@ -40,6 +41,7 @@ public class BlackboardControlTest {
     @After
     public void after() {
         blackboard.getTweetMap().clear();
+
     }
 
     @Test
