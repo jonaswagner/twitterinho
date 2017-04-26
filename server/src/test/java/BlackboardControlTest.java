@@ -59,6 +59,12 @@ public class BlackboardControlTest {
         while (blackboard.getTweetMap().containsValue(TweetStatus.NEW) || blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED)) {
             //wait
         }
+        Assert.assertTrue(blackboard.getTweetMap().containsValue(TweetStatus.EVALUATED) || blackboard.getTweetMap().containsValue(TweetStatus.FINISHED));
+        Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.NEW));
+        Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));
+        Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.STOPPED));
+
+        //TODO jwa shutdown slaves!
 
         System.out.println("Test Finished");
     }

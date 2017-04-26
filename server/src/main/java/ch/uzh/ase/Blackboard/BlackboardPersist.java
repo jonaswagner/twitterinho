@@ -14,7 +14,6 @@ public class BlackboardPersist extends Thread {
     @Override
     public void run() {
         while(!Blackboard.isShutdown()) {
-
         }
     }
 
