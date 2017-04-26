@@ -1,10 +1,10 @@
 {
   "/api": {
-    "target": "http://twitterinho-uzh.azurewebsites.net/",
+    "target": "http://twitterinho2.azurewebsites.net/",
     "secure": false
   },
   "/twt": {
-    "target": "http://twitterinho-uzh.azurewebsites.net/",
+    "target": "http://twitterinho2.azurewebsites.net/",
     "secure": false
   }
 }

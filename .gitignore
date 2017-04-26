@@ -17,5 +17,3 @@ mvc/target/*
 server/target/*
 *.iml
 _mvc/*
-*.txt
-!/server/
