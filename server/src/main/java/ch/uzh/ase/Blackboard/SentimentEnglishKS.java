@@ -1,5 +1,6 @@
 package ch.uzh.ase.Blackboard;
 
+import ch.uzh.ase.Monitoring.IWorkloadObserver;
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
@@ -93,6 +94,7 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     public void service() {
         splitWork();
         updateBlackboard();
+
     }
 
     @Override

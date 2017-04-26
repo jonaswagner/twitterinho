@@ -1,5 +1,6 @@
 package ch.uzh.ase.Blackboard;
 
+import ch.uzh.ase.Monitoring.IWorkloadObserver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 
@@ -9,9 +10,11 @@ import ch.uzh.ase.Util.TweetStatus;
 public abstract class AbstractKSMaster extends Thread implements IKSMaster {
 
     protected final Blackboard blackboard;
+    protected final IWorkloadObserver observer;
 
-    public AbstractKSMaster(Blackboard blackboard) {
+    public AbstractKSMaster(Blackboard blackboard, IWorkloadObserver observer) {
         this.blackboard = blackboard;
+        this.observer = observer;
     }
 
     @Override

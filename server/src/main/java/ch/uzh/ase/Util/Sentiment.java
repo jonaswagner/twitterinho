@@ -9,6 +9,8 @@ import java.util.Random;
 /**
  * Created by jonas on 24.04.2017.
  */
+
+//TODO jwa RENAME THIS CLASS BECAUSE OF DUPLICATE CLASS NAME
 public enum Sentiment {
     FULLY_NEGATIVE, NEGATIVE, NEUTRAL, POSITIVE, FULLY_POSITIVE;
 
