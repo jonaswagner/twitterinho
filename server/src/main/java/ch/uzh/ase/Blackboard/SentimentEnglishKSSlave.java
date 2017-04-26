@@ -60,7 +60,7 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
                 nextTweet.setSentimentScore(normalize(mainSentiment));
                 //TODO jwa delete this if not needed anymore
-                //System.out.println(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
+                System.out.println(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
                 master.reportResult(nextTweet);
             }
         }

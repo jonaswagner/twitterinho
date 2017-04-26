@@ -20,8 +20,8 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
 
-    public SentimentEnglishKS(Blackboard blackboard) {
-        super(blackboard);
+    public SentimentEnglishKS(Blackboard blackboard, IWorkloadObserver observer) {
+        super(blackboard, observer);
         this.untreatedTweets = new ConcurrentLinkedQueue<Tweet>();
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
 

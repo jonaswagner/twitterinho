@@ -38,6 +38,7 @@ public class Blackboard {
     public void addNewTweet(Tweet tweet, TweetStatus status) {
         tweetMap.put(tweet, status);
     }
+
     public static boolean isShutdown() {
         return shutdown;
     }

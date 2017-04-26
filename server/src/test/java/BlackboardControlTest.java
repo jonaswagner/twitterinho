@@ -2,6 +2,9 @@ import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Blackboard.BlackboardControl;
 import ch.uzh.ase.Blackboard.IKS;
 import ch.uzh.ase.Blackboard.SentimentEnglishKS;
+import ch.uzh.ase.Monitoring.IWorkloadObserver;
+import ch.uzh.ase.Monitoring.IWorkloadSubject;
+import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
@@ -20,6 +23,7 @@ import java.util.List;
 public class BlackboardControlTest {
 
     private final Blackboard blackboard = new Blackboard();
+    private final IWorkloadObserver observer = new WorkloadObserver(null); //FIXME PLS!
     private BlackboardControl blackboardControl;
     private SentimentEnglishKS sentimentEnglishKS;
     private final List<IKS> iksList = new ArrayList<IKS>();
@@ -33,7 +37,7 @@ public class BlackboardControlTest {
             blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
         }
 
-        sentimentEnglishKS = new SentimentEnglishKS(blackboard);
+        sentimentEnglishKS = new SentimentEnglishKS(blackboard, observer);
         iksList.add(sentimentEnglishKS);
         blackboardControl = new BlackboardControl(blackboard, iksList);
     }
