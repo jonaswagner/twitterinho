@@ -11,6 +11,6 @@ public interface IWorkloadSubject {
 
     //TODO jwa report Workload
     public void generateSlaves(int numberOfSlaves);
-    public void shutdownSlaves(int numberOfSlaves);
+    public void shutdownSlavesGracefully(int numberOfSlaves);
     public IKSSlave getLeastBusySlave() throws Exception;
 }

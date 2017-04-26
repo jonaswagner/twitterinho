@@ -8,7 +8,6 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by jonas on 25.04.2017.
@@ -19,7 +18,6 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     private final List<SentimentEnglishKSSlave> slaveList;
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
-    private boolean shutdown = false;
 
     public SentimentEnglishKS(Blackboard blackboard) {
         super(blackboard);
@@ -55,7 +53,7 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
                     this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
                 }
             } else {
-                for (int i = 0; i<100; i++) {
+                for (int i = 0; i < 100; i++) {
                     this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
                 }
             }
@@ -80,13 +78,21 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     }
 
     @Override
-    public void service() {
-        while (!shutdown) { //TODO jwa implement correct shutdown procedure
-            splitWork();
-            updateBlackboard();
+    public void run() {
+        super.run();
+        shutdownSlaves();
+    }
+
+    private void shutdownSlaves() {
+        for (IKSSlave slave : slaveList) {
+            slave.kill();
         }
-        //TODO jwa implement this
-        //alternate between splitwork and updateBlackboard
+    }
+
+    @Override
+    public void service() {
+        splitWork();
+        updateBlackboard();
     }
 
     @Override
@@ -104,9 +110,15 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     }
 
     @Override
-    public void shutdownSlaves(int numberOfSlaves) {
-        //TODO jwa implement this
-        // the master should not have less than two slaves
+    public void shutdownSlavesGracefully(int numberOfSlaves) {
+        for (int i=0; i<numberOfSlaves; i++) {
+            IKSSlave shutdownSlave = getLeastBusySlave();
+            slaveList.remove(shutdownSlave);
+            while (shutdownSlave.getUncompletedTasks()>0) {
+                //wait
+            }
+            shutdownSlave.kill();
+        }
     }
 
     @Override
@@ -120,5 +132,13 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
         }
 
         return (SentimentEnglishKSSlave) leastBusy;
+    }
+
+    public ConcurrentLinkedQueue<Tweet> getUntreatedTweets() {
+        return untreatedTweets;
+    }
+
+    public ConcurrentLinkedQueue<Tweet> getTreatedTweets() {
+        return treatedTweets;
     }
 }

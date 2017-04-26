@@ -19,9 +19,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
-    private final LinkedBlockingQueue<Tweet> taskQueue= new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
     private final IKSMaster master;
     private final StanfordCoreNLP pipeline;
+    public static volatile boolean shutdown = false;
 
     public SentimentEnglishKSSlave(IKSMaster master) {
         this.master = master;
@@ -34,41 +35,50 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
     @Override
     public void run() {
-        while(true) { //TODO jwa implement this
+        while (!shutdown) { //TODO jwa implement this
 
             Tweet nextTweet = taskQueue.poll();
-            String tweetText = nextTweet.getText();
+            if (nextTweet != null) {
+                String tweetText = nextTweet.getText();
 
-            int mainSentiment = 0;
-            if (tweetText != null && tweetText.length() > 0) {
-                int longest = 0;
-                Annotation annotation = pipeline.process(tweetText);
-                for (CoreMap sentence : annotation
-                        .get(CoreAnnotations.SentencesAnnotation.class)) {
-                    Tree tree = sentence
-                            .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                    int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                    String partText = sentence.toString();
-                    if (partText.length() > longest) {
-                        mainSentiment = sentiment;
-                        longest = partText.length();
+                int mainSentiment = 0;
+                if (tweetText != null && tweetText.length() > 0) {
+                    int longest = 0;
+                    Annotation annotation = pipeline.process(tweetText);
+                    for (CoreMap sentence : annotation
+                            .get(CoreAnnotations.SentencesAnnotation.class)) {
+                        Tree tree = sentence
+                                .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
+                        int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
+                        String partText = sentence.toString();
+                        if (partText.length() > longest) {
+                            mainSentiment = sentiment;
+                            longest = partText.length();
+                        }
                     }
                 }
+
+                long normalizedSentiment = Math.round(normalize(mainSentiment));
+                Sentiment definitiveSentiment = Sentiment.assignSentiment((int) normalizedSentiment);
+
+                nextTweet.setSentiment(definitiveSentiment);
+
+                System.out.println("Another one bites the dust! " + nextTweet.getText());
+
+                master.reportResult(nextTweet);
             }
-
-            long normalizedSentiment = Math.round(normalize(mainSentiment));
-            Sentiment definitiveSentiment = Sentiment.assignSentiment((int) normalizedSentiment);
-
-            nextTweet.setSentiment(definitiveSentiment);
-
-            master.reportResult(nextTweet);
         }
 
     }
 
     @Override
-    public void subservice(List<Tweet> tasks) {
+    public void kill(){
+        this.shutdown = true;
+    }
 
+    @Override
+    public void subservice(List<Tweet> tasks) {
+        taskQueue.addAll(tasks);
     }
 
     @Override
@@ -77,10 +87,10 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
     }
 
     //mapping of the sentiments (0-4) to a value between 0 and 1
-    private double normalize(int sentiment){
+    private double normalize(int sentiment) {
         double min = 0.0;
         double max = 4.0;
-        double  normSentiment = (((double)sentiment-min)/(max-min));
+        double normSentiment = (((double) sentiment - min) / (max - min));
         return normSentiment;
     }
 

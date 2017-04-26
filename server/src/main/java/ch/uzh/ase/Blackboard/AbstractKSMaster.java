@@ -6,7 +6,7 @@ import ch.uzh.ase.Util.TweetStatus;
 /**
  * Created by jonas on 25.04.2017.
  */
-public abstract class AbstractKSMaster implements IKSMaster {
+public abstract class AbstractKSMaster extends Thread implements IKSMaster {
 
     protected final Blackboard blackboard;
 
@@ -14,4 +14,11 @@ public abstract class AbstractKSMaster implements IKSMaster {
         this.blackboard = blackboard;
     }
 
+    @Override
+    public void run() {
+        while (!blackboard.isShutdown()) {
+            service();
+        }
+
+    }
 }

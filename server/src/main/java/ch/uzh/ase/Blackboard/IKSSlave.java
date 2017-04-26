@@ -12,4 +12,5 @@ public interface IKSSlave {
 
     public void subservice(List<Tweet> task);
     public int getUncompletedTasks();
+    public void kill();
 }

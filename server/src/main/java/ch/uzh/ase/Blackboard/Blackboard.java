@@ -11,8 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by jonas on 24.04.2017.
  */
 public class Blackboard {
+        public static volatile boolean shutdown = false;
 
-    private Map<Tweet, TweetStatus> tweetMap = new ConcurrentHashMap<Tweet, TweetStatus>();
+    private final Map<Tweet, TweetStatus> tweetMap = new ConcurrentHashMap<Tweet, TweetStatus>();
 
     public Map<Tweet, TweetStatus> getTweetMap() {
         return tweetMap;
@@ -27,5 +28,17 @@ public class Blackboard {
             tweetMap.remove(tweet);
         }
     }
+
+    public void addNewTweets(Map<Tweet, TweetStatus> tweets) {
+        tweetMap.putAll(tweets);
+    }
+
+    public void addNewTweet(Tweet tweet, TweetStatus status) {
+        tweetMap.put(tweet, status);
+    }
+    public static boolean isShutdown() {
+        return shutdown;
+    }
+
 }
 
