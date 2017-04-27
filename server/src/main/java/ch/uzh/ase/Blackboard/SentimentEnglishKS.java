@@ -1,10 +1,13 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.IWorkloadObserver;
-import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import ch.uzh.ase.Util.Workload;
 import com.neovisionaries.i18n.LanguageCode;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +16,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Created by jonas on 25.04.2017.
  */
-public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMaster, IWorkloadSubject {
+public class SentimentEnglishKS extends AbstractKSMaster {
 
     //TODO jwa check lifecycle of slaves
     private final List<SentimentEnglishKSSlave> slaveList;
+    private static final Logger LOG = LoggerFactory.getLogger(SentimentEnglishKS.class);
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
+    private long tweetCount = 0;
 
     public SentimentEnglishKS(Blackboard blackboard, IWorkloadObserver observer) {
         super(blackboard, observer);
@@ -26,7 +31,7 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
 
         this.slaveList = new ArrayList<>();
-        generateSlaves(IKSMaster.DEFAULT_NUMBER_OF_SLAVES);
+        generateSlaves(AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES);
     }
 
     @Override
@@ -40,42 +45,46 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     }
 
     @Override
-    public void execAction(Tweet tweet) {
+    public synchronized void execAction(Tweet tweet) {
         untreatedTweets.add(tweet);
     }
 
     @Override
     public void updateBlackboard() {
+        //LOG.info("Blackboard update started");
         if (treatedTweets.size() == 0) {
             return;
         } else {
-            if (treatedTweets.size() < 100) { //TODO jwa remove this magic number
+            if (treatedTweets.size() < DEFAULT_TWEET_CHUNK_SIZE) {
                 for (int i = 0; i < treatedTweets.size(); i++) {
                     this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
                 }
             } else {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < DEFAULT_TWEET_CHUNK_SIZE; i++) {
                     this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
                 }
             }
         }
+        //LOG.info("Blackboard update finished");
     }
 
     @Override
     public void splitWork() {
         //TODO jwa implement this
 
-        final List<Tweet> assignedTweets = new ArrayList(100);
+        //LOG.info("splitwork started");
+        final List<Tweet> assignedTweets = new ArrayList(DEFAULT_TWEET_CHUNK_SIZE);
         if (untreatedTweets.size() == 0) {
             return;
         } else {
-            while (untreatedTweets.size() != 0 && assignedTweets.size() != 100) { //TODO jwa Remove these magic numbers
+            while (untreatedTweets.size() != 0 && assignedTweets.size() != DEFAULT_TWEET_CHUNK_SIZE) {
                 assignedTweets.add(untreatedTweets.poll());
             }
 
             SentimentEnglishKSSlave leastBusySlave = getLeastBusySlave();
             leastBusySlave.subservice(assignedTweets);
         }
+        //LOG.info("splitwork finished");
     }
 
     @Override
@@ -84,6 +93,16 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
         shutdownSlaves();
     }
 
+    //TODO jwa this method might not be needed
+    @Override
+    public Workload reportWorkload() {
+        return createWorkload();
+    }
+
+    /**
+     * This is a hard shutdown of all slaves. Use with caution.
+     * If the corresponding slaves hold tweets, those tweets may be lost or end in a deadlock.
+     */
     private void shutdownSlaves() {
         for (IKSSlave slave : slaveList) {
             slave.kill();
@@ -94,12 +113,32 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
     public void service() {
         splitWork();
         updateBlackboard();
+        observer.notify(createWorkload(), this);
+    }
 
+    private Workload createWorkload() {
+        Workload current = new Workload();
+        current.setTimestamp(DateTime.now());
+        current.setTweetCount(tweetCount);
+        tweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        current.setNumberOfSlaves(slaveList.size());
+        current.setNumberOfNonCompletedTasksOnMaster(untreatedTweets.size());
+        current.setAvgSlaveLoad(calcAvgSlaveLoad());
+        return current;
+    }
+
+    private long calcAvgSlaveLoad() {
+        double rawNumberOfUncompletedTasks = 0;
+        for (IKSSlave slave : slaveList) {
+            rawNumberOfUncompletedTasks += slave.getUncompletedTasks();
+        }
+        return Math.round(rawNumberOfUncompletedTasks / (double) slaveList.size());
     }
 
     @Override
     public synchronized void reportResult(Tweet tweet) {
         this.treatedTweets.add(tweet);
+        tweetCount++;
     }
 
     public void generateSlaves(int numberOfSlaves) {
@@ -108,15 +147,18 @@ public class SentimentEnglishKS extends AbstractKSMaster implements IKS, IKSMast
             SentimentEnglishKSSlave slave = new SentimentEnglishKSSlave(this);
             slave.start();
             slaveList.add(slave);
+            LOG.warn("new slave has been generated and added to the slaveList");
         }
     }
 
+    //TODO jwa this might not be needed
     @Override
     public void shutdownSlavesGracefully(int numberOfSlaves) {
-        for (int i=0; i<numberOfSlaves; i++) {
+        for (int i = 0; i < numberOfSlaves; i++) {
+            LOG.warn("graceful shutdown of slave initiated!");
             IKSSlave shutdownSlave = getLeastBusySlave();
             slaveList.remove(shutdownSlave);
-            while (shutdownSlave.getUncompletedTasks()>0) {
+            while (shutdownSlave.getUncompletedTasks() > 0) {
                 //wait
             }
             shutdownSlave.kill();

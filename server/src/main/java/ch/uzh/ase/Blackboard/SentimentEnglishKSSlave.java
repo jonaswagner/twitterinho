@@ -1,6 +1,5 @@
 package ch.uzh.ase.Blackboard;
 
-import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -9,6 +8,9 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
@@ -20,11 +22,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
-    private final IKSMaster master;
+    private final AbstractKSMaster master;
     private final StanfordCoreNLP pipeline;
     public static volatile boolean shutdown = false;
+    private static final Logger LOG = LoggerFactory.getLogger(SentimentEnglishKSSlave.class);
 
-    public SentimentEnglishKSSlave(IKSMaster master) {
+    public SentimentEnglishKSSlave(AbstractKSMaster master) {
         this.master = master;
 
         //these properties are needed specify the NLP process
@@ -35,50 +38,68 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
     @Override
     public void run() {
-        while (!shutdown) { //TODO jwa implement this
+        while (!shutdown) {
 
             Tweet nextTweet = taskQueue.poll();
             if (nextTweet != null) {
-                String tweetText = nextTweet.getText();
 
-                int mainSentiment = 0;
-                if (tweetText != null && tweetText.length() > 0) {
-                    int longest = 0;
-                    Annotation annotation = pipeline.process(tweetText);
-                    for (CoreMap sentence : annotation
-                            .get(CoreAnnotations.SentencesAnnotation.class)) {
-                        Tree tree = sentence
-                                .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                        int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                        String partText = sentence.toString();
-                        if (partText.length() > longest) {
-                            mainSentiment = sentiment;
-                            longest = partText.length();
-                        }
-                    }
-                }
+                nextTweet.setStartSentimentAnalysis(DateTime.now());
+                detectSentiment(nextTweet);
+                nextTweet.setEndSentimentAnalysis(DateTime.now());
 
-                nextTweet.setSentimentScore(normalize(mainSentiment));
-                //TODO jwa delete this if not needed anymore
-                System.out.println(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
+                LOG.debug(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
                 master.reportResult(nextTweet);
             }
         }
 
+        if (!taskQueue.isEmpty()) {
+            int taskQueueSize = taskQueue.size();
+            for (Tweet tweet: taskQueue){
+                master.execAction(tweet);
+            }
+            LOG.debug(taskQueueSize + "remaining tasks have been put back to the master!");
+            LOG.debug("This thread will now shutdown");
+        }
+
+    }
+
+    private void detectSentiment(Tweet nextTweet) {
+        String tweetText = nextTweet.getText();
+
+        int mainSentiment = 0;
+        if (tweetText != null && tweetText.length() > 0) {
+            int longest = 0;
+            Annotation annotation = pipeline.process(tweetText);
+            for (CoreMap sentence : annotation
+                    .get(CoreAnnotations.SentencesAnnotation.class)) {
+                Tree tree = sentence
+                        .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
+                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
+                String partText = sentence.toString();
+                if (partText.length() > longest) {
+                    mainSentiment = sentiment;
+                    longest = partText.length();
+                }
+            }
+        }
+        nextTweet.setSentimentScore(normalize(mainSentiment));
     }
 
     @Override
     public void kill(){
+        LOG.warn("Slave shutdown initiated!");
         this.shutdown = true;
     }
 
     @Override
     public void subservice(List<Tweet> tasks) {
+        //LOG.info(tasks.size() + " new tasks added to the taskList");
         taskQueue.addAll(tasks);
     }
 
     @Override
     public int getUncompletedTasks() {
+        //LOG.info("This thread has " + taskQueue.size() + " unfinished tasks");
         return taskQueue.size();
     }
 

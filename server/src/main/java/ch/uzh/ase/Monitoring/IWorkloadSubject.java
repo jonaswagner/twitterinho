@@ -1,6 +1,7 @@
 package ch.uzh.ase.Monitoring;
 
 import ch.uzh.ase.Blackboard.IKSSlave;
+import ch.uzh.ase.Util.Workload;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 public interface IWorkloadSubject {
 
     //TODO jwa report Workload
+    public Workload reportWorkload();
     public void generateSlaves(int numberOfSlaves);
     public void shutdownSlavesGracefully(int numberOfSlaves);
     public IKSSlave getLeastBusySlave() throws Exception;
