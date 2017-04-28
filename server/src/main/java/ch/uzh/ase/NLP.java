@@ -16,7 +16,6 @@ public class NLP {
     static StanfordCoreNLP pipeline;
 
     public static void init() {
-        //pipeline = new StanfordCoreNLP("main/java/ch/uzh/ase/MyPropFile.properties");
         Properties properties = new Properties();
         properties.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
         pipeline = new StanfordCoreNLP(properties);
