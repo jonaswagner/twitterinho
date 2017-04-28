@@ -15,4 +15,5 @@ public interface IWorkloadSubject {
     public void generateSlaves(int numberOfSlaves);
     public void shutdownSlavesGracefully(int numberOfSlaves);
     public IKSSlave getLeastBusySlave() throws Exception;
+    public int getNumberOfSlaves();
 }

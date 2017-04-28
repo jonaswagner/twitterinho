@@ -7,7 +7,10 @@ package ch.uzh.ase.Monitoring;
  */
 public class DefaultPerformanceConfiguration {
 
-    //TODO jwa this might be adequate somewhere else
-    public static int tweetsPerQueueThreshhold = 1000;
+    public static final long LOAD_THRESHHOLD = 1000;
+    public static final double RESOURCE_GENERATION_FACTOR = 1.5d;
+    public static final double RESOURCE_RELEASE_FACTOR = 1.5d;
+    public static final int DEFAULT_SLAVE_THRESHHOLD = 30;
+
 
 }

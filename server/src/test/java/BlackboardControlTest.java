@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,7 +34,7 @@ public class BlackboardControlTest {
     public void before(){
 
 
-        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*1000);
+        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*100);
 
         for (Tweet tweet : newTweets) {
             tweet.setIso(LanguageCode.en);
@@ -46,6 +45,7 @@ public class BlackboardControlTest {
         observer.start();
         sentimentEnglishKS = new SentimentEnglishKS(blackboard, observer);
         iksList.add(sentimentEnglishKS);
+        sentimentEnglishKS.start();
         blackboardControl = new BlackboardControl(blackboard, iksList);
 
     }
@@ -59,21 +59,38 @@ public class BlackboardControlTest {
     @Test
     public void blackboardControlTest() throws InterruptedException {
         ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        rootLogger.setLevel(Level.toLevel(Level.WARN.levelInt));
+        rootLogger.setLevel(Level.toLevel(Level.DEBUG.levelInt));
 
         blackboardControl.start();
         Thread.sleep(1000);
         Assert.assertTrue(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));
-        SentimentEnglishKS testKS = (SentimentEnglishKS) iksList.get(0);
-        Assert.assertTrue(testKS.getUntreatedTweets().size()>0);
-        testKS.start();
-        testKS.generateSlaves(8);
-        Thread.sleep(1000);
+
+        //SentimentEnglishKS testKS = (SentimentEnglishKS) iksList.get(0);
+        //Assert.assertTrue(testKS.getUntreatedTweets().size()>0);
+        //testKS.start();
+        //testKS.generateSlaves(8);
+
+        for (int i = 0; i<4; i++) {
+            Thread.sleep(10000);
+            List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*100);
+
+            for (Tweet tweet : newTweets) {
+                tweet.setIso(LanguageCode.en);
+                blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
+            }
+        }
+
+
+
 //        Assert.assertTrue(testKS.getUntreatedTweets().size()==0);
 
+        //Thread.sleep(1000);
         while (blackboard.getTweetMap().containsValue(TweetStatus.NEW) || blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED)) {
             //wait
         }
+
+        this.hashCode();
+
         Assert.assertTrue(blackboard.getTweetMap().containsValue(TweetStatus.EVALUATED) || blackboard.getTweetMap().containsValue(TweetStatus.FINISHED));
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.NEW));
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));

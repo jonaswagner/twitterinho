@@ -20,12 +20,12 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     public AbstractKSMaster(Blackboard blackboard, IWorkloadObserver observer) {
         this.blackboard = blackboard;
         this.observer = observer;
-        observer.register(this);
     }
 
     @Override
     public void run() {
         while (!blackboard.isShutdown()) {
+            splitWork();
             service();
         }
     }

@@ -47,7 +47,7 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
                 detectSentiment(nextTweet);
                 nextTweet.setEndSentimentAnalysis(DateTime.now());
 
-                LOG.debug(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
+                //LOG.debug(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
                 master.reportResult(nextTweet);
             }
         }

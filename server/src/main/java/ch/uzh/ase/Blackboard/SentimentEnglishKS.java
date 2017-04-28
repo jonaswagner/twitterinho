@@ -32,6 +32,8 @@ public class SentimentEnglishKS extends AbstractKSMaster {
 
         this.slaveList = new ArrayList<>();
         generateSlaves(AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES);
+
+        observer.register(this);
     }
 
     @Override
@@ -113,7 +115,6 @@ public class SentimentEnglishKS extends AbstractKSMaster {
     public void service() {
         splitWork();
         updateBlackboard();
-        observer.notify(createWorkload(), this);
     }
 
     private Workload createWorkload() {
@@ -176,6 +177,11 @@ public class SentimentEnglishKS extends AbstractKSMaster {
         }
 
         return (SentimentEnglishKSSlave) leastBusy;
+    }
+
+    @Override
+    public int getNumberOfSlaves() {
+        return slaveList.size();
     }
 
     public ConcurrentLinkedQueue<Tweet> getUntreatedTweets() {
