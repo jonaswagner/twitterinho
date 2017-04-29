@@ -10,7 +10,7 @@ import java.util.List;
 public interface IKSSlave {
     public static final String NLP_ANNOTATORS = "tokenize, ssplit, parse, sentiment";
 
-    public void subservice(List<Tweet> task);
+    public void subservice(List<Tweet> tasks);
     public int getUncompletedTasks();
     public void kill();
 }

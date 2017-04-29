@@ -1,6 +1,7 @@
 package ch.uzh.ase;
 
 
+import ch.uzh.ase.controller.MainController;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,9 @@ public class Application {
             LOG.info(prop.getProperty("database"));
 
             database = new DB();
+
+            MainController mainController = new MainController();
+            mainController.addNewSentiment("Theresa May");
 
         } catch (IOException ex) {
             ex.printStackTrace();

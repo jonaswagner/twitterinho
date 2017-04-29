@@ -2,6 +2,9 @@
 package ch.uzh.ase.controller;
 
 import ch.uzh.ase.NLP;
+import ch.uzh.ase.TweetRetrieval.StreamRegistry;
+import ch.uzh.ase.TweetRetrieval.TweetManager;
+import ch.uzh.ase.TweetRetrieval.TweetStream;
 import ch.uzh.ase.domain.Sentiment;
 import ch.uzh.ase.repository.SentimentRepository;
 import org.json.JSONObject;
@@ -53,15 +56,23 @@ public class MainController {
 
 
     @RequestMapping(value = "/twt/sentiment", method = RequestMethod.POST)
-    public ResponseEntity<Sentiment> addNewSentiment(@RequestBody String sentiment){
-        System.out.println(sentiment);
-        JSONObject obj = new JSONObject(sentiment);
+    public ResponseEntity<Sentiment> addNewSentiment(@RequestBody String searchId){
+        System.out.println(searchId);
+        JSONObject obj = new JSONObject(searchId);
         String sentimentName = obj.getString("sentiment");
+
+
+        TweetStream tweetStream = new TweetStream();
+        StreamRegistry.getInstance().register(searchId, tweetStream);
+        tweetStream.startStream(searchId);
+
+
+
 
         Sentiment s = new Sentiment(sentimentName);
 
 
-        ArrayList<String> tweets = TweetManager.getTweets(sentiment);
+        ArrayList<String> tweets = TweetManager.getTweets(searchId);
         NLP.init();
 
         List<Double> sentimentValues = new ArrayList<>();
@@ -70,6 +81,9 @@ public class MainController {
             sentimentValues.add(sentimentValue);
         }
         s.setValues(sentimentValues);
+
+
+
 
 //        s.setValues(createDummyValues());
         return new ResponseEntity<Sentiment>(s, HttpStatus.CREATED);

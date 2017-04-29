@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * Created by flaviokeller on 28.03.17.
  */
+@Deprecated
 @Entity
 public class Sentiment {
     public Long getId() {

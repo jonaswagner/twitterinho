@@ -1,12 +1,17 @@
 package ch.uzh.ase.TweetRetrieval;
 
 import ch.uzh.ase.Application;
+import ch.uzh.ase.Util.Tweet;
+import ch.uzh.ase.Util.TweetStatus;
+import org.joda.time.DateTime;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TweetStream {
 
-    public static void startStream(String topic) {
+
+
+    public void startStream(String topic) {
 
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
@@ -19,7 +24,15 @@ public class TweetStream {
 
             public void onStatus(Status status) {
                 System.out.println(status.getText());
-//                blackboard.addNewTweet(status.getText(), TweetStatus.NEW);
+
+                String text = status.getText();
+                String author = status.getUser().toString();
+                DateTime date = new DateTime(status.getCreatedAt().getTime());
+                String searchID = topic;
+
+                Tweet tweet = new Tweet(text, author, date, searchID);
+
+                StreamRegistry.getInstance().locateBlackboard(searchID).addNewTweet(tweet, TweetStatus.NEW);
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {

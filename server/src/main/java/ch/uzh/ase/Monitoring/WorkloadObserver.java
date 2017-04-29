@@ -67,32 +67,32 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     //TODO jwa this is such a weird algorithm pls clarify the conditions for action
     private void evaluateAction(long avgSlavesLoad, List<Workload> workloadList, long currentTweetsPerMin) {
-        for (IWorkloadSubject subject : subjects) {
-            try {
-                if (avgSlavesLoad > currentTweetsPerMin) {
-                    if (subject.getLeastBusySlave().getUncompletedTasks() > configuration.LOAD_THRESHHOLD) {
-                        if (avgSlavesLoad > currentTweetsPerMin && configuration.DEFAULT_SLAVE_THRESHHOLD >= subject.getNumberOfSlaves()) {
-                            subject.generateSlaves((int) configuration.RESOURCE_GENERATION_FACTOR * subject.getNumberOfSlaves());
-                        } else {
-                            //hold number
-                            //subject.generateSlaves(1);
-                        }
-                    } else {
-                        //subject.generateSlaves(1);
-                    }
-                } else {
-                    if (subject.getNumberOfSlaves() > 2) {
-                        if (avgSlavesLoad < currentTweetsPerMin) {
-                            subject.shutdownSlavesGracefully(((int) Math.round(subject.getNumberOfSlaves() / configuration.RESOURCE_RELEASE_FACTOR)));
-                        } else {
-                            subject.shutdownSlavesGracefully(1);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                LOG.error(e.getStackTrace().toString());
-            }
-        }
+//        for (IWorkloadSubject subject : subjects) {
+//            try {
+//                if (avgSlavesLoad > currentTweetsPerMin) {
+//                    if (subject.getLeastBusySlave().getUncompletedTasks() > configuration.LOAD_THRESHHOLD) {
+//                        if (avgSlavesLoad > currentTweetsPerMin && configuration.DEFAULT_SLAVE_THRESHHOLD >= subject.getNumberOfSlaves()) {
+//                            subject.generateSlaves((int) configuration.RESOURCE_GENERATION_FACTOR * subject.getNumberOfSlaves());
+//                        } else {
+//                            //hold number
+//                            //subject.generateSlaves(1);
+//                        }
+//                    } else {
+//                        //subject.generateSlaves(1);
+//                    }
+//                } else {
+//                    if (subject.getNumberOfSlaves() > 2) {
+//                        if (avgSlavesLoad < currentTweetsPerMin) {
+//                            subject.shutdownSlavesGracefully(((int) Math.round(subject.getNumberOfSlaves() / configuration.RESOURCE_RELEASE_FACTOR)));
+//                        } else {
+//                            subject.shutdownSlavesGracefully(1);
+//                        }
+//                    }
+//                }
+//            } catch (Exception e) {
+//                LOG.error(e.getStackTrace().toString());
+//            }
+//        }
     }
 
     //This is public for testing reasons

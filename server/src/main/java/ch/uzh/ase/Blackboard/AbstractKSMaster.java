@@ -5,6 +5,11 @@ import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 import ch.uzh.ase.Util.Workload;
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by jonas on 25.04.2017.
@@ -23,10 +28,66 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     }
 
     @Override
-    public void run() {
-        while (!blackboard.isShutdown()) {
-            splitWork();
-            service();
+    public void updateBlackboard(ConcurrentLinkedQueue<Tweet> treatedTweets) {
+        //LOG.info("Blackboard update started");
+        if (treatedTweets.size() == 0) {
+            return;
+        } else {
+            if (treatedTweets.size() < DEFAULT_TWEET_CHUNK_SIZE) {
+                for (int i = 0; i < treatedTweets.size(); i++) {
+                    this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
+                }
+            } else {
+                for (int i = 0; i < DEFAULT_TWEET_CHUNK_SIZE; i++) {
+                    this.blackboard.changeTweetStatus(treatedTweets.poll(), TweetStatus.EVALUATED);
+                }
+            }
         }
+        //LOG.info("Blackboard update finished");
+    }
+
+    public void splitWork(ConcurrentLinkedQueue<Tweet> untreatedTweets, List<IKSSlave> slaveList) throws Exception {
+        //LOG.info("splitwork started");
+        final List<Tweet> assignedTweets = new ArrayList(DEFAULT_TWEET_CHUNK_SIZE);
+        if (untreatedTweets.size() == 0) {
+            return;
+        } else {
+            while (untreatedTweets.size() != 0 && assignedTweets.size() != DEFAULT_TWEET_CHUNK_SIZE) {
+                assignedTweets.add(untreatedTweets.poll());
+            }
+            IKSSlave leastBusySlave = getLeastBusySlave(slaveList);
+            leastBusySlave.subservice(assignedTweets);
+        }
+        //LOG.info("splitwork finished");
+    }
+
+    protected long calcAvgSlaveLoad(List<IKSSlave> slaveList) {
+        double rawNumberOfUncompletedTasks = 0;
+        for (IKSSlave slave : slaveList) {
+            rawNumberOfUncompletedTasks += slave.getUncompletedTasks();
+        }
+        return Math.round(rawNumberOfUncompletedTasks / (double) slaveList.size());
+    }
+
+    protected Workload createWorkload(long tweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
+        Workload current = new Workload();
+        current.setTimestamp(DateTime.now());
+        current.setTweetCount(tweetCount);
+        current.setNumberOfSlaves(slaveList.size());
+        current.setNumberOfNonCompletedTasksOnMaster(untreatedTweets.size());
+        current.setAvgSlaveLoad(calcAvgSlaveLoad(slaveList));
+        return current;
+    }
+
+    public IKSSlave getLeastBusySlave(List<IKSSlave> slaveList) {
+
+        IKSSlave leastBusy = slaveList.get(0);
+        for (IKSSlave slave : slaveList) {
+            if (leastBusy.getUncompletedTasks() > slave.getUncompletedTasks()) {
+                leastBusy = slave;
+            }
+        }
+
+        return leastBusy;
     }
 }

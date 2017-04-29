@@ -24,13 +24,14 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
     private final AbstractKSMaster master;
     private final StanfordCoreNLP pipeline;
-    public static volatile boolean shutdown = false;
+    private boolean shutdown = false;
     private static final Logger LOG = LoggerFactory.getLogger(SentimentEnglishKSSlave.class);
 
     public SentimentEnglishKSSlave(AbstractKSMaster master) {
         this.master = master;
 
         //these properties are needed specify the NLP process
+        //TODO jwa put properties in properties file
         Properties properties = new Properties();
         properties.setProperty("annotators", NLP_ANNOTATORS);
         pipeline = new StanfordCoreNLP(properties);
