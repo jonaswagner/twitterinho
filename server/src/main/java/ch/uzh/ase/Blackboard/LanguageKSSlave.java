@@ -12,11 +12,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by Silvio Fankhauser on 29.04.2017.
  */
-public class LanguageKSSlave extends Thread implements  IKSSlave{
+public class LanguageKSSlave extends Thread implements IKSSlave {
 
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
     private final AbstractKSMaster master;
-    private  boolean shutdown = false;
+    private boolean shutdown = false;
     private static final Logger LOG = LoggerFactory.getLogger(LanguageKSSlave.class);
 
     public LanguageKSSlave(AbstractKSMaster master) {
@@ -26,19 +26,22 @@ public class LanguageKSSlave extends Thread implements  IKSSlave{
     @Override
     public void run() {
 
-        while (!shutdown){
+        while (!shutdown) {
 
-            Tweet nextTweet = taskQueue.poll();
-            nextTweet.setStartLangDetection(DateTime.now());
-            //TODO: implement Language detection
-            nextTweet.setIso(LanguageCode.en);
-            nextTweet.setEndLangDetection(DateTime.now());
-            master.reportResult(nextTweet);
+            if (!taskQueue.isEmpty()) {
+                Tweet nextTweet = taskQueue.poll();
+                nextTweet.setStartLangDetection(DateTime.now());
+                //TODO: implement Language detection
+                nextTweet.setIso(LanguageCode.en);
+                nextTweet.setEndLangDetection(DateTime.now());
+                master.reportResult(nextTweet);
+            }
         }
     }
 
     @Override
     public void subservice(List<Tweet> tasks) {
+        LOG.info(tasks.size() + " new tasks added to the taskList");
         taskQueue.addAll(tasks);
     }
 

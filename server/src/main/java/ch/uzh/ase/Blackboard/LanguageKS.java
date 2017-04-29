@@ -50,11 +50,11 @@ public class LanguageKS extends AbstractKSMaster {
     @Override
     public void service() {
         try {
-            splitWork(untreatedTweets, slaveList);
+            super.splitWork(untreatedTweets, slaveList);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        updateBlackboard(treatedTweets);
+        super.updateBlackboard(treatedTweets);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class LanguageKS extends AbstractKSMaster {
             LanguageKSSlave slave = new LanguageKSSlave(this);
             slave.start();
             slaveList.add(slave);
-            LOG.warn("new slave has been generated and added to the slaveList");
+            LOG.warn("new LanguageSlave has been generated and added to the slaveList");
         }
     }
 

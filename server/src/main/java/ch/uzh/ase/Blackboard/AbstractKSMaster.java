@@ -28,6 +28,13 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     }
 
     @Override
+    public void run() {
+        while (!Blackboard.isShutdown()) {
+            service();
+        }
+    }
+
+    @Override
     public void updateBlackboard(ConcurrentLinkedQueue<Tweet> treatedTweets) {
         //LOG.info("Blackboard update started");
         if (treatedTweets.size() == 0) {

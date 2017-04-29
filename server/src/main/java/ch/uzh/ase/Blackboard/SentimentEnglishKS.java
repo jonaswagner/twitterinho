@@ -95,7 +95,7 @@ public class SentimentEnglishKS extends AbstractKSMaster {
             SentimentEnglishKSSlave slave = new SentimentEnglishKSSlave(this);
             slave.start();
             slaveList.add(slave);
-            LOG.warn("new slave has been generated and added to the slaveList");
+            LOG.warn("new SentimentEnglishSlave has been generated and added to the slaveList");
         }
     }
 

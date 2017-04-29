@@ -30,11 +30,10 @@ public class Application {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
 
-        Properties prop = new Properties();
         InputStream input = null;
 
         try {
-            input = new FileInputStream("config.properties");
+            input = new FileInputStream("server/config.properties");
             prop.load(input);
 
             LOG.info(prop.getProperty("databaseconnection"));

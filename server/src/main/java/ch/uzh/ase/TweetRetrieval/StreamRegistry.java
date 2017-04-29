@@ -29,7 +29,12 @@ public class StreamRegistry {
     public void register(String streamId, TweetStream tweetStream){
         streamMap.put(streamId, tweetStream);
 
-        blackboardMap.get(setBlackboard()).add(streamId);
+        if (blackboardMap.isEmpty()){
+            setBlackboard();
+            blackboardMap.put(blackboardList.get(0), Arrays.asList(streamId)); //FIXME pls consider concurrency
+        } else {
+            blackboardMap.get(blackboardList.get(0)).add(streamId);
+        }
     }
 
     public void unRegister(String streamId, TweetStream tweetStream){
@@ -55,11 +60,13 @@ public class StreamRegistry {
             Blackboard blackboard = new Blackboard();
             WorkloadObserver workloadObserver = new WorkloadObserver();
             workloadObserver.start();
-            AbstractKSMaster iks = new SentimentEnglishKS(blackboard, workloadObserver);
-            iks.start();
-            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks));
+            AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard, workloadObserver);
+            iks1.start();
+            AbstractKSMaster iks2 = new LanguageKS(blackboard, workloadObserver);
+            iks2.start();
+            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2));
             blackboardControl.start();
-            //TODO: add language stuff
+
             //TODO: start persistentControler
 
             blackboardList.add(blackboard);

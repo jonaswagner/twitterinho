@@ -1,6 +1,7 @@
 package ch.uzh.ase.TweetRetrieval;
 
 import ch.uzh.ase.Application;
+import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 import org.joda.time.DateTime;
@@ -15,15 +16,19 @@ public class TweetStream {
 
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
-                .setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
-                .setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
-                .setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
-                .setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
+                //.setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
+                //.setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
+                //.setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
+                //.setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
+        .setOAuthConsumerKey(TestDriver.getProp().getProperty("oauth.consumerKey"))
+                .setOAuthConsumerSecret(TestDriver.getProp().getProperty("oauth.consumerSecret"))
+                .setOAuthAccessToken(TestDriver.getProp().getProperty("oauth.accessToken"))
+                .setOAuthAccessTokenSecret(TestDriver.getProp().getProperty("oauth.accessTokenSecret"));
         TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         StatusListener listener = new StatusListener() {
 
             public void onStatus(Status status) {
-                System.out.println(status.getText());
+                //System.out.println(status.getText());
 
                 String text = status.getText();
                 String author = status.getUser().toString();

@@ -94,7 +94,7 @@ public class SentimentEnglishKSSlave extends Thread implements IKSSlave {
 
     @Override
     public void subservice(List<Tweet> tasks) {
-        //LOG.info(tasks.size() + " new tasks added to the taskList");
+        LOG.info(tasks.size() + " new tasks added to the taskList");
         taskQueue.addAll(tasks);
     }
 
