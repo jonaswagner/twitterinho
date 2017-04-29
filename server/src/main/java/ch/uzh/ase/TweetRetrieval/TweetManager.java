@@ -7,6 +7,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class TweetManager {
 
     public static ArrayList<String> getTweets(String topic) {

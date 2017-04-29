@@ -78,7 +78,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                             //subject.generateSlaves(1);
                         }
                     } else {
-                        subject.generateSlaves(1);
+                        //subject.generateSlaves(1);
                     }
                 } else {
                     if (subject.getNumberOfSlaves() > 2) {

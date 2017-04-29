@@ -11,6 +11,7 @@ import edu.stanford.nlp.util.CoreMap;
 
 import java.util.Properties;
 
+@Deprecated
 public class NLP {
 
     static StanfordCoreNLP pipeline;

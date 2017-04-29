@@ -2,7 +2,6 @@
 package ch.uzh.ase.controller;
 
 import ch.uzh.ase.NLP;
-import ch.uzh.ase.TweetManager;
 import ch.uzh.ase.domain.Sentiment;
 import ch.uzh.ase.repository.SentimentRepository;
 import org.json.JSONObject;

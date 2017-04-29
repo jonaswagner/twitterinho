@@ -16,7 +16,9 @@ import java.util.Set;
 /**
  * Created by jonas on 15.03.2017.
  */
+@Deprecated
 public class DBDriver {
+
 
     public static void main(String[] args) {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
