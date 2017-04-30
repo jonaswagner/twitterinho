@@ -24,32 +24,22 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
     private boolean shutdown = false;
     private static final Logger LOG = LoggerFactory.getLogger(LanguageKSSlave.class);
 
-    public LanguageKSSlave(AbstractKSMaster master) {
+    public LanguageKSSlave(AbstractKSMaster master) throws IOException {
         this.master = master;
     }
+    LanguageDetector detector = new OptimaizeLangDetector().loadModels();
+
 
     @Override
     public void run() {
-
         while (!shutdown) {
-
             if (!taskQueue.isEmpty()) {
                 Tweet nextTweet = taskQueue.poll();
                 nextTweet.setStartLangDetection(DateTime.now());
                 String text = nextTweet.getText();
-
                 String languageCode = "undefined";
-
-
-                try {
-                    LanguageDetector detector = new OptimaizeLangDetector().loadModels();
-                    LanguageResult result = detector.detect(text);
-                    languageCode =  result.getLanguage();
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                LanguageResult result = detector.detect(text);
+                languageCode =  result.getLanguage();
                 nextTweet.setIso(LanguageCode.getByCode(languageCode));
                 nextTweet.setEndLangDetection(DateTime.now());
                 master.reportResult(nextTweet);

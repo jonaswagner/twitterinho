@@ -64,7 +64,9 @@ public class StreamRegistry {
             iks1.start();
             AbstractKSMaster iks2 = new LanguageKS(blackboard, workloadObserver);
             iks2.start();
-            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2));
+            AbstractKSMaster iks3 = new SentimentGermanKS(blackboard, workloadObserver);
+            iks3.start();
+            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2, iks3));
             blackboardControl.start();
             BlackboardPersist blackboardPersist = new BlackboardPersist(blackboard);
             blackboardPersist.start();

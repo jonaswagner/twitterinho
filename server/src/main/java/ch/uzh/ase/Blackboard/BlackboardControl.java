@@ -55,7 +55,6 @@ public class BlackboardControl extends Thread {
                 }
                 case FINISHED:
                     //TODO jwa persist tweet
-                    //TODO jwa discard finished tweet
                     break;
                 default:
             }
@@ -73,7 +72,6 @@ public class BlackboardControl extends Thread {
             blackboard.changeTweetStatus(tweet, TweetStatus.FINISHED);
             return;
         }
-
         for (IKS ks : iksList) {
             if (ks.execCondition(tweet)) {
                 blackboard.changeTweetStatus(tweet, TweetStatus.FLAGGED);
