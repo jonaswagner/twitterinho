@@ -38,11 +38,11 @@ public class DB {
     }
 
     public void persist(Tweet tweet) {
-        LanguageCode iso = tweet.getIso();
+        String iso = tweet.getIso().toString();
         double sentiment = tweet.getSentimentScore();
         String text = tweet.getText();
         String author = tweet.getAuthor();
-        DateTime date = tweet.getDate();
+        String date = tweet.getDate().toString();
         String searchID = tweet.getSearchID();
 
         Document doc = new Document(ISO, iso)

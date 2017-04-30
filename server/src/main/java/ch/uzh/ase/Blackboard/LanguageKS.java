@@ -83,6 +83,15 @@ public class LanguageKS extends AbstractKSMaster {
 
     @Override
     public void shutdownSlavesGracefully(int numberOfSlaves) {
+        for (int i = 0; i < numberOfSlaves; i++) {
+            LOG.warn("graceful shutdown of slave initiated!");
+            IKSSlave shutdownSlave = getLeastBusySlave(slaveList);
+            slaveList.remove(shutdownSlave);
+            while (shutdownSlave.getUncompletedTasks() > 0) {
+                //wait
+            }
+            shutdownSlave.kill();
+        }
 
     }
 

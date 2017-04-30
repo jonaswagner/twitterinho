@@ -31,7 +31,7 @@ public class TweetStream {
                 //System.out.println(status.getText());
 
                 String text = status.getText();
-                String author = status.getUser().toString();
+                String author = status.getUser().getName();
                 DateTime date = new DateTime(status.getCreatedAt().getTime());
                 String searchID = topic;
 

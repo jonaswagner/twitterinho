@@ -66,8 +66,8 @@ public class StreamRegistry {
             iks2.start();
             BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2));
             blackboardControl.start();
-
-            //TODO: start persistentControler
+            BlackboardPersist blackboardPersist = new BlackboardPersist(blackboard);
+            blackboardPersist.start();
 
             blackboardList.add(blackboard);
             return blackboard;
