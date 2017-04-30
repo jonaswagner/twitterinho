@@ -11,6 +11,11 @@
         <module>server</module>
     </modules>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
     <repositories>
         <repository>
             <id>twitter4j.org</id>
@@ -31,45 +36,45 @@
             <version>[4.0,)</version>
         </dependency>
         <dependency>
-        <groupId>org.twitter4j</groupId>
-        <artifactId>twitter4j-stream</artifactId>
-        <version>4.0.6</version>
-    </dependency>
-
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>4.0.6</version>
+        </dependency>
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp &ndash;&gt;-->
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>3.7.0</version>
         </dependency>
-
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>3.7.0</version>
             <classifier>models-english</classifier>
         </dependency>
-
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.slf4j/slf4j-simple &ndash;&gt;-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.24</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.cybozu.labs/langdetect -->
+        <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->
         <dependency>
-            <groupId>com.cybozu.labs</groupId>
-            <artifactId>langdetect</artifactId>
-            <version>1.1-20120112</version>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.14</version>
         </dependency>
-
-
+        <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-langdetect -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-langdetect</artifactId>
+            <version>1.14</version>
+        </dependency>
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.mongodb</groupId>-->
-            <!--<artifactId>mongo-java-driver</artifactId>-->
-            <!--<version>3.4.1</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.4.1</version>
+        </dependency>
     </dependencies>
 </project>

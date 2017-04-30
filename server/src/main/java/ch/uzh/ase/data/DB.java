@@ -1,6 +1,7 @@
 package ch.uzh.ase.data;
 
 import ch.uzh.ase.Application;
+import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
@@ -30,8 +31,8 @@ public class DB {
     private final String COLLECTION_NAME = "collection";
 
     public DB(){
-        mongoClient = new MongoClient(new MongoClientURI(Application.getProp().getProperty("databaseconnection")));
-        mdb= mongoClient.getDatabase(Application.getProp().getProperty("dbname"));
+        mongoClient = new MongoClient(new MongoClientURI(TestDriver.getProp().getProperty("databaseconnection")));
+        mdb= mongoClient.getDatabase(TestDriver.getProp().getProperty("dbname"));
         mdb.withWriteConcern(WriteConcern.JOURNALED);
         mc = mdb.getCollection(COLLECTION_NAME);
     }

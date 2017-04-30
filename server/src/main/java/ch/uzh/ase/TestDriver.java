@@ -23,6 +23,8 @@ public class TestDriver {
 
     public static void main(String[] args) throws Exception {
 
+        String searchWord = "Merkel";
+
         InputStream input = null;
 
         try {
@@ -34,12 +36,12 @@ public class TestDriver {
             LOG.info(prop.getProperty("dbname"));
             LOG.info(prop.getProperty("database"));
 
-            //database = new DB();
+ //           database = new DB();
 
             MainController mainController = new MainController();
             TweetStream tweetStream = new TweetStream();
-            StreamRegistry.getInstance().register("Theresa May", tweetStream);
-            tweetStream.startStream("Theresa May");
+            StreamRegistry.getInstance().register(searchWord, tweetStream);
+            tweetStream.startStream(searchWord);
 
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -2,10 +2,15 @@ package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Util.Tweet;
 import com.neovisionaries.i18n.LanguageCode;
+import org.apache.tika.langdetect.OptimaizeLangDetector;
+import org.apache.tika.language.detect.LanguageDetector;
+import org.apache.tika.language.detect.LanguageResult;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class LanguageKSSlave extends Thread implements IKSSlave {
 
-    private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<Tweet>();
     private final AbstractKSMaster master;
     private boolean shutdown = false;
     private static final Logger LOG = LoggerFactory.getLogger(LanguageKSSlave.class);
@@ -31,8 +36,21 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
             if (!taskQueue.isEmpty()) {
                 Tweet nextTweet = taskQueue.poll();
                 nextTweet.setStartLangDetection(DateTime.now());
-                //TODO: implement Language detection
-                nextTweet.setIso(LanguageCode.en);
+                String text = nextTweet.getText();
+
+                String languageCode = "undefined";
+
+
+                try {
+                    LanguageDetector detector = new OptimaizeLangDetector().loadModels();
+                    LanguageResult result = detector.detect(text);
+                    languageCode =  result.getLanguage();
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                nextTweet.setIso(LanguageCode.getByCode(languageCode));
                 nextTweet.setEndLangDetection(DateTime.now());
                 master.reportResult(nextTweet);
             }
