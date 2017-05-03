@@ -3,18 +3,16 @@ package ch.uzh.ase.Monitoring;
 import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Util.Workload;
+import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spock.util.environment.OperatingSystem;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jonas on 26.04.2017.
@@ -25,7 +23,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private final List<IWorkloadSubject> subjects;
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
     private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
-    long nanoBefore = 0l;
+    private final MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
+    private OperatingSystemMXBean osMBean;
+    long freeSwapSize = 0l;
     double loadAverage = 0.0d;
     String arch = "";
     String name = "";
@@ -40,12 +40,30 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         this.configuration = new DefaultPerformanceConfiguration();
         this.timeSlot = DateTime.now();
         this.subjects = Collections.synchronizedList(new ArrayList<>());
+        try {
+            this.osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+            arch = osMBean.getArch();
+            LOG.warn("System Architecture: " + osMBean.getArch());
+            name = osMBean.getName();
+            LOG.warn("OS Name: "+ name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public WorkloadObserver(DefaultPerformanceConfiguration configuration) {
         this.configuration = configuration;
         this.timeSlot = DateTime.now();
         this.subjects = Collections.synchronizedList(new ArrayList<>());
+        try {
+            this.osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+            arch = osMBean.getArch();
+            LOG.warn("System Architecture: " + osMBean.getArch());
+            name = osMBean.getName();
+            LOG.warn("OS Name: "+ name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -73,15 +91,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 LOG.warn("The system processes " + systemTweetsPerMin + " tweets per minute!");
                 evaluateAction(workloadMap);
 
-                MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
-                try {
-                    OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-                    loadAverage = osMBean.getSystemLoadAverage();
-                    name = osMBean.getName();
-                    arch = osMBean.getArch();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                loadAverage = osMBean.getSystemCpuLoad();
+                freeSwapSize = osMBean.getFreeSwapSpaceSize();
+                LOG.warn("CPU Load Average: " + loadAverage);
+                LOG.warn("Free Memory (max 16GB): " + (freeSwapSize/1024)/1024 + "MB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;
@@ -95,9 +109,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         for (IWorkloadSubject subject : subjects) {
 
             Workload currentWorkload = workloadMap.get(subject);
-            double inOutRatio = (double) currentWorkload.getInTweetCount() /(double) currentWorkload.getOutTweetCount();
+            double inOutRatio = (double) currentWorkload.getInTweetCount() / (double) currentWorkload.getOutTweetCount();
 
-            if (currentWorkload.getAvgSlaveLoad()>configuration.LOAD_THRESHHOLD) {
+            if (currentWorkload.getAvgSlaveLoad() > configuration.LOAD_THRESHHOLD) {
                 if (inOutRatio > configuration.IN_OUT_PARITY) {
                     generateSlaves(subject, inOutRatio);
                 } else {
@@ -136,9 +150,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     private int calcSlavesRatio(double inOutRatio, double numberOfSlaves) {
         int minNumberOfSlaves = 1;
-        double current = inOutRatio*numberOfSlaves;
+        double current = inOutRatio * numberOfSlaves;
 
-        if (current<1) {
+        if (current < 1) {
             return minNumberOfSlaves;
         } else {
             return (int) Math.round(current);
