@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by jonas on 24.04.2017.
  */
 public class Blackboard {
-        public static volatile boolean shutdown = false;
+    public static volatile boolean shutdown = false;
 
     private final Map<Tweet, TweetStatus> tweetMap = new ConcurrentHashMap<Tweet, TweetStatus>();
 

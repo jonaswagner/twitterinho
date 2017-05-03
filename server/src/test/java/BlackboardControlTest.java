@@ -38,7 +38,7 @@ public class BlackboardControlTest {
     public void before(){
 
 
-        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*100);
+        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
 
         for (Tweet tweet : newTweets) {
             tweet.setIso(LanguageCode.en);
@@ -49,17 +49,7 @@ public class BlackboardControlTest {
         observer.start();
         sentimentEnglishKS = new SentimentEnglishKS(blackboard, observer);
         iksList.add(sentimentEnglishKS);
-        sentimentEnglishKS.start();
         blackboardControl = new BlackboardControl(blackboard, iksList);
-
-        prop.setProperty("oauth.accessToken", "836174414232317952-wuRaWtg4bIENKvzHYihSJzxLKKiV64j");
-        prop.setProperty("databaseconnection", "mongodb://twitterinhodb:yRk0BXHxpFalTBWuWdjIWC3eRw5fdcCxwxFuvsS5pM9HjHQ3JGDIvmL2fI2QaCaQqkLamPPtDQYOK3V5ai06Hg==@twitterinhodb.documents.azure.com:10250/?ssl=true&sslInvalidHostNameAllowed=true");
-        prop.setProperty("dbname", "tweetCollection");
-
-        db = new DB();
-
-        persist = new BlackboardPersist(blackboard);
-        persist.start();
 
     }
 
@@ -71,33 +61,19 @@ public class BlackboardControlTest {
 
     @Test
     public void blackboardControlTest() throws InterruptedException {
-        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        rootLogger.setLevel(Level.toLevel(Level.DEBUG.levelInt));
 
         blackboardControl.start();
         Thread.sleep(1000);
         Assert.assertTrue(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));
 
-        //SentimentEnglishKS testKS = (SentimentEnglishKS) iksList.get(0);
-        //Assert.assertTrue(testKS.getUntreatedTweets().size()>0);
-        //testKS.start();
-        //testKS.generateSlaves(8);
-
-        for (int i = 0; i<12; i++) {
-            Thread.sleep(10000);
-            List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
-
-            for (Tweet tweet : newTweets) {
-                tweet.setIso(LanguageCode.en);
-                blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
-            }
-        }
+        SentimentEnglishKS testKS = (SentimentEnglishKS) iksList.get(0);
+        Assert.assertTrue(testKS.reportWorkload().getInTweetCount()>0);
+        testKS.start();
+        testKS.generateSlaves(8);
 
 
+       Assert.assertTrue(testKS.reportWorkload().getInTweetCount()==0);
 
-//        Assert.assertTrue(testKS.getUntreatedTweets().size()==0);
-
-        //Thread.sleep(1000);
         while (blackboard.getTweetMap().containsValue(TweetStatus.NEW) || blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED)) {
             //wait
         }
@@ -109,7 +85,7 @@ public class BlackboardControlTest {
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.STOPPED));
 
-        //TODO jwa shutdown slaves!
+        Blackboard.shutdown = true;
 
         System.out.println("Test Finished");
     }

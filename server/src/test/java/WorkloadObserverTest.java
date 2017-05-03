@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jonas on 27.04.2017.
@@ -17,6 +17,10 @@ public class WorkloadObserverTest {
     private static final long DEFAULT_TWEET_COUNT = 100;
     private static final int DEFAULT_SLAVES_COUNT = 2;
     private static final long DEFAULT_HIGH_LOAD = 2000;
+    private static final long DEFAULT_IN_TWEET_COUNT = 200;
+    private static final long DEFAULT_OUT_TWEET_COUNT = 200;
+    private static final long DEFAULT_NEUTRAL_LOAD = 500;
+    private static final long DEFAULT_LOW_LOAD = 50;
 
     WorkloadObserver observer;
     Blackboard blackboard = null;
@@ -35,27 +39,39 @@ public class WorkloadObserverTest {
 
     @Test
     public void montitoringTest() {
-//        int numberOfWorkloads = 2;
-//        Long result = observer.aggregateTweetCount(generateWorkloads(numberOfWorkloads));
-//        Assert.assertEquals(numberOfWorkloads*DEFAULT_TWEET_COUNT, result.longValue());
-//
-//        numberOfWorkloads = 5;
-//        long avgSlavesLoad = observer.calcAvgSlavesLoad(generateWorkloads(5));
-//        Assert.assertEquals(DEFAULT_HIGH_LOAD, avgSlavesLoad);
+
+        Map<IWorkloadSubject, Workload> workloadMap = new HashMap<>();
+        workloadMap.put(subject, generateNeutralWorkload());
+        observer.evaluateAction(workloadMap);
     }
 
-    private List<Workload> generateWorkloads(int numberOfWorkloads) {
-//        List<Workload> workloads = new ArrayList<>(numberOfWorkloads);
-//
-//        for (int i = 0; i<numberOfWorkloads; i++) {
-//            Workload workload = new Workload();
-//            workload.setTweetCount(DEFAULT_TWEET_COUNT);
-//            workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT);
-//            workload.setAvgSlaveLoad(DEFAULT_HIGH_LOAD);
-//            workloads.add(workload);
-//        }
-//
-//        return workloads;
-        return null;
+    private Workload generateNeutralWorkload() {
+            Workload workload = new Workload();
+            workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT);
+            workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
+            workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT);
+            workload.setAvgSlaveLoad(DEFAULT_NEUTRAL_LOAD);
+
+            return workload;
+    }
+
+    private Workload generateLowWorkload() {
+        Workload workload = new Workload();
+        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*20);
+        workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*8);
+        workload.setAvgSlaveLoad(DEFAULT_HIGH_LOAD);
+
+        return workload;
+    }
+
+    private Workload generateNHighWorkload() {
+        Workload workload = new Workload();
+        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/20);
+        workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*8);
+        workload.setAvgSlaveLoad(DEFAULT_LOW_LOAD);
+
+        return workload;
     }
 }

@@ -1,5 +1,8 @@
 package ch.uzh.ase;
 
+import ch.qos.logback.classic.Level;
+import ch.uzh.ase.TweetRetrieval.StreamRegistry;
+import ch.uzh.ase.TweetRetrieval.TweetStream;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +23,10 @@ public class TestDriver {
 
     public static void main(String[] args) throws Exception {
 
-        String searchWord = "London";
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.toLevel(Level.WARN.levelInt));
+
+        String searchWord = "GordonRamsay";
 
         InputStream input = null;
 
@@ -31,15 +37,15 @@ public class TestDriver {
             LOG.info(prop.getProperty("oauth.accessToken"));
             LOG.info(prop.getProperty("databaseconnection"));
             LOG.info(prop.getProperty("dbname"));
-            LOG.info(prop.getProperty("database"));
+            LOG.info(prop.getProperty("database")); //TODO silvio - remove this
 
            database = new DB();
 
-//            TweetStream tweetStream = new TweetStream();
-//            StreamRegistry.getInstance().register(searchWord, tweetStream);
-//            tweetStream.startStream(searchWord);
+            TweetStream tweetStream = new TweetStream();
+            StreamRegistry.getInstance().register(searchWord, tweetStream);
+            tweetStream.startStream(searchWord);
 
-             Map<String, Double> allAverageSentiments = database.getAllAverageSentiments();
+             //Map<String, Double> allAverageSentiments = database.getAllAverageSentiments();
 
         } catch (IOException ex) {
             ex.printStackTrace();
