@@ -1,14 +1,12 @@
 import ch.qos.logback.classic.Level;
-import ch.uzh.ase.Blackboard.Blackboard;
-import ch.uzh.ase.Blackboard.BlackboardControl;
-import ch.uzh.ase.Blackboard.IKS;
-import ch.uzh.ase.Blackboard.SentimentEnglishKS;
+import ch.uzh.ase.Blackboard.*;
 import ch.uzh.ase.Monitoring.IWorkloadObserver;
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import ch.uzh.ase.data.DB;
 import com.neovisionaries.i18n.LanguageCode;
 import org.junit.After;
 import org.junit.Assert;
@@ -16,8 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by jonas on 26.04.2017.
@@ -28,7 +29,10 @@ public class BlackboardControlTest {
     private WorkloadObserver observer;
     private BlackboardControl blackboardControl;
     private SentimentEnglishKS sentimentEnglishKS;
+    private BlackboardPersist persist;
     private final List<IKS> iksList = new ArrayList<IKS>();
+    private Properties prop = new Properties();
+    private DB db;
 
     @Before
     public void before(){
@@ -47,6 +51,15 @@ public class BlackboardControlTest {
         iksList.add(sentimentEnglishKS);
         sentimentEnglishKS.start();
         blackboardControl = new BlackboardControl(blackboard, iksList);
+
+        prop.setProperty("oauth.accessToken", "836174414232317952-wuRaWtg4bIENKvzHYihSJzxLKKiV64j");
+        prop.setProperty("databaseconnection", "mongodb://twitterinhodb:yRk0BXHxpFalTBWuWdjIWC3eRw5fdcCxwxFuvsS5pM9HjHQ3JGDIvmL2fI2QaCaQqkLamPPtDQYOK3V5ai06Hg==@twitterinhodb.documents.azure.com:10250/?ssl=true&sslInvalidHostNameAllowed=true");
+        prop.setProperty("dbname", "tweetCollection");
+
+        db = new DB();
+
+        persist = new BlackboardPersist(blackboard);
+        persist.start();
 
     }
 
@@ -70,9 +83,9 @@ public class BlackboardControlTest {
         //testKS.start();
         //testKS.generateSlaves(8);
 
-        for (int i = 0; i<4; i++) {
+        for (int i = 0; i<12; i++) {
             Thread.sleep(10000);
-            List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*100);
+            List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
 
             for (Tweet tweet : newTweets) {
                 tweet.setIso(LanguageCode.en);
