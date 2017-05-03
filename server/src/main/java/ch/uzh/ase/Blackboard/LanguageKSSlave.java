@@ -37,9 +37,7 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
                 Tweet nextTweet = taskQueue.poll();
                 nextTweet.setStartLangDetection(DateTime.now());
                 String text = nextTweet.getText();
-                String languageCode = "undefined";
-                LanguageResult result = detector.detect(text);
-                languageCode =  result.getLanguage();
+                String languageCode = detector.detect(text).getLanguage();
                 nextTweet.setIso(LanguageCode.getByCode(languageCode));
                 nextTweet.setEndLangDetection(DateTime.now());
                 master.reportResult(nextTweet);

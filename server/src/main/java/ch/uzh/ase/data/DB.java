@@ -1,6 +1,5 @@
 package ch.uzh.ase.data;
 
-import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import com.mongodb.BasicDBObject;
@@ -10,9 +9,12 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.neovisionaries.i18n.LanguageCode;
 import org.bson.Document;
-import org.joda.time.DateTime;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Silvio Fankhauser on 26.04.2017.
@@ -39,7 +41,7 @@ public class DB {
 
     public void persist(Tweet tweet) {
         String iso = tweet.getIso().toString();
-        double sentiment = tweet.getSentimentScore();
+        String sentiment = new String (""+tweet.getSentimentScore());
         String text = tweet.getText();
         String author = tweet.getAuthor();
         String date = tweet.getDate().toString();
@@ -61,7 +63,7 @@ public class DB {
         MongoCursor<Document>  cursor = mc.find(query).iterator();
         try {
             while (cursor.hasNext()) {
-                sum = sum + cursor.next().getDouble(SENTIMENT);
+                sum = sum + Double.parseDouble(cursor.next().getString(SENTIMENT));
                 numberOfTweets++;
             }
         } finally {
@@ -69,6 +71,30 @@ public class DB {
         }
         double average = sum/(double)numberOfTweets;
         return average;
+    }
+
+
+    public Set<String> getDistinctSearchIDs() {
+        Set<String> searchIDs = new HashSet<>();
+        MongoCursor<Document> cursor = mc.find().iterator();
+        try {
+            while (cursor.hasNext()) {
+                searchIDs.add(cursor.next().getString(SEARCH_ID));
+            }
+        } finally {
+            cursor.close();
+        }
+        return searchIDs;
+    }
+
+
+    public Map<String, Double> getAllAverageSentiments(){
+        Map<String, Double> resultMap = new HashMap();
+        Set<String> searchIDs = getDistinctSearchIDs();
+        for (String searchId : searchIDs){
+            resultMap.put(searchId, getAverageSentiment(searchId));
+        }
+        return resultMap;
     }
 
 
