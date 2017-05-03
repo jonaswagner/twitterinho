@@ -23,10 +23,10 @@ public class TestDriver {
 
     public static void main(String[] args) throws Exception {
 
-        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        rootLogger.setLevel(Level.toLevel(Level.WARN.levelInt));
+        //ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        //rootLogger.setLevel(Level.toLevel(Level.WARN.levelInt));
 
-        String searchWord = "GordonRamsay";
+        String searchWord = "BritneySpears";
 
         InputStream input = null;
 

@@ -7,7 +7,12 @@ import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spock.util.environment.OperatingSystem;
 
+import javax.management.MBeanServerConnection;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,9 +23,12 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     public static final int MIN_DIV_BY_TEN_SEC = 6;
     private final List<IWorkloadSubject> subjects;
-    private final Map<IWorkloadSubject, List<Workload>> workloadMap = new ConcurrentHashMap<>();
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
     private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
+    long nanoBefore = 0l;
+    double loadAverage = 0.0d;
+    String arch = "";
+    String name = "";
 
     //Monitoring variables
     private final DefaultPerformanceConfiguration configuration;
@@ -44,7 +52,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     public void run() {
 
         long currentTweetsPerTenSec = 0;
-        while (Blackboard.shutdown) { //FIXME jwa replace with shutdownGracefully
+        while (!Blackboard.shutdown) { //FIXME jwa replace with shutdownGracefully
             DateTime current = DateTime.now();
             if (current.minusSeconds(configuration.TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
 
@@ -64,6 +72,16 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 systemTweetsPerMin = currentTweetsPerTenSec * MIN_DIV_BY_TEN_SEC;
                 LOG.warn("The system processes " + systemTweetsPerMin + " tweets per minute!");
                 evaluateAction(workloadMap);
+
+                MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
+                try {
+                    OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+                    loadAverage = osMBean.getSystemLoadAverage();
+                    name = osMBean.getName();
+                    arch = osMBean.getArch();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;

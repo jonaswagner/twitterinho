@@ -39,7 +39,14 @@ public class WorkloadObserverTest {
 
     @After
     public void after(){
+        observer = null;
+        subject = null;
+    }
 
+    public void registerDeRegisterTest() {
+        observer.register(subject);
+        //Assert.assertEquals(observer.getName());
+        //TODO jwa implement this further
     }
 
     @Test
