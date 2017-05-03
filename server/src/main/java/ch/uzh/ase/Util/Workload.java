@@ -8,15 +8,23 @@ import org.joda.time.DateTime;
  */
 public class Workload {
 
-    private long tweetCount;
+    private long outTweetCount;
+    private long inTweetCount;
     private int numberOfSlaves;
     private long numberOfNonCompletedTasksOnMaster; //FIXME jwa this name is crap
     private long avgSlaveLoad;
     private DateTime timestamp;
 
+    public long getInTweetCount() {
+        return inTweetCount;
+    }
 
-    public long getTweetCount() {
-        return tweetCount;
+    public void setInTweetCount(long inTweetCount) {
+        this.inTweetCount = inTweetCount;
+    }
+
+    public long getOutTweetCount() {
+        return outTweetCount;
     }
 
     public int getNumberOfSlaves() {
@@ -31,8 +39,8 @@ public class Workload {
         return timestamp;
     }
 
-    public void setTweetCount(long tweetCount) {
-        this.tweetCount = tweetCount;
+    public void setOutTweetCount(long outTweetCount) {
+        this.outTweetCount = outTweetCount;
     }
 
     public void setNumberOfSlaves(int numberOfSlaves) {

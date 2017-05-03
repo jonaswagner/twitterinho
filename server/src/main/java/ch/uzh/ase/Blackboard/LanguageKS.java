@@ -19,7 +19,10 @@ public class LanguageKS extends AbstractKSMaster {
     private static final Logger LOG = LoggerFactory.getLogger(LanguageKS.class);
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
-    private long tweetCount = 0;
+
+    //These variables are needed for monitoring
+    private long outTweetCount = 0;
+    private long inTweetCount = 0;
 
     public  LanguageKS(Blackboard blackboard, IWorkloadObserver observer){
         super(blackboard, observer);
@@ -44,6 +47,7 @@ public class LanguageKS extends AbstractKSMaster {
     @Override
     public void execAction(Tweet tweet) {
         untreatedTweets.add(tweet);
+        inTweetCount++;
     }
 
 
@@ -60,14 +64,15 @@ public class LanguageKS extends AbstractKSMaster {
     @Override
     public void reportResult(Tweet tweet) {
         this.treatedTweets.add(tweet);
-        tweetCount++;
+        outTweetCount++;
     }
 
 
     @Override
     public Workload reportWorkload() {
-        Workload workload  = createWorkload(tweetCount, slaveList, untreatedTweets);
-        tweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        Workload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
+        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        inTweetCount = 0;
         return workload;    }
 
     @Override

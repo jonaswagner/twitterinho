@@ -76,10 +76,11 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
         return Math.round(rawNumberOfUncompletedTasks / (double) slaveList.size());
     }
 
-    protected Workload createWorkload(long tweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
+    protected Workload createWorkload(long inTweetCount, long outTweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
         Workload current = new Workload();
         current.setTimestamp(DateTime.now());
-        current.setTweetCount(tweetCount);
+        current.setOutTweetCount(outTweetCount);
+        current.setInTweetCount(inTweetCount);
         current.setNumberOfSlaves(slaveList.size());
         current.setNumberOfNonCompletedTasksOnMaster(untreatedTweets.size());
         current.setAvgSlaveLoad(calcAvgSlaveLoad(slaveList));
