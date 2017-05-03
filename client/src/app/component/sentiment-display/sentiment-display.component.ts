@@ -4,7 +4,7 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SentimentService} from "../../service/sentiment.service";
-import {Sentiment} from "../../model/sentiment";
+import {Term} from "../../model/term";
 import {Subscription} from "rxjs";
 
 @Component({
@@ -19,15 +19,13 @@ export class SentimentDisplayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  sentiments: Sentiment[] = [];
-  selectedSentiment: Sentiment = new Sentiment();
+  selectedTerm: Term = new Term();
   subscription: Subscription;
 
   constructor(private sentimentService: SentimentService) {
     this.subscription = this.sentimentService.sentimentStream$.subscribe(
-      sentiment => {
-        console.log('new sentiment ' + sentiment.name);
-        this.selectedSentiment = sentiment;
+      term => {
+        this.selectedTerm = term;
       },
       err => {
         console.log(err);
@@ -35,19 +33,19 @@ export class SentimentDisplayComponent implements OnInit, OnDestroy {
       () => console.log('done'));
   }
 
-  // getSentiments() {
-  //  this.sentimentService.getSentiments().subscribe(
-  //     doughnutData => {
-  //     },
-  //     err => {
-  //       console.log(err);
-  //     },
-  //     () => console.log("done")
-  //   );
-  // }
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     this.subscription.unsubscribe();
+  }
+
+  cancelStream() {
+    this.sentimentService.cancelStream(this.selectedTerm.name).subscribe(
+      data => {
+        console.log("canceled current term: " + data);
+      },
+      err => console.log(err),
+      () => console.log("done")
+    )
   }
 
 }

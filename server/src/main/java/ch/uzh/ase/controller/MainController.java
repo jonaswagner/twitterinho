@@ -8,6 +8,7 @@ import ch.uzh.ase.TweetRetrieval.TweetStream;
 import ch.uzh.ase.domain.Sentiment;
 import ch.uzh.ase.repository.SentimentRepository;
 import org.json.JSONObject;
+import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,14 +50,14 @@ public class MainController {
 //        return er.findBetween(from, to);
 //    }
 
-    @RequestMapping(value = "/twt/sentiments", method = RequestMethod.GET)
-    public ResponseEntity<List<Sentiment>> getRegisteredSentiments() {
+    @RequestMapping(value = "/twt/terms", method = RequestMethod.GET)
+    public ResponseEntity<List<Sentiment>> getRegisteredTerms() {
         return new ResponseEntity<>(createSentiments(), HttpStatus.OK);
     }
 
 
-    @RequestMapping(value = "/twt/sentiment", method = RequestMethod.POST)
-    public ResponseEntity<Sentiment> addNewSentiment(@RequestBody String searchId){
+    @RequestMapping(value = "/twt/term", method = RequestMethod.POST)
+    public ResponseEntity<Sentiment> addTerm(@RequestBody String searchId) {
         System.out.println(searchId);
         JSONObject obj = new JSONObject(searchId);
         String sentimentName = obj.getString("sentiment");
@@ -67,8 +68,6 @@ public class MainController {
         tweetStream.startStream(searchId);
 
 
-
-
         Sentiment s = new Sentiment(sentimentName);
 
 
@@ -77,70 +76,62 @@ public class MainController {
 
         List<Double> sentimentValues = new ArrayList<>();
         for (String tweet : tweets) {
-            double sentimentValue =  NLP.findSentiment(tweet);
+            double sentimentValue = NLP.findSentiment(tweet);
             sentimentValues.add(sentimentValue);
         }
         s.setValues(sentimentValues);
 
 
-
-
 //        s.setValues(createDummyValues());
         return new ResponseEntity<Sentiment>(s, HttpStatus.CREATED);
     }
-//    @PostMapping("/api/events/create")
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @Transactional
-//    Event createEvent(@RequestBody EventCreateParams params) {
-//
-//        Resource r = rr.findOne(params.resource);
-//
-//        Event e = new Event();
-//        e.setStart(params.start);
-//        e.setEnd(params.end);
-//        e.setText(params.text);
-//        e.setResource(r);
-//
-//        er.save(e);
-//
-//        return e;
-//    }
-//
-//    @PostMapping("/api/events/move")
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @Transactional
-//    Event moveEvent(@RequestBody EventMoveParams params) {
-//
-//        Event e = er.findOne(params.id);
-//        Resource r = rr.findOne(params.resource);
-//
-//        e.setStart(params.start);
-//        e.setEnd(params.end);
-//        e.setResource(r);
-//
-//        er.save(e);
-//
-//        return e;
-//    }
-//
-//    public static class EventCreateParams {
-//        public LocalDateTime start;
-//        public LocalDateTime end;
-//        public String text;
-//        public Long resource;
-//    }
-//
-//    public static class EventMoveParams {
-//        public Long id;
-//        public LocalDateTime start;
-//        public LocalDateTime end;
-//        public Long resource;
-//    }
-    private List<Double> createDummyValues(){
+
+    @RequestMapping(value = "/twt/term", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteTerm(String termId) {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/term/stream", method = RequestMethod.GET)
+    public ResponseEntity<Object> getStream(String termId) {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/term/stream", method = RequestMethod.PUT)
+    public ResponseEntity<Object> cancelStream(String termId) {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/monitor/cpu", method = RequestMethod.GET)
+    public ResponseEntity<Object> getCpuLoad() {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/monitor/statistics", method = RequestMethod.GET)
+    public ResponseEntity<Object> getTermStatistics() {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/monitor/work", method = RequestMethod.GET)
+    public ResponseEntity<Object> getWorkLoad() {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/monitor/slave", method = RequestMethod.GET)
+    public ResponseEntity<Object> getSlaveLoad() {
+        return null;
+    }
+
+    @RequestMapping(value = "/twt/monitor/scale", method = RequestMethod.POST)
+    public ResponseEntity<Object> scaleUp(){
+        return null;
+    }
+
+    //TODO below here needs to be deleted
+    private List<Double> createDummyValues() {
         List<Double> dummyValues = new ArrayList<>();
         Random rand = new Random();
         for (int j = 0; j < 15; j++) {
-            dummyValues.add((double) Math.round(rand.nextDouble() * 100d)/100d);
+            dummyValues.add((double) Math.round(rand.nextDouble() * 100d) / 100d);
         }
         return dummyValues;
     }
