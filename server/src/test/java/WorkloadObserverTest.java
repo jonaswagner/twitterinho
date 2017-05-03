@@ -4,6 +4,7 @@ import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.Workload;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,6 +22,7 @@ public class WorkloadObserverTest {
     private static final long DEFAULT_OUT_TWEET_COUNT = 200;
     private static final long DEFAULT_NEUTRAL_LOAD = 500;
     private static final long DEFAULT_LOW_LOAD = 50;
+    private static final int MAX_NR_OF_SLAVES = 42; //FIXME jwa calculate this value
 
     WorkloadObserver observer;
     Blackboard blackboard = null;
@@ -43,6 +45,23 @@ public class WorkloadObserverTest {
         Map<IWorkloadSubject, Workload> workloadMap = new HashMap<>();
         workloadMap.put(subject, generateNeutralWorkload());
         observer.evaluateAction(workloadMap);
+        Assert.assertEquals(subject.getNumberOfSlaves(), DEFAULT_SLAVES_COUNT);
+
+        workloadMap.put(subject, generateHighWorkload());
+        observer.evaluateAction(workloadMap);
+        Assert.assertEquals(MAX_NR_OF_SLAVES, subject.getNumberOfSlaves());
+
+        observer.evaluateAction(workloadMap);
+        Assert.assertEquals(MAX_NR_OF_SLAVES, subject.getNumberOfSlaves());
+
+        for (int i = 0; i<MAX_NR_OF_SLAVES-DEFAULT_SLAVES_COUNT; i++) {
+            workloadMap.put(subject, generateLowWorkload());
+            observer.evaluateAction(workloadMap);
+            Assert.assertEquals(MAX_NR_OF_SLAVES-i-1, subject.getNumberOfSlaves());
+        }
+
+        observer.evaluateAction(workloadMap);
+        Assert.assertEquals(DEFAULT_SLAVES_COUNT, subject.getNumberOfSlaves());
     }
 
     private Workload generateNeutralWorkload() {
@@ -55,7 +74,7 @@ public class WorkloadObserverTest {
             return workload;
     }
 
-    private Workload generateLowWorkload() {
+    private Workload generateHighWorkload() {
         Workload workload = new Workload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*20);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
@@ -65,7 +84,7 @@ public class WorkloadObserverTest {
         return workload;
     }
 
-    private Workload generateNHighWorkload() {
+    private Workload generateLowWorkload() {
         Workload workload = new Workload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/20);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);

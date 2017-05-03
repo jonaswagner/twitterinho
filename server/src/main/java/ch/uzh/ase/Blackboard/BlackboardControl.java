@@ -54,13 +54,12 @@ public class BlackboardControl extends Thread {
                     break;
                 }
                 case FINISHED:
-                    //TODO jwa persist tweet
                     break;
                 default:
             }
         }
 
-        //TODO jwa handle discarded tweets
+        blackboard.removeTweet(discardedTweets);
     }
 
     /**
