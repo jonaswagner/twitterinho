@@ -2,12 +2,9 @@ package ch.uzh.ase;
 
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.TweetRetrieval.TweetStream;
-import ch.uzh.ase.controller.MainController;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +50,13 @@ public class TestDriver {
                 }
             }
         }
+
+        //only for testing:
+//        while (true) {
+//            Thread.sleep(5000);
+//            double averageSentiment = database.getAverageSentiment(searchWord);
+//            LOG.info("The average sentiment for the term: " +searchWord+ " is " + averageSentiment);
+//        }
     }
 
     public static DB getDatabase(){
