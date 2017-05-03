@@ -22,7 +22,10 @@ public class WorkloadObserverTest {
     private static final long DEFAULT_OUT_TWEET_COUNT = 200;
     private static final long DEFAULT_NEUTRAL_LOAD = 500;
     private static final long DEFAULT_LOW_LOAD = 50;
+    private static final long DEFAULT_TWEET_FACTOR = 20;
+    private static final int DEFAULT_SLAVE_FACTOR = 8;
     private static final int MAX_NR_OF_SLAVES = 42; //FIXME jwa calculate this value
+
 
     WorkloadObserver observer;
     Blackboard blackboard = null;
@@ -76,9 +79,9 @@ public class WorkloadObserverTest {
 
     private Workload generateHighWorkload() {
         Workload workload = new Workload();
-        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*20);
+        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
-        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*8);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);
         workload.setAvgSlaveLoad(DEFAULT_HIGH_LOAD);
 
         return workload;
@@ -86,9 +89,9 @@ public class WorkloadObserverTest {
 
     private Workload generateLowWorkload() {
         Workload workload = new Workload();
-        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/20);
+        workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
-        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*8);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);
         workload.setAvgSlaveLoad(DEFAULT_LOW_LOAD);
 
         return workload;

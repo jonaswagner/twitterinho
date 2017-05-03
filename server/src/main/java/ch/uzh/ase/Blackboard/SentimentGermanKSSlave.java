@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by jonas on 25.04.2017.
  */
-public class SentimentGermanKSSlave extends Thread implements IKSSlave {
+public class SentimentGermanKSSlave extends AbstractLanguageSlave implements IKSSlave {
 
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
     private final AbstractKSMaster master;
@@ -28,6 +28,7 @@ public class SentimentGermanKSSlave extends Thread implements IKSSlave {
     private static final Logger LOG = LoggerFactory.getLogger(SentimentGermanKSSlave.class);
 
     public SentimentGermanKSSlave(AbstractKSMaster master) {
+        super();
         this.master = master;
 
         //these properties are needed specify the NLP process
@@ -45,44 +46,14 @@ public class SentimentGermanKSSlave extends Thread implements IKSSlave {
             if (nextTweet != null) {
 
                 nextTweet.setStartSentimentAnalysis(DateTime.now());
-                detectSentiment(nextTweet);
+                detectSentiment(nextTweet, pipeline);
                 nextTweet.setEndSentimentAnalysis(DateTime.now());
 
-                //LOG.debug(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
+                LOG.info(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getSentimentScore());
                 master.reportResult(nextTweet);
             }
         }
-        if (!taskQueue.isEmpty()) {
-            int taskQueueSize = taskQueue.size();
-            for (Tweet tweet: taskQueue){
-                master.execAction(tweet);
-            }
-            LOG.debug(taskQueueSize + "remaining tasks have been put back to the master!");
-            LOG.debug("This thread will now shutdown");
-        }
-
-    }
-
-    private void detectSentiment(Tweet nextTweet) {
-        String tweetText = nextTweet.getText();
-
-        int mainSentiment = 0;
-        if (tweetText != null && tweetText.length() > 0) {
-            int longest = 0;
-            Annotation annotation = pipeline.process(tweetText);
-            for (CoreMap sentence : annotation
-                    .get(CoreAnnotations.SentencesAnnotation.class)) {
-                Tree tree = sentence
-                        .get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                String partText = sentence.toString();
-                if (partText.length() > longest) {
-                    mainSentiment = sentiment;
-                    longest = partText.length();
-                }
-            }
-        }
-        nextTweet.setSentimentScore(normalize(mainSentiment));
+        shutdown(taskQueue, master);
     }
 
     @Override
@@ -99,16 +70,7 @@ public class SentimentGermanKSSlave extends Thread implements IKSSlave {
 
     @Override
     public int getUncompletedTasks() {
-        //LOG.info("This thread has " + taskQueue.size() + " unfinished tasks");
         return taskQueue.size();
-    }
-
-    //mapping of the sentiments (0-4) to a value between 0 and 1
-    private double normalize(int sentiment) {
-        double min = 0.0;
-        double max = 4.0;
-        double normSentiment = (((double) sentiment - min) / (max - min));
-        return normSentiment;
     }
 
 }
