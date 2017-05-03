@@ -1,10 +1,12 @@
 {
   "/api": {
-    "target": "http://twitterinho2.azurewebsites.net/",
+    "target": "http://twitterinho2.azurewebsites.net",
+    "changeOrigin" : true,
     "secure": false
   },
   "/twt": {
-    "target": "http://twitterinho2.azurewebsites.net/",
+    "target": "http://twitterinho2.azurewebsites.net",
+    "changeOrigin" : true,
     "secure": false
   }
 }

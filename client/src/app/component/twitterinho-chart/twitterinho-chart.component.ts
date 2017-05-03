@@ -1,6 +1,6 @@
 import {Message, UIChart} from "primeng/primeng";
 import {Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild} from "@angular/core";
-import {Sentiment} from "../../model/sentiment";
+import {Term} from "../../model/term";
 import {Subscription} from "rxjs";
 import {SentimentService} from "../../service/sentiment.service";
 /**
@@ -16,15 +16,15 @@ export class TwitterinhoChartComponent implements OnChanges {
   @ViewChild('chart') chart: UIChart;
 
   ngOnChanges(changes: any): void {
-    this.data.datasets[0].label = this.currentSentiment.name;
-    this.data.datasets[0].data = this.currentSentiment.values;
+    this.data.datasets[0].label = this.currentTerm.name;
+    this.data.datasets[0].data = this.currentTerm.values;
     setTimeout(() => {
       this.chart.reinit();
     }, 100);
   }
 
   @Input()
-  currentSentiment: Sentiment = new Sentiment();
+  currentTerm: Term = new Term();
   data: any;
   options: any;
   msgs: Message[];

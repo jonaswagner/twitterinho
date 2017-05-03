@@ -7,7 +7,7 @@ import {Injectable} from "@angular/core";
  */
 
 @Injectable()
-export class PerformanceDisplayService{
+export class MonitorDisplayService{
 
   constructor(
     private http: Http

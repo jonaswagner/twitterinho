@@ -3,22 +3,25 @@
  */
 
 import {Component} from '@angular/core';
-import {PerformanceDisplayService} from './performance-display.service';
+import {MonitorDisplayService} from './monitor-display.service';
+import {MonitorService} from "../../service/monitor.service";
 @Component({
-  selector: 'performance-display-component',
-  templateUrl: './performance-display.component.html',
-  styleUrls: ['./performance-display.component.css'],
+  selector: 'monitor-display-component',
+  templateUrl: './monitor-display.component.html',
+  styleUrls: ['./monitor-display.component.css'],
 
 })
 
-export class PerformanceDisplayComponent {
+export class MonitorDisplayComponent {
 
   private tweet: any[] = [];
 
   doughnutData: any;
   lineData: any;
+  barData: any;
 
-  constructor(private performanceDisplayService: PerformanceDisplayService) {
+
+  constructor(private monitorService: MonitorService) {
     this.doughnutData = {
       labels: ['A', 'B', 'C'],
       datasets: [
@@ -60,5 +63,17 @@ export class PerformanceDisplayComponent {
 
       ]
     };
+  }
+
+  getCpuLoad() {
+    this.monitorService.getCpuLoad().subscribe(
+      load => {
+        this.barData = load;
+      },
+      err => {
+        console.log(err)
+      },
+      () => console.log("done")
+    );
   }
 }
