@@ -21,7 +21,9 @@ public class SentimentGermanKS extends AbstractKSMaster {
     private static final Logger LOG = LoggerFactory.getLogger(SentimentGermanKS.class);
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
-    private long tweetCount = 0;
+    //These variables are needed for monitoring
+    private long outTweetCount = 0;
+    private long inTweetCount = 0;
 
     public SentimentGermanKS(Blackboard blackboard, IWorkloadObserver observer) {
         super(blackboard, observer);
@@ -47,6 +49,7 @@ public class SentimentGermanKS extends AbstractKSMaster {
     @Override
     public synchronized void execAction(Tweet tweet) {
         untreatedTweets.add(tweet);
+        inTweetCount++;
     }
 
     @Override
@@ -58,8 +61,9 @@ public class SentimentGermanKS extends AbstractKSMaster {
     //TODO jwa this method might not be needed
     @Override
     public Workload reportWorkload() {
-        Workload workload  = createWorkload(tweetCount, slaveList, untreatedTweets);
-        tweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        Workload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
+        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        inTweetCount = 0;
         return workload;
     }
 
@@ -86,7 +90,7 @@ public class SentimentGermanKS extends AbstractKSMaster {
     @Override
     public synchronized void reportResult(Tweet tweet) {
         this.treatedTweets.add(tweet);
-        tweetCount++;
+        outTweetCount++;
     }
 
     public void generateSlaves(int numberOfSlaves) {
