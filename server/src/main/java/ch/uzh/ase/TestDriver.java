@@ -1,13 +1,13 @@
 package ch.uzh.ase;
 
-import ch.uzh.ase.TweetRetrieval.StreamRegistry;
-import ch.uzh.ase.TweetRetrieval.TweetStream;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -20,7 +20,7 @@ public class TestDriver {
 
     public static void main(String[] args) throws Exception {
 
-        String searchWord = "Merkel";
+        String searchWord = "London";
 
         InputStream input = null;
 
@@ -35,9 +35,11 @@ public class TestDriver {
 
            database = new DB();
 
-            TweetStream tweetStream = new TweetStream();
-            StreamRegistry.getInstance().register(searchWord, tweetStream);
-            tweetStream.startStream(searchWord);
+//            TweetStream tweetStream = new TweetStream();
+//            StreamRegistry.getInstance().register(searchWord, tweetStream);
+//            tweetStream.startStream(searchWord);
+
+             Map<String, Double> allAverageSentiments = database.getAllAverageSentiments();
 
         } catch (IOException ex) {
             ex.printStackTrace();
