@@ -5,5 +5,5 @@ package ch.uzh.ase.Util;
  */
 public enum TweetStatus {
     //TODO jwa Possible Deadlock: if a slave crashes -> the status of the corresponding tweets remain "FLAGGED" forever!
-    NEW, FLAGGED, EVALUATED, FINISHED, STOPPED;
+    NEW, FLAGGED, EVALUATED, FINISHED, STOPPED
 }

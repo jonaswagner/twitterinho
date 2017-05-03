@@ -21,27 +21,27 @@ import java.util.Set;
  */
 public class DB {
 
-    private MongoDatabase mdb;
-    private MongoClient mongoClient;
-    private MongoCollection mc;
-    private final String ISO = "iso";
-    private final String SENTIMENT = "sentiment";
-    private final String TEXT = "text";
-    private final String AUTHOR = "author";
-    private final String DATE = "date";
-    private final String SEARCH_ID = "searchID";
-    private final String COLLECTION_NAME = "collection";
+    private final MongoDatabase mdb;
+    private final MongoClient mongoClient;
+    private final MongoCollection mc;
+    private static final String ISO = "iso";
+    private static final String SENTIMENT = "sentiment";
+    private static final String TEXT = "text";
+    private static final String AUTHOR = "author";
+    private static final String DATE = "date";
+    private static final String SEARCH_ID = "searchID";
+    private static final String COLLECTION_NAME = "collection";
 
-    public DB(){
+    public DB() {
         mongoClient = new MongoClient(new MongoClientURI(TestDriver.getProp().getProperty("databaseconnection")));
-        mdb= mongoClient.getDatabase(TestDriver.getProp().getProperty("dbname"));
+        mdb = mongoClient.getDatabase(TestDriver.getProp().getProperty("dbname"));
         mdb.withWriteConcern(WriteConcern.JOURNALED);
         mc = mdb.getCollection(COLLECTION_NAME);
     }
 
     public void persist(Tweet tweet) {
         String iso = tweet.getIso().toString();
-        String sentiment = new String (""+tweet.getSentimentScore());
+        String sentiment = new String("" + tweet.getSentimentScore());
         String text = tweet.getText();
         String author = tweet.getAuthor();
         String date = tweet.getDate().toString();
@@ -53,14 +53,14 @@ public class DB {
                 .append(AUTHOR, author)
                 .append(DATE, date)
                 .append(SEARCH_ID, searchID);
-            mc.insertOne(doc);
+        mc.insertOne(doc);
     }
 
-    public double getAverageSentiment(String searchId){
+    public double getAverageSentiment(String searchId) {
         double sum = 0.0;
         int numberOfTweets = 0;
         BasicDBObject query = new BasicDBObject(SEARCH_ID, searchId);
-        MongoCursor<Document>  cursor = mc.find(query).iterator();
+        MongoCursor<Document> cursor = mc.find(query).iterator();
         try {
             while (cursor.hasNext()) {
                 sum = sum + Double.parseDouble(cursor.next().getString(SENTIMENT));
@@ -69,8 +69,7 @@ public class DB {
         } finally {
             cursor.close();
         }
-        double average = sum/(double)numberOfTweets;
-        return average;
+        return sum / (double) numberOfTweets;
     }
 
 
@@ -88,10 +87,10 @@ public class DB {
     }
 
 
-    public Map<String, Double> getAllAverageSentiments(){
-        Map<String, Double> resultMap = new HashMap();
+    public Map<String, Double> getAllAverageSentiments() {
+        Map<String, Double> resultMap = new HashMap<>();
         Set<String> searchIDs = getDistinctSearchIDs();
-        for (String searchId : searchIDs){
+        for (String searchId : searchIDs) {
             resultMap.put(searchId, getAverageSentiment(searchId));
         }
         return resultMap;

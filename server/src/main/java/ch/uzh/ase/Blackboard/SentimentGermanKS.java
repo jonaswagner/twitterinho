@@ -38,12 +38,7 @@ public class SentimentGermanKS extends AbstractKSMaster {
 
     @Override
     public boolean execCondition(Tweet tweet) {
-
-        if (tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.de))) {
-            return true;
-        } else {
-            return false;
-        }
+        return tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.de));
     }
 
     @Override

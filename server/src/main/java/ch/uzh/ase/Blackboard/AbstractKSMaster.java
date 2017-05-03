@@ -55,7 +55,7 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
 
     public void splitWork(ConcurrentLinkedQueue<Tweet> untreatedTweets, List<IKSSlave> slaveList) throws Exception {
         //LOG.info("splitwork started");
-        final List<Tweet> assignedTweets = new ArrayList(DEFAULT_TWEET_CHUNK_SIZE);
+        final List<Tweet> assignedTweets = new ArrayList<>(DEFAULT_TWEET_CHUNK_SIZE);
         if (untreatedTweets.size() == 0) {
             return;
         } else {

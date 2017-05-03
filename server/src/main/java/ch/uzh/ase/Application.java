@@ -43,7 +43,7 @@ public class Application {
             database = new DB();
 
             MainController mainController = new MainController();
-            mainController.addNewSentiment("Theresa May");
+            //mainController.addNewSentiment("Theresa May");
 
         } catch (IOException ex) {
             ex.printStackTrace();

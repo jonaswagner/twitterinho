@@ -22,7 +22,7 @@ public class SentimentEnglishKS extends AbstractKSMaster {
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
 
-    //These variables are needed for monitoring
+
     private long outTweetCount = 0;
     private long inTweetCount = 0;
 
@@ -39,12 +39,7 @@ public class SentimentEnglishKS extends AbstractKSMaster {
 
     @Override
     public boolean execCondition(Tweet tweet) {
-
-        if (tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.en))) {
-            return true;
-        } else {
-            return false;
-        }
+        return tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.en));
     }
 
     @Override

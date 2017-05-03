@@ -38,11 +38,7 @@ public class LanguageKS extends AbstractKSMaster {
 
     @Override
     public boolean execCondition(Tweet tweet) {
-
-        if (tweet.getIso() == null){
-            return true;
-        }
-        return false;
+        return tweet.getIso() == null;
     }
 
     @Override

@@ -11,10 +11,10 @@ import java.util.List;
 public interface IWorkloadSubject {
 
     //TODO jwa report Workload
-    public Workload reportWorkload();
-    public void generateSlaves(int numberOfSlaves);
+     Workload reportWorkload();
+     void generateSlaves(int numberOfSlaves);
     @Deprecated
-    public void shutdownSlavesGracefully(int numberOfSlaves);
-    public IKSSlave getLeastBusySlave(List<IKSSlave> slaveList) throws Exception;
-    public int getNumberOfSlaves();
+     void shutdownSlavesGracefully(int numberOfSlaves);
+     IKSSlave getLeastBusySlave(List<IKSSlave> slaveList) throws Exception;
+     int getNumberOfSlaves();
 }

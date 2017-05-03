@@ -8,9 +8,9 @@ import java.util.List;
  * Created by jonas on 25.04.2017.
  */
 public interface IKSSlave {
-    public static final String NLP_ANNOTATORS = "tokenize, ssplit, parse, sentiment";
+     static final String NLP_ANNOTATORS = "tokenize, ssplit, parse, sentiment";
 
-    public void subservice(List<Tweet> tasks);
-    public int getUncompletedTasks();
-    public void kill();
+     void subservice(List<Tweet> tasks);
+     int getUncompletedTasks();
+     void kill();
 }
