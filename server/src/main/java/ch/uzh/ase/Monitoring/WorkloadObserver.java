@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -29,6 +31,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     double loadAverage = 0.0d;
     String arch = "";
     String name = "";
+    DecimalFormat df = new DecimalFormat("#.##");
+
 
     //Monitoring variables
     private final DefaultPerformanceConfiguration configuration;
@@ -45,10 +49,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             arch = osMBean.getArch();
             LOG.warn("System Architecture: " + osMBean.getArch());
             name = osMBean.getName();
-            LOG.warn("OS Name: "+ name);
+            LOG.warn("OS Name: " + name);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        df.setRoundingMode(RoundingMode.CEILING);
     }
 
     public WorkloadObserver(DefaultPerformanceConfiguration configuration) {
@@ -60,10 +65,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             arch = osMBean.getArch();
             LOG.warn("System Architecture: " + osMBean.getArch());
             name = osMBean.getName();
-            LOG.warn("OS Name: "+ name);
+            LOG.warn("OS Name: " + name);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        df.setRoundingMode(RoundingMode.CEILING);
     }
 
     @Override
@@ -94,8 +100,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
                 loadAverage = osMBean.getSystemCpuLoad();
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
-                LOG.warn("CPU Load Average: " + loadAverage);
-                LOG.warn("Free Memory (max 16GB): " + (freeSwapSize/1024)/1024 + "MB");
+                LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
+                LOG.warn("Free RAM (max 16GB): " + df.format((((double) freeSwapSize / 1024d) / 1024d) / 1024d) + "GB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;
