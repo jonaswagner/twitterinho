@@ -31,7 +31,7 @@ public class TweetStream {
         listener = new StatusListener() {
 
             public void onStatus(Status status) {
-                System.out.println(status.getText());
+               // System.out.println(status.getText());
 
                 String text = status.getText();
                 String author = status.getUser().getName();
