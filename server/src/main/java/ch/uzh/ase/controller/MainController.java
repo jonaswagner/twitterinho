@@ -64,7 +64,7 @@ public class MainController {
 
 
         TweetStream tweetStream = new TweetStream();
-        StreamRegistry.getInstance().register(searchId, tweetStream);
+        StreamRegistry.getInstance().register(searchId);
         tweetStream.startStream(searchId);
 
 

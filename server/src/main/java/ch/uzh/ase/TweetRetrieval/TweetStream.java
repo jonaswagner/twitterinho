@@ -4,16 +4,19 @@ import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import com.mongodb.connection.Stream;
 import org.joda.time.DateTime;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TweetStream {
 
+    private TwitterStream twitterStream;
+    private StatusListener listener;
+    private String searchID;
 
-
-    public void startStream(String topic) {
-
+    public void startStream(String searchID) {
+        this.searchID = searchID;
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
                 //.setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
@@ -24,19 +27,16 @@ public class TweetStream {
                 .setOAuthConsumerSecret(TestDriver.getProp().getProperty("oauth.consumerSecret"))
                 .setOAuthAccessToken(TestDriver.getProp().getProperty("oauth.accessToken"))
                 .setOAuthAccessTokenSecret(TestDriver.getProp().getProperty("oauth.accessTokenSecret"));
-        TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
-        StatusListener listener = new StatusListener() {
+        twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+        listener = new StatusListener() {
 
             public void onStatus(Status status) {
-                //System.out.println(status.getText());
+                System.out.println(status.getText());
 
                 String text = status.getText();
                 String author = status.getUser().getName();
                 DateTime date = new DateTime(status.getCreatedAt().getTime());
-                String searchID = topic;
-
                 Tweet tweet = new Tweet(text, author, date, searchID);
-
                 StreamRegistry.getInstance().locateBlackboard(searchID).addNewTweet(tweet, TweetStatus.NEW);
             }
 
@@ -60,10 +60,22 @@ public class TweetStream {
         };
 
         FilterQuery fq = new FilterQuery();
-        String keywords[] = {topic};
+        String keywords[] = {searchID};
         fq.track(keywords);
         twitterStream.addListener(listener);
         twitterStream.filter(fq);
     }
+
+    public void stopStream(){
+        if (twitterStream != null) {
+            twitterStream.shutdown();
+            twitterStream.cleanUp();
+        }
+        twitterStream = null;
+        listener = null;
+        StreamRegistry.getInstance().unRegister(searchID);
+        System.out.println("___________________________________________________________________TWITTER STREAM STOPP________________________________________________________________________________________");
+    }
+
 
 }

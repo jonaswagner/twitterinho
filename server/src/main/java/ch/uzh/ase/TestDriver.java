@@ -26,7 +26,7 @@ public class TestDriver {
         //ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         //rootLogger.setLevel(Level.toLevel(Level.WARN.levelInt));
 
-        String searchWord = "MacronPresident";
+        String searchWord = "Paris";
 
         InputStream input = null;
 
@@ -34,18 +34,15 @@ public class TestDriver {
             input = new FileInputStream("server/config.properties");
             prop.load(input);
 
-            LOG.info(prop.getProperty("oauth.accessToken"));
             LOG.info(prop.getProperty("databaseconnection"));
             LOG.info(prop.getProperty("dbname"));
-            LOG.info(prop.getProperty("database")); //TODO silvio - remove this
+            LOG.info(prop.getProperty("database")); //TODO silvio - http://tinyurl.com/4poyc6x
 
            database = new DB();
 
-            TweetStream tweetStream = new TweetStream();
-            StreamRegistry.getInstance().register(searchWord, tweetStream);
-            tweetStream.startStream(searchWord);
+           StreamRegistry.getInstance().register(searchWord);
 
-             //Map<String, Double> allAverageSentiments = database.getAllAverageSentiments();
+//            Map<String, Double> allAverageSentiments = database.getAllAverageSentiments();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -59,12 +56,8 @@ public class TestDriver {
             }
         }
 
-        //only for testing:
-//        while (true) {
-//            Thread.sleep(5000);
-//            double averageSentiment = database.getAverageSentiment(searchWord);
-//            LOG.info("The average sentiment for the term: " +searchWord+ " is " + averageSentiment);
-//        }
+        Thread.sleep(10000);
+        StreamRegistry.getInstance().locateStream(searchWord).stopStream();
     }
 
     public static DB getDatabase(){

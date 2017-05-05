@@ -38,12 +38,8 @@ public class Application {
 
             LOG.info(prop.getProperty("databaseconnection"));
             LOG.info(prop.getProperty("dbname"));
-            LOG.info(prop.getProperty("database"));
 
             database = new DB();
-
-            MainController mainController = new MainController();
-            //mainController.addNewSentiment("Theresa May");
 
         } catch (IOException ex) {
             ex.printStackTrace();

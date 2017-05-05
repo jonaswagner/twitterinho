@@ -20,13 +20,13 @@ public class StreamRegistry {
     private StreamRegistry(){
     }
 
-
-
     private List<Blackboard> blackboardList =  Collections.synchronizedList(new ArrayList<>());
     private Map<String, TweetStream> streamMap = new ConcurrentHashMap<>();
     private Map<Blackboard, List<String>> blackboardMap = new ConcurrentHashMap<>();
 
-    public void register(String streamId, TweetStream tweetStream){
+    public void register(String streamId){
+        TweetStream tweetStream = new TweetStream();
+        tweetStream.startStream(streamId);
         streamMap.put(streamId, tweetStream);
 
         if (blackboardMap.isEmpty()){
@@ -37,7 +37,7 @@ public class StreamRegistry {
         }
     }
 
-    public void unRegister(String streamId, TweetStream tweetStream){
+    public void unRegister(String streamId){
         streamMap.remove(streamId);
     }
 
