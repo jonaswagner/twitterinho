@@ -96,5 +96,14 @@ public class DB {
         return resultMap;
     }
 
+    public void deleteCollection() {
+        mc.drop();
+    }
 
+    public void deleteSearchIdEntries(String searchId){
+        BasicDBObject query = new BasicDBObject();
+        query.append(SEARCH_ID, searchId);
+        mc.deleteMany(query);
+
+    }
 }

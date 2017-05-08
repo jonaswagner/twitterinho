@@ -1,14 +1,10 @@
 
 package ch.uzh.ase.controller;
 
-import ch.uzh.ase.NLP;
+import ch.uzh.ase.Application;
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
-import ch.uzh.ase.TweetRetrieval.TweetManager;
-import ch.uzh.ase.TweetRetrieval.TweetStream;
 import ch.uzh.ase.domain.Sentiment;
 import ch.uzh.ase.repository.SentimentRepository;
-import org.json.JSONObject;
-import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @RestController
@@ -52,52 +49,50 @@ public class MainController {
 
     @RequestMapping(value = "/twt/terms", method = RequestMethod.GET)
     public ResponseEntity<List<Sentiment>> getRegisteredTerms() {
+
+        //String = searchId, Double = Sentimentvalue
+        Map<String, Double> allRegistredTerms = Application.getDatabase().getAllAverageSentiments();
+
         return new ResponseEntity<>(createSentiments(), HttpStatus.OK);
     }
 
 
     @RequestMapping(value = "/twt/term", method = RequestMethod.POST)
     public ResponseEntity<Sentiment> addTerm(@RequestBody String searchId) {
-        System.out.println(searchId);
-        JSONObject obj = new JSONObject(searchId);
-        String sentimentName = obj.getString("sentiment");
 
-
-        TweetStream tweetStream = new TweetStream();
+        //starts TweetStream for given searchWord
         StreamRegistry.getInstance().register(searchId);
-        tweetStream.startStream(searchId);
 
+        Sentiment s = new Sentiment(null);
 
-        Sentiment s = new Sentiment(sentimentName);
-
-
-        ArrayList<String> tweets = TweetManager.getTweets(searchId);
-        NLP.init();
-
-        List<Double> sentimentValues = new ArrayList<>();
-        for (String tweet : tweets) {
-            double sentimentValue = NLP.findSentiment(tweet);
-            sentimentValues.add(sentimentValue);
-        }
-        s.setValues(sentimentValues);
-
-
-//        s.setValues(createDummyValues());
         return new ResponseEntity<Sentiment>(s, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/twt/term", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteTerm(String termId) {
+    public ResponseEntity<Object> deleteTerm(String searchId) {
+        //deletes all documents for a certain searchId from DB
+        Application.getDatabase().deleteSearchIdEntries(searchId);
+        return null;
+    }
+
+    //TODO Flavio: neue Methode
+    @RequestMapping(value = "/twt/term", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteCollection() {
+        //deletes whole DB
+        Application.getDatabase().deleteCollection();
         return null;
     }
 
     @RequestMapping(value = "/twt/term/stream", method = RequestMethod.GET)
-    public ResponseEntity<Object> getStream(String termId) {
+    public ResponseEntity<Object> getStream(String searchId) {
+        //holt den aktuellen durchschnittlichen Sentimentwert für eine searchId
+        double averageSentiment = Application.getDatabase().getAverageSentiment(searchId);
         return null;
     }
 
     @RequestMapping(value = "/twt/term/stream", method = RequestMethod.PUT)
-    public ResponseEntity<Object> cancelStream(String termId) {
+    public ResponseEntity<Object> cancelStream(String searchId) {
+        StreamRegistry.getInstance().locateStream(searchId).stopStream();
         return null;
     }
 
