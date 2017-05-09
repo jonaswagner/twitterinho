@@ -1,10 +1,8 @@
 package ch.uzh.ase.TweetRetrieval;
 
-import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
-import com.mongodb.connection.Stream;
 import org.joda.time.DateTime;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
@@ -37,6 +35,7 @@ public class TweetStream {
                 String author = status.getUser().getName();
                 DateTime date = new DateTime(status.getCreatedAt().getTime());
                 Tweet tweet = new Tweet(text, author, date, searchID);
+                tweet.setFlaggedNew(DateTime.now());
                 StreamRegistry.getInstance().locateBlackboard(searchID).addNewTweet(tweet, TweetStatus.NEW);
             }
 

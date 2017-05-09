@@ -2,6 +2,7 @@ package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,7 @@ public class BlackboardControl extends Thread {
 
         if (tweet.getIso() != null && tweet.getSentimentScore() != Tweet.INIT_SENTIMENT_SCORE) {
             blackboard.changeTweetStatus(tweet, TweetStatus.FINISHED);
+            tweet.setFlaggedFinished(DateTime.now());
             return;
         }
         for (IKS ks : iksList) {

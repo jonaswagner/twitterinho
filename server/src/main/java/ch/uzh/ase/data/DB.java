@@ -10,6 +10,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +33,9 @@ public class DB {
     private static final String DATE = "date";
     private static final String SEARCH_ID = "searchID";
     private static final String COLLECTION_NAME = "collection";
+    private final String LANGUAGE_DETECTION_DURATION = "languageDetectionDuration";
+    private final String SENTIMENT_DETECTION_DURATION = "sentimentDetectionDuration";
+    private final String PROCESSING_TIME = "processingTime";
 
     public DB() {
         mongoClient = new MongoClient(new MongoClientURI(TestDriver.getProp().getProperty("databaseconnection")));
@@ -41,18 +46,35 @@ public class DB {
 
     public void persist(Tweet tweet) {
         String iso = tweet.getIso().toString();
-        String sentiment = new String("" + tweet.getSentimentScore());
+        String sentiment = new String (""+tweet.getSentimentScore());
         String text = tweet.getText();
         String author = tweet.getAuthor();
         String date = tweet.getDate().toString();
         String searchID = tweet.getSearchID();
+        DateTime startLangDetTime = tweet.getStartLangDetection();
+        DateTime endLangDetTime = tweet.getEndLangDetection();
+        DateTime startSentDetTime = tweet.getStartSentimentAnalysis();
+        DateTime endSentDetTime = tweet.getEndSentimentAnalysis();
+        DateTime newTweetTime = tweet.getFlaggedNew();
+        DateTime finishedTweetTime = tweet.getFlaggedFinished();
+
+        Interval langDetTimeInterval = new Interval(startLangDetTime, endLangDetTime);
+        Interval sentDetTimeInterval = new Interval(startSentDetTime, endSentDetTime);
+        Interval processingTimeInterval = new Interval(newTweetTime, finishedTweetTime);
+
+        String langDetTime  = String.valueOf(langDetTimeInterval.toDurationMillis());
+        String sentDetTime  = String.valueOf(sentDetTimeInterval.toDurationMillis());
+        String processingTime = String.valueOf(processingTimeInterval.toDurationMillis());
 
         Document doc = new Document(ISO, iso)
                 .append(SENTIMENT, sentiment)
                 .append(TEXT, text)
                 .append(AUTHOR, author)
                 .append(DATE, date)
-                .append(SEARCH_ID, searchID);
+                .append(SEARCH_ID, searchID)
+                .append(LANGUAGE_DETECTION_DURATION, langDetTime)
+                .append(SENTIMENT_DETECTION_DURATION, sentDetTime)
+                .append(PROCESSING_TIME, processingTime);
         mc.insertOne(doc);
     }
 
@@ -86,7 +108,6 @@ public class DB {
         return searchIDs;
     }
 
-
     public Map<String, Double> getAllAverageSentiments() {
         Map<String, Double> resultMap = new HashMap<>();
         Set<String> searchIDs = getDistinctSearchIDs();
@@ -104,6 +125,20 @@ public class DB {
         BasicDBObject query = new BasicDBObject();
         query.append(SEARCH_ID, searchId);
         mc.deleteMany(query);
+    }
 
+    public long getProcessingTime(){
+        long sum = 0;
+        int numberOfTweets = 0;
+        MongoCursor<Document> cursor = mc.find().iterator();
+        try {
+            while (cursor.hasNext()) {
+                sum = sum + Long.parseLong(cursor.next().getString(PROCESSING_TIME));
+                numberOfTweets++;
+            }
+        } finally {
+            cursor.close();
+        }
+        return sum / numberOfTweets;
     }
 }
