@@ -103,6 +103,7 @@ public class MainController {
 
     @RequestMapping(value = "/twt/monitor/statistics", method = RequestMethod.GET)
     public ResponseEntity<Object> getTermStatistics() {
+        Map<String, Long> termStats = Application.getDatabase().getTermStatistics();
         return null;
     }
 

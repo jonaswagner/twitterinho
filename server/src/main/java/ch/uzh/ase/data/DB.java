@@ -13,10 +13,7 @@ import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Silvio Fankhauser on 26.04.2017.
@@ -127,13 +124,13 @@ public class DB {
         mc.deleteMany(query);
     }
 
-    public long getProcessingTime(){
+    public long getEvaluationTime(String key){
         long sum = 0;
         int numberOfTweets = 0;
         MongoCursor<Document> cursor = mc.find().iterator();
         try {
             while (cursor.hasNext()) {
-                sum = sum + Long.parseLong(cursor.next().getString(PROCESSING_TIME));
+                sum = sum + Long.parseLong(cursor.next().getString(key));
                 numberOfTweets++;
             }
         } finally {
@@ -141,4 +138,21 @@ public class DB {
         }
         return sum / numberOfTweets;
     }
+
+    public Map<String, Long> getTermStatistics(){
+        Map<String, Long> resultMap = new HashMap<>();
+
+        long langDetTime = getEvaluationTime(LANGUAGE_DETECTION_DURATION);
+        long sentDetTime = getEvaluationTime(SENTIMENT_DETECTION_DURATION);
+        long procTime = getEvaluationTime(PROCESSING_TIME);
+
+        resultMap.put(LANGUAGE_DETECTION_DURATION, langDetTime);
+        resultMap.put(SENTIMENT_DETECTION_DURATION, sentDetTime);
+        resultMap.put(PROCESSING_TIME, procTime);
+
+        return resultMap;
+    }
+
+
+
 }

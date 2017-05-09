@@ -73,7 +73,6 @@ public class TweetStream {
         twitterStream = null;
         listener = null;
         StreamRegistry.getInstance().unRegister(searchID);
-        System.out.println("___________________________________________________________________TWITTER STREAM STOPP________________________________________________________________________________________");
     }
 
 
