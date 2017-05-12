@@ -26,7 +26,7 @@ public class StreamRegistry {
 
     public void register(String streamId){
         TweetStream tweetStream = new TweetStream();
-        //tweetStream.startStream(streamId);
+        tweetStream.startStream(streamId);
         streamMap.put(streamId, tweetStream);
 
         if (blackboardMap.isEmpty()){
