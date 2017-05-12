@@ -27,11 +27,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
     private final MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
     private OperatingSystemMXBean osMBean;
-    long freeSwapSize = 0l;
-    double loadAverage = 0.0d;
-    String arch = "";
-    String name = "";
-    DecimalFormat df = new DecimalFormat("#.##");
+    private long freeSwapSize = 0l;
+    private double loadAverage = 0.0d;
+    private String arch = "";
+    private String name = "";
+    private final DecimalFormat df = new DecimalFormat("#.##");
 
 
     //Monitoring variables
@@ -41,19 +41,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private long systemTweetsPerMin = 0;
 
     public WorkloadObserver() {
-        this.configuration = new DefaultPerformanceConfiguration();
-        this.timeSlot = DateTime.now();
-        this.subjects = Collections.synchronizedList(new ArrayList<>());
-        try {
-            this.osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-            arch = osMBean.getArch();
-            LOG.warn("System Architecture: " + osMBean.getArch());
-            name = osMBean.getName();
-            LOG.warn("OS Name: " + name);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        df.setRoundingMode(RoundingMode.CEILING);
+        this(new DefaultPerformanceConfiguration());
     }
 
     public WorkloadObserver(DefaultPerformanceConfiguration configuration) {
@@ -201,5 +189,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             this.subjects.remove(subject);
             LOG.warn("subject has been removed: " + subject.toString());
         }
+    }
+
+    public int getNumberOfSubjects() {
+        return subjects.size();
     }
 }

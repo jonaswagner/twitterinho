@@ -13,8 +13,6 @@ public interface IWorkloadSubject {
     //TODO jwa report Workload
      Workload reportWorkload();
      void generateSlaves(int numberOfSlaves);
-    @Deprecated
      void shutdownSlavesGracefully(int numberOfSlaves);
-     IKSSlave getLeastBusySlave(List<IKSSlave> slaveList) throws Exception;
      int getNumberOfSlaves();
 }

@@ -12,11 +12,8 @@ import java.util.Map;
  * Created by jonas on 24.04.2017.
  */
 public class BlackboardControl extends Thread {
-    //TODO jwa init this somewhere
     private final Blackboard blackboard;
-    //TODO jwa init IKSList
     private List<IKS> iksList;
-    //TODO jwa implement DB stuff
     private boolean shutdown = false;
 
     public BlackboardControl(Blackboard blackboard, List<IKS> iksList) {
@@ -49,14 +46,13 @@ public class BlackboardControl extends Thread {
                     break;
                 }
                 case FLAGGED:
+                case FINISHED:
                     break;
-                case STOPPED: {
+                case STOPPED:
+                default: {
                     discardedTweets.add(element.getKey());
                     break;
                 }
-                case FINISHED:
-                    break;
-                default:
             }
         }
 

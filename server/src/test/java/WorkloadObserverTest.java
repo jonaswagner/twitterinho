@@ -43,9 +43,16 @@ public class WorkloadObserverTest {
         subject = null;
     }
 
+    @Test
     public void registerDeRegisterTest() {
         observer.register(subject);
-        //Assert.assertEquals(observer.getName());
+        Assert.assertEquals(observer.getNumberOfSubjects(), 1);
+        observer.register(subject);
+        Assert.assertEquals(observer.getNumberOfSubjects(), 1);
+        observer.deRegister(subject);
+        Assert.assertEquals(observer.getNumberOfSubjects(), 0);
+        observer.deRegister(subject);
+        Assert.assertEquals(observer.getNumberOfSubjects(), 0);
         //TODO jwa implement this further
     }
 

@@ -26,14 +26,17 @@ public class StreamRegistry {
 
     public void register(String streamId){
         TweetStream tweetStream = new TweetStream();
-        tweetStream.startStream(streamId);
+        //tweetStream.startStream(streamId);
         streamMap.put(streamId, tweetStream);
 
         if (blackboardMap.isEmpty()){
             setBlackboard();
             blackboardMap.put(blackboardList.get(0), Arrays.asList(streamId)); //FIXME pls consider concurrency
         } else {
-            blackboardMap.get(blackboardList.get(0)).add(streamId);
+            List<String> streams = blackboardMap.get(locateBlackboard(streamId));
+            if (!streams.contains(streamId)) {
+                streams.add(streamId);
+            }
         }
     }
 
