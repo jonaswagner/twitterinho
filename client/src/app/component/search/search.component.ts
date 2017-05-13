@@ -2,31 +2,32 @@
  * Created by flaviokeller on 20.03.17.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Term} from "../../model/term";
 import {SentimentService} from "../../service/sentiment.service";
+import {Subscription} from "rxjs/Subscription";
 @Component({
   selector: 'search-component',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css'],
 })
 
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
-    this.getSentiments();
+    this.getTerms();
   }
 
   private tweet: any[] = [];
   private activeSentiments: Term[] = [];
   private addedSentiment: Term;
   private addedSentimentString: string;
+  private sentimentSubscription: Subscription;
 
   constructor(private sentimentService: SentimentService) {
   }
 
   addSentiment() {
-//TODO added tech stack: maven, git, primeng
     this.addedSentiment = {id: 1, name: this.addedSentimentString, values: []};
 
     this.sentimentService.addTerm(this.addedSentimentString).subscribe(
@@ -43,7 +44,7 @@ export class SearchComponent implements OnInit {
   }
 
 
-  getSentiments() {
+  getTerms() {
 
     this.sentimentService.getTerms().subscribe(
       data => {
@@ -58,5 +59,27 @@ export class SearchComponent implements OnInit {
 
   sendToDisplay(sentiment) {
     this.sentimentService.displaySentiment(sentiment);
+    this.sentimentService.startStream(sentiment).subscribe(
+      data => {
+      },
+      err => console.log(err),
+      () => console.log("done")
+    );
+    this.sentimentSubscription = this.sentimentService.getStream(sentiment).subscribe(
+      data => {
+        let currentSentiment = this.activeSentiments.find(currentSentiment => currentSentiment.name == sentiment.name);
+        currentSentiment.values.push(data);
+        this.sentimentService.displaySentiment(currentSentiment);
+      },
+      err => {
+        console.log(err);
+      },
+      () => console.log("done")
+    );
+
+  }
+
+  ngOnDestroy(): void {
+    this.sentimentSubscription.unsubscribe();
   }
 }

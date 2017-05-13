@@ -18,17 +18,6 @@ export class MonitorService {
 
   }
 
-  addSentiment(sentiment: string): Observable<Term> {
-    let headers = new Headers({'Content-Type': 'application/json'});
-    let options = new RequestOptions({headers: headers});
-
-    return this.http.post("/twt/sentiment", {sentiment}, options)
-      .map((response: Response) => <Term>response.json()) // ...and calling .json() on the response to return data
-      .catch(
-        (error: any) => Observable.throw(error.json().error || 'Server error')); //...errors if a;
-  }
-
-
   getCpuLoad(): Observable<number> {
 
     return this.http.get("/twt/monitor/cpu")

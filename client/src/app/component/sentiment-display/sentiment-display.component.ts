@@ -11,8 +11,6 @@ import {Subscription} from "rxjs";
   selector: 'sentiment-display-component',
   templateUrl: './sentiment-display.component.html',
   styleUrls: ['./sentiment-display.component.css'],
-
-
 })
 
 export class SentimentDisplayComponent implements OnInit, OnDestroy {
@@ -39,7 +37,8 @@ export class SentimentDisplayComponent implements OnInit, OnDestroy {
   }
 
   cancelStream() {
-    this.sentimentService.cancelStream(this.selectedTerm.name).subscribe(
+    // this.subscription.unsubscribe();
+    this.sentimentService.cancelStream(this.selectedTerm).subscribe(
       data => {
         console.log("canceled current term: " + data);
       },

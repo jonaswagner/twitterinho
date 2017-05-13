@@ -16,6 +16,9 @@
 <div class="row">
   <ul class="active-sentiments">
     <li *ngFor="let s of activeSentiments">
-      <a (click)="sendToDisplay(s)">{{s.name}}</a></li>
+      <a (click)="sendToDisplay(s)">{{s.name}}
+        <span class="pull-right">{{s.values[0]}}</span>
+      </a>
+    </li>
   </ul>
 </div>

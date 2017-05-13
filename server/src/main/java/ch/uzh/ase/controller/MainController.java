@@ -4,12 +4,15 @@ package ch.uzh.ase.controller;
 import ch.uzh.ase.Application;
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.domain.Sentiment;
+import ch.uzh.ase.domain.Term;
 import ch.uzh.ase.repository.SentimentRepository;
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.Path;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -48,12 +51,16 @@ public class MainController {
 //    }
 
     @RequestMapping(value = "/twt/terms", method = RequestMethod.GET)
-    public ResponseEntity<List<Sentiment>> getRegisteredTerms() {
+    public ResponseEntity<List<Term>> getRegisteredTerms() {
 
         //String = searchId, Double = Sentimentvalue
         Map<String, Double> allRegistredTerms = Application.getDatabase().getAllAverageSentiments();
-
-        return new ResponseEntity<>(createSentiments(), HttpStatus.OK);
+        List<Term> termList = new ArrayList<>();
+        for (Map.Entry<String, Double> mapTerm : allRegistredTerms.entrySet()) {
+            Term term = new Term(mapTerm.getKey(), mapTerm.getValue());
+            termList.add(term);
+        }
+        return new ResponseEntity<List<Term>>(termList, HttpStatus.OK);
     }
 
 
@@ -76,23 +83,28 @@ public class MainController {
     }
 
     //TODO Flavio: neue Methode
-    @RequestMapping(value = "/twt/term", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/twt/terms", method = RequestMethod.DELETE)
     public ResponseEntity<Object> deleteCollection() {
         //deletes whole DB
         Application.getDatabase().deleteCollection();
         return null;
     }
 
-    @RequestMapping(value = "/twt/term/stream", method = RequestMethod.GET)
-    public ResponseEntity<Object> getStream(String searchId) {
-        //holt den aktuellen durchschnittlichen Sentimentwert für eine searchId
-        double averageSentiment = Application.getDatabase().getAverageSentiment(searchId);
-        return null;
+    @RequestMapping(value = "/twt/term/{name}/stream/start", method = RequestMethod.POST)
+    public void startStream(@PathVariable String name) {
+        StreamRegistry.getInstance().register(name);
     }
 
-    @RequestMapping(value = "/twt/term/stream", method = RequestMethod.PUT)
-    public ResponseEntity<Object> cancelStream(String searchId) {
-        StreamRegistry.getInstance().locateStream(searchId).stopStream();
+    @RequestMapping(value = "/twt/term/{name}/stream", method = RequestMethod.GET)
+    public double getStream(@PathVariable String name) {
+        //holt den aktuellen durchschnittlichen Sentimentwert für eine searchId
+        double averageSentiment = Application.getDatabase().getAverageSentiment(name);
+        return Application.getDatabase().getAverageSentiment(name);
+    }
+
+    @RequestMapping(value = "/twt/term/{name}/stream", method = RequestMethod.PUT)
+    public ResponseEntity<Object> cancelStream(@PathVariable String name) {
+        StreamRegistry.getInstance().locateStream(name).stopStream();
         return null;
     }
 
@@ -118,7 +130,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/twt/monitor/scale", method = RequestMethod.POST)
-    public ResponseEntity<Object> scaleUp(){
+    public ResponseEntity<Object> scaleUp() {
         return null;
     }
 

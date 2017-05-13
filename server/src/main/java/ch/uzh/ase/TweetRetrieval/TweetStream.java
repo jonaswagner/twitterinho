@@ -1,5 +1,6 @@
 package ch.uzh.ase.TweetRetrieval;
 
+import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
@@ -21,10 +22,10 @@ public class TweetStream {
                 //.setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
                 //.setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
                 //.setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
-        .setOAuthConsumerKey(TestDriver.getProp().getProperty("oauth.consumerKey"))
-                .setOAuthConsumerSecret(TestDriver.getProp().getProperty("oauth.consumerSecret"))
-                .setOAuthAccessToken(TestDriver.getProp().getProperty("oauth.accessToken"))
-                .setOAuthAccessTokenSecret(TestDriver.getProp().getProperty("oauth.accessTokenSecret"));
+        .setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
+                .setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
+                .setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
+                .setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
         twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         listener = new StatusListener() {
 

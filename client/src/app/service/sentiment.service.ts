@@ -1,9 +1,10 @@
-import {Http, RequestOptions, Headers, Response} from "@angular/http";
+import {Http, RequestOptions, Headers, Response, URLSearchParams} from "@angular/http";
 import 'rxjs/add/operator/map';
 import {Observable, Subject} from "rxjs";
 import {Injectable} from "@angular/core";
 import {Term} from "../model/term";
 import {parseHttpResponse} from "selenium-webdriver/http";
+import {subscribeOn} from "rxjs/operator/subscribeOn";
 /**
  * Created by flaviokeller on 20.03.17.
  */
@@ -14,6 +15,7 @@ export class SentimentService {
   private sentiments: Term[];
   private sentimentSource = new Subject<Term>();
   sentimentStream$ = this.sentimentSource.asObservable();
+  private subscription: any;
 
   constructor(private http: Http) {
 
@@ -44,16 +46,29 @@ export class SentimentService {
       .catch((error: any) => Observable.throw(error.json().error || "Server error"))
   }
 
-  getStream(term: string): Observable<number> {
-    return this.http.get("/twt/term/stream")
-      .map((response: Response) => <number>response.json())
-      .catch((error: any) => Observable.throw(error.json().error || "Server error"));
+  startStream(term: Term): any {
+    let headers = new Headers({'Content-Type': 'application/json'});
+    let options = new RequestOptions({headers: headers});
+    return this.http.post("/twt/term/" + term.name + "/stream/start", options);
   }
-  cancelStream(term: string):any {
+
+  getStream(term: Term): Observable<number> {
+    this.subscription = Observable
+      .interval(10000);
+    return this.subscription.flatMap(
+      () =>
+        this.http.get("/twt/term/" + term.name + "/stream")
+          .map((response: Response) => <number>response.json())
+          .catch((error: any) => Observable.throw(error.json().error || "Server error"))
+    );
+  }
+
+  cancelStream(term: Term): any {
+    this.subscription = Observable.interval(0);
     let headers = new Headers({'Content-Type': 'application/json'});
     let options = new RequestOptions({headers: headers});
 
-    return this.http.put("/twt/term/stream", {term}, options)
+    return this.http.put("/twt/term/" + term.name + "/stream", options)
       .map((response: Response) => response.json())
       .catch((error: any) => Observable.throw(error.json().error || "Server error"));
   }

@@ -15,7 +15,7 @@ import {SentimentService} from "../../service/sentiment.service";
 export class TwitterinhoChartComponent implements OnChanges {
   @ViewChild('chart') chart: UIChart;
 
-  ngOnChanges(changes: any): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.data.datasets[0].label = this.currentTerm.name;
     this.data.datasets[0].data = this.currentTerm.values;
     setTimeout(() => {
