@@ -16,23 +16,31 @@ export class TwitterinhoChartComponent implements OnChanges {
   @ViewChild('chart') chart: UIChart;
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.data.datasets[0].label = this.currentTerm.name;
-    this.data.datasets[0].data = this.currentTerm.values;
-    setTimeout(() => {
-      this.chart.reinit();
-    }, 100);
+    if (this.data.datasets[0].label === this.currentTerm.name) {
+      this.data.datasets[0].data.concat(this.currentTerm.values);
+      setTimeout(() => {
+        this.chart.refresh();
+      }, 100);
+    } else {
+      this.data.datasets[0].label = this.currentTerm.name;
+      this.data.datasets[0].data = this.currentTerm.values;
+      setTimeout(() => {
+        this.chart.reinit();
+      }, 100);
+    }
   }
 
   @Input()
   currentTerm: Term = new Term();
+  @Input()
   data: any;
   options: any;
   msgs: Message[];
 
   constructor() {
 
-    var bodyStyles = window.getComputedStyle(document.body);
-    var twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
+    let bodyStyles = window.getComputedStyle(document.body);
+    let twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
     this.data = {
       labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'],
       datasets: [

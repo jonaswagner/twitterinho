@@ -75,6 +75,7 @@ export class SentimentService {
 
 
   displaySentiment(sentiment: Term) {
-    this.sentimentSource.next(sentiment);
+    let changedTerm: Term = {id: sentiment.id, name: sentiment.name, values: sentiment.values};
+    this.sentimentSource.next(changedTerm);
   }
 }
