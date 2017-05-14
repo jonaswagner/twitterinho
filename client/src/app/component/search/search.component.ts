@@ -6,6 +6,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Term} from "../../model/term";
 import {SentimentService} from "../../service/sentiment.service";
 import {Subscription} from "rxjs/Subscription";
+import {IntervalObservable} from "rxjs/observable/IntervalObservable";
 @Component({
   selector: 'search-component',
   templateUrl: './search.component.html',
@@ -18,37 +19,50 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.getTerms();
   }
 
-  private tweet: any[] = [];
-  private activeSentiments: Term[] = [];
-  private addedSentiment: Term;
-  private addedSentimentString: string;
+  private activeTerms: Term[] = [];
+  private addedTerm: Term;
+  private addedTermName: string;
   private sentimentSubscription: Subscription;
 
   constructor(private sentimentService: SentimentService) {
   }
 
-  addSentiment() {
-    this.addedSentiment = {id: 1, name: this.addedSentimentString, values: []};
+  addTerm() {
+    this.addedTerm = {id: 1, name: this.addedTermName, values: []};
 
-    this.sentimentService.addTerm(this.addedSentimentString).subscribe(
+    this.sentimentService.addTerm(this.addedTermName).subscribe(
       data => {
-        this.activeSentiments.push(data);
-        this.sendToDisplay(data);
+        this.activeTerms.push(this.addedTerm);
+        this.sendToDisplay(this.addedTerm);
       },
       err => {
         console.log(err);
       },
       () => console.log("done"))
     ;
-    this.addedSentimentString = "";
+    this.addedTermName = "";
+    this.sendToDisplay(this.addedTerm)
   }
 
 
-  getTerms() {
+  deleteTerm(term: Term) {
+    this.sentimentService.deleteTerm(term.name).subscribe(
+      data => {
+        let index: number = this.activeTerms.indexOf(term);
+        if (index !== -1) {
 
+          this.activeTerms.splice(index, 1);
+        }
+      },
+      err => console.log(err),
+      () => console.log('done')
+    );
+  }
+
+  getTerms() {
     this.sentimentService.getTerms().subscribe(
       data => {
-        this.activeSentiments = data;
+        this.activeTerms = data;
       },
       err => {
         console.log(err);
@@ -57,17 +71,17 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   }
 
-  sendToDisplay(sentiment) {
-    this.sentimentService.displaySentiment(sentiment);
-    this.sentimentService.startStream(sentiment).subscribe(
+  sendToDisplay(term: Term) {
+    this.sentimentService.displaySentiment(term);
+    this.sentimentService.startStream(term).subscribe(
       data => {
       },
       err => console.log(err),
       () => console.log("done")
     );
-    this.sentimentSubscription = this.sentimentService.getStream(sentiment).subscribe(
+    this.sentimentSubscription = this.sentimentService.getStream(term).subscribe(
       data => {
-        let currentSentiment = this.activeSentiments.find(currentSentiment => currentSentiment.name == sentiment.name);
+        let currentSentiment = this.activeTerms.find(currentSentiment => currentSentiment.name == term.name);
         currentSentiment.values.push(data);
         this.sentimentService.displaySentiment(currentSentiment);
       },
@@ -77,6 +91,16 @@ export class SearchComponent implements OnInit, OnDestroy {
       () => console.log("done")
     );
 
+  }
+
+  deleteAllTerms() {
+    this.sentimentService.deleteAllTerms().subscribe(
+      data => {
+        this.activeTerms = [];
+      },
+      err => console.log(err),
+      () => console.log("done")
+    )
   }
 
   ngOnDestroy(): void {
