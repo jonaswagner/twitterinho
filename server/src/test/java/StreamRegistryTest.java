@@ -6,8 +6,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Created by jonas on 11.05.2017.
+ *
+ * This Test requires a running internet connection!
  */
 public class StreamRegistryTest {
 
@@ -17,16 +25,23 @@ public class StreamRegistryTest {
 
     private StreamRegistry registry = null;
     private Blackboard board = null;
+    private InputStream input = null;
+    private Properties prop = new Properties();
 
     @Before
-    public void before() {
+    public void before() throws IOException {
         registry = StreamRegistry.getInstance();
+        input = new FileInputStream("server/config.properties");
+        prop.load(input);
+        //FIXME jwa init Properties for Twitter API
     }
 
     @After
     public void after() {
         registry = null;
         Blackboard.shutdown = true;
+        input = null;
+        prop = null;
     }
 
     @Test
@@ -55,6 +70,7 @@ public class StreamRegistryTest {
         Assert.assertNull(registry.locateBlackboard(STREAM_ID_1));
         Assert.assertNull(registry.locateStream(STREAM_ID_2));
         Assert.assertNull(registry.locateBlackboard(STREAM_ID_2));
+
 
     }
 }

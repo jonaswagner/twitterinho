@@ -2,6 +2,7 @@ package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Util.Tweet;
 
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public interface IKS {
     boolean execCondition(Tweet tweet);
     void execAction(Tweet tweet);
-    void updateBlackboard(ConcurrentLinkedQueue<Tweet> queue);
+    void updateBlackboard(Queue<Tweet> queue);
 
 }
 

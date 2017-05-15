@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -35,7 +36,7 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     }
 
     @Override
-    public void updateBlackboard(ConcurrentLinkedQueue<Tweet> treatedTweets) {
+    public void updateBlackboard(Queue<Tweet> treatedTweets) {
         //LOG.info("Blackboard update started");
         if (treatedTweets.size() == 0) {
             return;
@@ -53,7 +54,8 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
         //LOG.info("Blackboard update finished");
     }
 
-    public void splitWork(ConcurrentLinkedQueue<Tweet> untreatedTweets, List<IKSSlave> slaveList) throws Exception {
+    @Override
+    public void splitWork(Queue<Tweet> untreatedTweets, List<IKSSlave> slaveList) throws Exception {
         //LOG.info("splitwork started");
         final List<Tweet> assignedTweets = new ArrayList<>(DEFAULT_TWEET_CHUNK_SIZE);
         if (untreatedTweets.size() == 0) {
