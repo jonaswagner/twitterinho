@@ -1,12 +1,12 @@
-.active-sentiments{
+.active-terms{
   list-style: none;
   padding-left: 10px;
 }
-.active-sentiments li{
+.active-terms li{
   padding: 5px;
   margin: 5px 0;
 }
-.active-sentiments li:hover, .active-sentiments .active{
+.active-terms li:hover, .active-terms .active{
   background: #ddd;
   cursor: pointer;
 }

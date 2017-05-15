@@ -1,5 +1,6 @@
 package ch.uzh.ase.data;
 
+import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import com.mongodb.BasicDBObject;
@@ -35,15 +36,15 @@ public class DB {
     private final String PROCESSING_TIME = "processingTime";
 
     public DB() {
-        mongoClient = new MongoClient(new MongoClientURI(TestDriver.getProp().getProperty("databaseconnection")));
-        mdb = mongoClient.getDatabase(TestDriver.getProp().getProperty("dbname"));
+        mongoClient = new MongoClient(new MongoClientURI(Application.getProp().getProperty("databaseconnection")));
+        mdb = mongoClient.getDatabase(Application.getProp().getProperty("dbname"));
         mdb.withWriteConcern(WriteConcern.JOURNALED);
         mc = mdb.getCollection(COLLECTION_NAME);
     }
 
     public void persist(Tweet tweet) {
         String iso = tweet.getIso().toString();
-        String sentiment = new String (""+tweet.getSentimentScore());
+        String sentiment = "" + tweet.getSentimentScore();
         String text = tweet.getText();
         String author = tweet.getAuthor();
         String date = tweet.getDate().toString();
@@ -59,8 +60,8 @@ public class DB {
         Interval sentDetTimeInterval = new Interval(startSentDetTime, endSentDetTime);
         Interval processingTimeInterval = new Interval(newTweetTime, finishedTweetTime);
 
-        String langDetTime  = String.valueOf(langDetTimeInterval.toDurationMillis());
-        String sentDetTime  = String.valueOf(sentDetTimeInterval.toDurationMillis());
+        String langDetTime = String.valueOf(langDetTimeInterval.toDurationMillis());
+        String sentDetTime = String.valueOf(sentDetTimeInterval.toDurationMillis());
         String processingTime = String.valueOf(processingTimeInterval.toDurationMillis());
 
         Document doc = new Document(ISO, iso)
@@ -118,13 +119,13 @@ public class DB {
         mc.drop();
     }
 
-    public void deleteSearchIdEntries(String searchId){
+    public void deleteSearchIdEntries(String searchId) {
         BasicDBObject query = new BasicDBObject();
         query.append(SEARCH_ID, searchId);
         mc.deleteMany(query);
     }
 
-    public long getEvaluationTime(String key){
+    public long getEvaluationTime(String key) {
         long sum = 0;
         int numberOfTweets = 0;
         MongoCursor<Document> cursor = mc.find().iterator();
@@ -139,7 +140,7 @@ public class DB {
         return sum / numberOfTweets;
     }
 
-    public Map<String, Long> getTermStatistics(){
+    public Map<String, Long> getTermStatistics() {
         Map<String, Long> resultMap = new HashMap<>();
 
         long langDetTime = getEvaluationTime(LANGUAGE_DETECTION_DURATION);
@@ -152,7 +153,6 @@ public class DB {
 
         return resultMap;
     }
-
 
 
 }
