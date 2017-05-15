@@ -7,18 +7,18 @@ import java.util.List;
  * Created by flaviokeller on 28.03.17.
  */
 @Deprecated
-@Entity
+//@Entity
 public class Sentiment {
     public Long getId() {
         return id;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    @Column
-    @ElementCollection(targetClass=Integer.class)
+//    @Column
+//    @ElementCollection(targetClass=Integer.class)
     private List<Double> values;
 
 

@@ -28,17 +28,6 @@ export class SentimentService {
       );
   }
 
-  setStopStream(isStopped: boolean) {
-    this.stopStream = isStopped;
-  }
-
-  addTerm(term: string): any {
-    let headers = new Headers({'Content-Type': 'application/json'});
-    let options = new RequestOptions({headers: headers});
-
-    return this.http.post("/twt/term/" + term, options);
-  }
-
   deleteTerm(term: string): any {
     return this.http.delete("/twt/term/" + term)
       .map((response: Response) => response.status)
@@ -52,7 +41,7 @@ export class SentimentService {
   startStream(term: Term): any {
     let headers = new Headers({'Content-Type': 'application/json'});
     let options = new RequestOptions({headers: headers});
-    return this.http.post("/twt/term/" + term.name + "/stream/start", options);
+    return this.http.post("/twt/term/" + term.name, options);
   }
 
   getStream(term: Term): Observable<number> {
@@ -73,9 +62,13 @@ export class SentimentService {
     return this.http.put("/twt/term/" + term.name + "/stream", options);
   }
 
-
   displaySentiment(sentiment: Term) {
     let changedTerm: Term = {id: sentiment.id, name: sentiment.name, values: sentiment.values};
     this.sentimentSource.next(changedTerm);
   }
+
+  setStopStream(isStopped: boolean) {
+    this.stopStream = isStopped;
+  }
+
 }

@@ -19,6 +19,9 @@ export class TwitterinhoChartComponent implements OnChanges {
     if (this.data.datasets[0].label === this.currentTerm.name) {
       this.data.datasets[0].data.concat(this.currentTerm.values);
       setTimeout(() => {
+        if (this.data.labels.length === this.data.datasets[0].data.length + 1) {
+          this.data.datasets[0].data.shift();
+        }
         this.chart.refresh();
       }, 100);
     } else {

@@ -7,7 +7,7 @@
       </div>
       <div class="form-group pull-right">
         <label for="evalBtn"></label>
-        <button id="evalBtn" (click)="addTerm()" class="btn btn-success btn-block form-control" >Evaluate</button>
+        <button id="evalBtn" (click)="addTerm()" class="btn btn-success btn-block form-control">Evaluate</button>
         <div class="clearfix"></div>
       </div>
     </div>
@@ -15,16 +15,19 @@
 </div>
 <div class="row">
   <div class="col-xs-12">
-  <ul class="active-terms">
-    <li *ngFor="let s of activeTerms">
-      <a (click)="sendToDisplay(s)">{{s.name}}
-        <span class="pull-right">{{s.values[0]}}
-          <a (click)="deleteTerm(s)">&times;</a>
-        </span>
-      </a>
-    </li>
-  </ul>
-</div>
+    <ul class="active-terms">
+      <li *ngFor="let s of activeTerms">
+        <div class="pull-left">
+          <a (click)="activateStream(s)">{{s.name}}
+          </a></div>
+        <div class="pull-right">
+          <span>{{s.values[s.values.length-1]}}</span>
+          <a class="btn btn-danger btn-sm" (click)="deleteTerm(s)">&times;</a>
+        </div>
+        <div class="clearfix"></div>
+      </li>
+    </ul>
+  </div>
 </div>
 <div class="row">
   <div class="col-xs-12">

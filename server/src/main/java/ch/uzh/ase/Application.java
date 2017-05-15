@@ -1,23 +1,17 @@
 package ch.uzh.ase;
 
 
-import ch.uzh.ase.controller.MainController;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-@EntityScan(
-	basePackageClasses = { Application.class, Jsr310JpaConverters.class }
-)
 
 @SpringBootApplication
 public class Application {
@@ -38,6 +32,8 @@ public class Application {
 
             LOG.info(prop.getProperty("databaseconnection"));
             LOG.info(prop.getProperty("dbname"));
+            LOG.info(prop.getProperty("database")); //TODO silvio - http://tinyurl.com/4poyc6x
+
 
             database = new DB();
 

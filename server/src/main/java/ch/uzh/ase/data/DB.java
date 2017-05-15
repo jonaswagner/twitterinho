@@ -89,7 +89,7 @@ public class DB {
         } finally {
             cursor.close();
         }
-        return sum / (double) numberOfTweets;
+        return Math.round((sum / (double) numberOfTweets) * 100.0) / 100.0;
     }
 
 

@@ -1,6 +1,6 @@
 package ch.uzh.ase.Blackboard;
 
-import ch.uzh.ase.TestDriver;
+import ch.uzh.ase.Application;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.data.DB;
 
@@ -13,15 +13,15 @@ public class BlackboardPersist extends Thread {
 
     private final Blackboard blackboard;
 
-    public BlackboardPersist(Blackboard blackboard){
+    public BlackboardPersist(Blackboard blackboard) {
         this.blackboard = blackboard;
     }
 
     @Override
     public void run() {
-        while(!Blackboard.isShutdown()) {
-            List<Tweet>  tweetList = blackboard.removeAndPassFinishedTweets();
-            DB db = TestDriver.getDatabase();
+        DB db = Application.getDatabase();
+        while (!Blackboard.isShutdown()) {
+            List<Tweet> tweetList = blackboard.removeAndPassFinishedTweets();
             for (Tweet tweet : tweetList) {
                 db.persist(tweet);
             }

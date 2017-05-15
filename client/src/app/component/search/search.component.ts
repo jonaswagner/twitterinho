@@ -29,19 +29,20 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   addTerm() {
     this.addedTerm = {id: 1, name: this.addedTermName, values: []};
+    this.sentimentService.setStopStream(false);
 
-    this.sentimentService.addTerm(this.addedTermName).subscribe(
+    this.sentimentService.startStream(this.addedTerm).subscribe(
       data => {
         this.activeTerms.push(this.addedTerm);
-        this.sendToDisplay(this.addedTerm);
+        this.sentimentSubscription = this.getStream(this.addedTerm);
       },
       err => {
         console.log(err);
       },
-      () => console.log("done"))
-    ;
-    this.addedTermName = "";
-    this.sendToDisplay(this.addedTerm)
+      () => {
+        console.log("done");
+        this.addedTermName = "";
+      });
   }
 
 
@@ -73,13 +74,21 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   sendToDisplay(term: Term) {
     this.sentimentService.displaySentiment(term);
+  }
+
+  activateStream(term: Term) {
+    this.sentimentService.setStopStream(false);
     this.sentimentService.startStream(term).subscribe(
       data => {
+        this.sentimentSubscription = this.getStream(term);
       },
       err => console.log(err),
       () => console.log("done")
     );
-    this.sentimentSubscription = this.sentimentService.getStream(term).subscribe(
+  }
+
+  getStream(term: Term): Subscription {
+    return this.sentimentService.getStream(term).subscribe(
       data => {
         let currentSentiment = this.activeTerms.find(currentSentiment => currentSentiment.name == term.name);
         currentSentiment.values.push(data);
@@ -90,7 +99,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       },
       () => console.log("done")
     );
-
   }
 
   deleteAllTerms() {
