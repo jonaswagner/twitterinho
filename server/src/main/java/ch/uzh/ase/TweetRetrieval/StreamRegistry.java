@@ -2,6 +2,7 @@ package ch.uzh.ase.TweetRetrieval;
 
 import ch.uzh.ase.Blackboard.*;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
+import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +24,7 @@ public class StreamRegistry {
     private List<Blackboard> blackboardList =  Collections.synchronizedList(new ArrayList<>());
     private Map<String, TweetStream> streamMap = new ConcurrentHashMap<>();
     private Map<Blackboard, List<String>> blackboardMap = new ConcurrentHashMap<>();
+    private final WorkloadObserver workloadObserver = new WorkloadObserver();
 
     public void register(String streamId){
         TweetStream tweetStream = new TweetStream();
@@ -38,6 +40,8 @@ public class StreamRegistry {
                 streams.add(streamId);
             }
         }
+
+        //TODO jwa add Stream to WorkloadObserver
     }
 
     public void unRegister(String streamId){
@@ -61,7 +65,6 @@ public class StreamRegistry {
     private Blackboard setBlackboard(){
         if(blackboardList.isEmpty()){
             Blackboard blackboard = new Blackboard();
-            WorkloadObserver workloadObserver = new WorkloadObserver();
             workloadObserver.start();
             AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard, workloadObserver);
             iks1.start();
@@ -81,6 +84,10 @@ public class StreamRegistry {
             //TODO: handle workload of blackboard
             return blackboardList.get(0);
         }
+    }
+
+    public WorkloadObserver getWorkloadObserver(){
+        return workloadObserver;
     }
 
 }

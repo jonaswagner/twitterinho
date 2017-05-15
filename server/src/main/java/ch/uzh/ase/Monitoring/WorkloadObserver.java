@@ -2,6 +2,7 @@ package ch.uzh.ase.Monitoring;
 
 import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
+import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.Util.Workload;
 import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
@@ -25,13 +26,15 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private final List<IWorkloadSubject> subjects;
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
     private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
+    private final DecimalFormat df = new DecimalFormat("#.##");
+
+    //static monitoring
     private final MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
     private OperatingSystemMXBean osMBean;
-    private long freeSwapSize = 0l;
-    private double loadAverage = 0.0d;
     private String arch = "";
     private String name = "";
-    private final DecimalFormat df = new DecimalFormat("#.##");
+    private long totalSwapSize = -1;
+    private long totalPhysicalSize = -1;
 
 
     //Monitoring variables
@@ -39,6 +42,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private DateTime timeSlot;
     private long systemAvgSlavesLoad = 0;
     private long systemTweetsPerMin = 0;
+    private long freeSwapSize = -1;
+    private double loadAverage = 0.0d;
+    private long freePhysicalSize = -1;
 
     public WorkloadObserver() {
         this(new DefaultPerformanceConfiguration());
@@ -54,6 +60,10 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             LOG.warn("System Architecture: " + osMBean.getArch());
             name = osMBean.getName();
             LOG.warn("OS Name: " + name);
+            totalSwapSize = osMBean.getTotalSwapSpaceSize();
+            LOG.warn("Total Swap size: " + totalSwapSize);
+            totalPhysicalSize = osMBean.getFreePhysicalMemorySize();
+            LOG.warn("Total Physical Memory size: " + totalPhysicalSize);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,13 +99,20 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 loadAverage = osMBean.getSystemCpuLoad();
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-                LOG.warn("Free RAM (max 16GB): " + df.format((((double) freeSwapSize / 1024d) / 1024d) / 1024d) + "GB");
+                LOG.warn("Free RAM (max 16GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
+
+                freePhysicalSize = osMBean.getTotalPhysicalMemorySize();
+                LOG.warn("Free RAM (max 16GB): " + df.format(bytesToGigaBytes(freePhysicalSize)) + "GB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;
                 currentTweetsPerTenSec = 0; //reset
             }
         }
+    }
+
+    private double bytesToGigaBytes(long number) {
+        return (((double) number / 1024d) / 1024d) / 1024d;
     }
 
     //this is public for testing reasons
@@ -193,5 +210,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     public int getNumberOfSubjects() {
         return subjects.size();
+    }
+
+    public SystemWorkload getSystemWorkload(){
+        return new SystemWorkload(arch, name, loadAverage, totalSwapSize, freeSwapSize, totalPhysicalSize, freePhysicalSize, systemAvgSlavesLoad, systemTweetsPerMin);
     }
 }

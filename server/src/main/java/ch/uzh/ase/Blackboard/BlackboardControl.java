@@ -55,7 +55,6 @@ public class BlackboardControl extends Thread {
                 }
             }
         }
-
         blackboard.removeTweet(discardedTweets);
     }
 
