@@ -3,6 +3,8 @@ import 'rxjs/add/operator/map';
 import {Observable, Subject} from "rxjs";
 import {Injectable} from "@angular/core";
 import {Term} from "../model/term";
+import {MonitorData} from "../model/monitorData";
+import {Subscription} from "rxjs/Subscription";
 /**
  * Created by flaviokeller on 20.03.17.
  */
@@ -13,18 +15,22 @@ export class MonitorService {
   private sentiments: Term[];
   private sentimentSource = new Subject<Term>();
   sentimentStream$ = this.sentimentSource.asObservable();
+  private subscription: any;
+  private stopMonitor: boolean = false;
 
   constructor(private http: Http) {
 
   }
 
-  getCpuLoad(): Observable<number> {
-
-    return this.http.get("/twt/monitor/cpu")
-      .map((response: Response) => <number>response.json())
-      .catch(
-        (error: any) => Observable.throw(error.json().error || 'Server error')
-      );
+  getMonitorData(): Observable<MonitorData> {
+    this.subscription = Observable.interval(5000).takeWhile(x => !this.stopMonitor).flatMap(
+      () => this.http.get("/twt/monitor")
+        .map((response: Response) => <MonitorData>response.json())
+        .catch(
+          (error: any) => Observable.throw(error.json().error || 'Server error')
+        )
+    );
+    return this.subscription;
   }
 
   getTermStatistics(): Observable<number> {
@@ -35,23 +41,8 @@ export class MonitorService {
         (error: any) => Observable.throw(error.json().error || 'Server error')
       );
   }
-
-  getWorkLoad(): Observable<number> {
-
-    return this.http.get("/twt/monitor/work")
-      .map((response: Response) => <number>response.json())
-      .catch(
-        (error: any) => Observable.throw(error.json().error || 'Server error')
-      );
-  }
-
-  getSlaveLoad(): Observable<number> {
-
-    return this.http.get("/twt/monitor/slave")
-      .map((response: Response) => <number>response.json())
-      .catch(
-        (error: any) => Observable.throw(error.json().error || 'Server error')
-      );
+  setStopMonitor(isStopped: boolean) {
+    this.stopMonitor = isStopped;
   }
 
   scaleUp(): Observable<number> {
@@ -65,7 +56,4 @@ export class MonitorService {
       );
   }
 
-  displaySentiment(sentiment: Term) {
-    this.sentimentSource.next(sentiment);
-  }
 }

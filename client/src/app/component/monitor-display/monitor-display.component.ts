@@ -2,9 +2,11 @@
  * Created by flaviokeller on 20.03.17.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MonitorDisplayService} from './monitor-display.service';
 import {MonitorService} from "../../service/monitor.service";
+import {MonitorData} from "../../model/monitorData";
+import {Subscription} from "rxjs/Subscription";
 @Component({
   selector: 'monitor-display-component',
   templateUrl: './monitor-display.component.html',
@@ -12,10 +14,14 @@ import {MonitorService} from "../../service/monitor.service";
 
 })
 
-export class MonitorDisplayComponent {
+export class MonitorDisplayComponent implements OnInit, OnDestroy {
+  ngOnInit(): void {
+    this.getMonitorData();
+  }
 
-  private tweet: any[] = [];
 
+  private monitorData: MonitorData = new MonitorData();
+  private subscription: Subscription;
   doughnutData: any;
   lineData: any;
   barData: any;
@@ -65,15 +71,26 @@ export class MonitorDisplayComponent {
     };
   }
 
-  getCpuLoad() {
-    this.monitorService.getCpuLoad().subscribe(
-      load => {
-        this.barData = load;
+  getMonitorData() {
+    this.subscription = this.monitorService.getMonitorData().subscribe(
+      data => {
+        this.monitorData = data;
       },
       err => {
         console.log(err)
       },
       () => console.log("done")
     );
+  }
+  startMonitorData(){
+    this.monitorService.setStopMonitor(false);
+    this.getMonitorData();
+  }
+  stopMonitorData(){
+    this.monitorService.setStopMonitor(true);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

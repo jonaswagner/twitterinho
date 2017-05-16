@@ -3,7 +3,7 @@
  */
 
 export class MonitorData{
-  arch: number;
+  arch: string;
   name: string;
   loadAverage: number;
   totalSwapSize: number;

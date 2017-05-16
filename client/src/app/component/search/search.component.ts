@@ -51,7 +51,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       data => {
         let index: number = this.activeTerms.indexOf(term);
         if (index !== -1) {
-
           this.activeTerms.splice(index, 1);
         }
       },
@@ -80,11 +79,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.sentimentService.setStopStream(false);
     this.sentimentService.startStream(term).subscribe(
       data => {
-        this.sentimentSubscription = this.getStream(term);
       },
       err => console.log(err),
       () => console.log("done")
     );
+    this.sentimentSubscription = this.getStream(term);
   }
 
   getStream(term: Term): Subscription {
