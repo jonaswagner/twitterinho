@@ -46,7 +46,7 @@ export class SentimentService {
 
   getStream(term: Term): Observable<number> {
     this.subscription = Observable
-      .interval(10000).takeWhile(x => !this.stopStream).flatMap(
+      .interval(10000).takeWhile(x => !this.isStreamStopped).flatMap(
         () =>
           this.http.get("/twt/term/" + term.name + "/stream")
             .map((response: Response) => <number>response.json())
