@@ -19,7 +19,7 @@ export class TwitterinhoChartComponent implements OnChanges {
     if (this.data.datasets[0].label === this.currentTerm.name) {
       this.data.datasets[0].data.concat(this.currentTerm.values);
       setTimeout(() => {
-        if (this.data.labels.length === this.data.datasets[0].data.length + 1) {
+        if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
           this.data.datasets[0].data.shift();
         }
         this.chart.refresh();
@@ -45,7 +45,7 @@ export class TwitterinhoChartComponent implements OnChanges {
     let bodyStyles = window.getComputedStyle(document.body);
     let twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
     this.data = {
-      labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'],
+      labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', ''],
       datasets: [
         {
           label: 'First Dataset',

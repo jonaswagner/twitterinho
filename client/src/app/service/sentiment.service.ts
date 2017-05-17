@@ -13,7 +13,7 @@ export class SentimentService {
   private sentimentSource = new Subject<Term>();
   sentimentStream$ = this.sentimentSource.asObservable();
   private subscription: any;
-  private stopStream: boolean = false;
+  private isStreamStopped: boolean = false;
 
   constructor(private http: Http) {
 
@@ -46,7 +46,7 @@ export class SentimentService {
 
   getStream(term: Term): Observable<number> {
     this.subscription = Observable
-      .interval(10000).takeWhile(x => !this.stopStream).flatMap(
+      .interval(10000).takeWhile(x => !this.isStreamStopped).flatMap(
         () =>
           this.http.get("/twt/term/" + term.name + "/stream")
             .map((response: Response) => <number>response.json())
@@ -55,11 +55,19 @@ export class SentimentService {
     return this.subscription;
   }
 
-  cancelStream(term: Term): any {
+  stopStream(term: Term): any {
     let headers = new Headers({'Content-Type': 'application/json'});
     let options = new RequestOptions({headers: headers});
 
     return this.http.put("/twt/term/" + term.name + "/stream", options);
+  }
+
+  startGenerateArtificialTweets() {
+    this.http.get('/twt/generate/start');
+  }
+
+  stopGenerateArtificialTweets() {
+    this.http.get('/twt/generate/stop');
   }
 
   displaySentiment(sentiment: Term) {
@@ -68,7 +76,7 @@ export class SentimentService {
   }
 
   setStopStream(isStopped: boolean) {
-    this.stopStream = isStopped;
+    this.isStreamStopped = isStopped;
   }
 
 }

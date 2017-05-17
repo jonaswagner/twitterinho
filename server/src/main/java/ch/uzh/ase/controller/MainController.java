@@ -52,7 +52,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/twt/term/{name}/stream", method = RequestMethod.PUT)
-    public void cancelStream(@PathVariable String name) {
+    public void stopStream(@PathVariable String name) {
         StreamRegistry.getInstance().locateStream(name).stopStream();
     }
 
@@ -66,5 +66,13 @@ public class MainController {
     public ResponseEntity<Object> getTermStatistics() {
         Map<String, Long> termStats = Application.getDatabase().getTermStatistics();
         return null;
+    }
+    @RequestMapping(value = "/twt/generate/start", method = RequestMethod.GET)
+    public void startGenerateArtificialTweets() {
+
+    }
+    @RequestMapping(value = "/twt/generate/stop", method = RequestMethod.GET)
+    public void stopGenerateArtificialTweets() {
+
     }
 }

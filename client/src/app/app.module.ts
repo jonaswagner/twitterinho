@@ -7,6 +7,7 @@ import {AppComponent} from './app.component';
 import {SearchComponent} from "./component/search/search.component";
 import {SentimentDisplayComponent} from "./component/sentiment-display/sentiment-display.component";
 import {MonitorDisplayComponent} from "./component/monitor-display/monitor-display.component";
+import {DevDisplayComponent} from "./component/dev-display/dev-display.component";
 import {SentimentDisplayService} from "./component/sentiment-display/sentiment-display.service";
 import {MonitorDisplayService} from "./component/monitor-display/monitor-display.service";
 import {ModalModule} from "ng2-bootstrap";
@@ -22,6 +23,7 @@ import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterin
     SearchComponent,
     SentimentDisplayComponent,
     MonitorDisplayComponent,
+    DevDisplayComponent,
     TwitterinhoChartComponent
   ],
   imports: [

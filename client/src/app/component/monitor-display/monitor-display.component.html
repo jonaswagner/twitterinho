@@ -12,12 +12,57 @@
     </div>
     <div class="row">
       <div class="col-xs-6">
+        <p>CPU type: {{monitorData.arch}}</p>
+      </div>
+      <div class="col-xs-6">
+        <p>Name: {{monitorData.name}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <p>Average load: {{monitorData.loadAverage}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <p>Swap Size: {{monitorData.totalSwapSize}}</p>
+      </div>
+      <div class="col-xs-6">
+        <p>Free Swap: {{monitorData.freeSwapSize}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <p>Total Size: {{monitorData.totalPhysicalSize}}</p>
+      </div>
+      <div class="col-xs-6">
+        <p>Free size: {{monitorData.freePhysicalSize}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <p>Avg. Slave load: {{monitorData.systemAvgSlavesLoad}}</p>
+      </div>
+      <div class="col-xs-6">
+        <p>Tweets per Minute: {{monitorData.systemTweetsPerMin}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
         <p>Average load</p>
         <p-chart type="doughnut" [data]="doughnutData"></p-chart>
       </div>
       <div class="col-xs-6">
         <p>Load over Time</p>
         <p-chart type="line" [data]="lineData"></p-chart>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <button class="btn btn-success btn-sm" (click)="startMonitorData()">Start Monitor</button>
+      </div>
+      <div class="col-xs-6">
+        <button class="btn btn-danger btn-sm" (click)="stopMonitorData()">Stop Monitor</button>
       </div>
     </div>
   </div>
