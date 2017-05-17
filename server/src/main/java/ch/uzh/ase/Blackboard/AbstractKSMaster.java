@@ -21,11 +21,9 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     public static final int DEFAULT_NUMBER_OF_SLAVES = 2;
 
     protected final Blackboard blackboard;
-    protected final IWorkloadObserver observer;
 
-    public AbstractKSMaster(Blackboard blackboard, IWorkloadObserver observer) {
+    public AbstractKSMaster(Blackboard blackboard) {
         this.blackboard = blackboard;
-        this.observer = observer;
     }
 
     @Override

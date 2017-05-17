@@ -39,6 +39,12 @@ public class Blackboard {
         tweetMap.put(tweet, status);
     }
 
+    public void addNewTweets(List<Tweet> tweets) {
+        for (Tweet tweet: tweets) {
+            addNewTweet(tweet, TweetStatus.NEW);
+        }
+    }
+
     public static boolean isShutdown() {
         return shutdown;
     }

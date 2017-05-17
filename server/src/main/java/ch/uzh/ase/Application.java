@@ -1,6 +1,7 @@
 package ch.uzh.ase;
 
 
+import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     private static Properties prop = new Properties();
     private static DB database;
+    private static final WorkloadObserver instance = WorkloadObserver.getInstance();
 
 
     public static void main(String[] args) throws Exception {

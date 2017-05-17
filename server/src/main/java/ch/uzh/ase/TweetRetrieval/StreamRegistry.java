@@ -24,7 +24,6 @@ public class StreamRegistry {
     private List<Blackboard> blackboardList =  Collections.synchronizedList(new ArrayList<>());
     private Map<String, TweetStream> streamMap = new ConcurrentHashMap<>();
     private Map<Blackboard, List<String>> blackboardMap = new ConcurrentHashMap<>();
-    private final WorkloadObserver workloadObserver = new WorkloadObserver();
 
     public void register(String streamId){
         TweetStream tweetStream = new TweetStream();
@@ -62,15 +61,23 @@ public class StreamRegistry {
         return null;
     }
 
+    //TODO jwa delete this pls
+    public Blackboard locateDefaultBlackboard() {
+        if (!blackboardList.isEmpty()) {
+            return blackboardList.get(0);
+        } else {
+            return null;
+        }
+    }
+
     private Blackboard setBlackboard(){
         if(blackboardList.isEmpty()){
             Blackboard blackboard = new Blackboard();
-            workloadObserver.start();
-            AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard, workloadObserver);
+            AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard);
             iks1.start();
-            AbstractKSMaster iks2 = new LanguageKS(blackboard, workloadObserver);
+            AbstractKSMaster iks2 = new LanguageKS(blackboard);
             iks2.start();
-            AbstractKSMaster iks3 = new SentimentGermanKS(blackboard, workloadObserver);
+            AbstractKSMaster iks3 = new SentimentGermanKS(blackboard);
             iks3.start();
             BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2, iks3));
             blackboardControl.start();
@@ -84,10 +91,6 @@ public class StreamRegistry {
             //TODO: handle workload of blackboard
             return blackboardList.get(0);
         }
-    }
-
-    public WorkloadObserver getWorkloadObserver(){
-        return workloadObserver;
     }
 
 }

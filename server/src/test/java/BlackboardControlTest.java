@@ -45,9 +45,7 @@ public class BlackboardControlTest {
             blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
         }
 
-        observer = new WorkloadObserver();
-        observer.start();
-        sentimentEnglishKS = new SentimentEnglishKS(blackboard, observer);
+        sentimentEnglishKS = new SentimentEnglishKS(blackboard);
         iksList.add(sentimentEnglishKS);
         blackboardControl = new BlackboardControl(blackboard, iksList);
 

@@ -1,6 +1,7 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.IWorkloadObserver;
+import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.Workload;
 import org.slf4j.Logger;
@@ -25,15 +26,15 @@ public class LanguageKS extends AbstractKSMaster {
     private long outTweetCount = 0;
     private long inTweetCount = 0;
 
-    public  LanguageKS(Blackboard blackboard, IWorkloadObserver observer){
-        super(blackboard, observer);
+    public  LanguageKS(Blackboard blackboard){
+        super(blackboard);
         this.untreatedTweets = new ConcurrentLinkedQueue<Tweet>();
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
 
         this.slaveList = new ArrayList<>();
         generateSlaves(AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES);
 
-        observer.register(this);
+        WorkloadObserver.getInstance().register(this);
     }
 
     @Override

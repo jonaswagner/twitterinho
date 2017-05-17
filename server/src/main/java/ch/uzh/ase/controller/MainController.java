@@ -2,7 +2,10 @@
 package ch.uzh.ase.controller;
 
 import ch.uzh.ase.Application;
+import ch.uzh.ase.Blackboard.Blackboard;
+import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
+import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.domain.Term;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +61,7 @@ public class MainController {
 
     @RequestMapping(value = "/twt/monitor", method = RequestMethod.GET)
     public ResponseEntity<SystemWorkload> getMonitorData() {
-        SystemWorkload wl = StreamRegistry.getInstance().getWorkloadObserver().getSystemWorkload(); //FIXME jonas: law of demeter abuse!
+        SystemWorkload wl = WorkloadObserver.getInstance().getSystemWorkload();
         return new ResponseEntity<SystemWorkload>(wl, HttpStatus.OK);
     }
 
@@ -69,7 +72,11 @@ public class MainController {
     }
     @RequestMapping(value = "/twt/generate/start", method = RequestMethod.GET)
     public void startGenerateArtificialTweets() {
-
+        String streamId = ""; //TODO flavio please add streamId to arguments
+        Blackboard board = StreamRegistry.getInstance().locateBlackboard(streamId);
+        for (int i = 0; i<100; i++) {
+            board.addNewTweets(Sentiment.generateTweets(100));
+        }
     }
     @RequestMapping(value = "/twt/generate/stop", method = RequestMethod.GET)
     public void stopGenerateArtificialTweets() {

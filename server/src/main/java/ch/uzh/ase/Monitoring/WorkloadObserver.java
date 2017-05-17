@@ -22,10 +22,12 @@ import java.util.*;
  */
 public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
-    public static final int MIN_DIV_BY_TEN_SEC = 6;
+    private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
+    private static final WorkloadObserver instance = new WorkloadObserver();
+
+    private static final int MIN_DIV_BY_TEN_SEC = 6;
     private final List<IWorkloadSubject> subjects;
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
-    private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
     private final DecimalFormat df = new DecimalFormat("#.##");
 
     //static monitoring
@@ -46,18 +48,15 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private double loadAverage = 0.0d;
     private long freePhysicalSize = -1;
 
-    public WorkloadObserver() {
-        this(new DefaultPerformanceConfiguration());
-    }
-
-    public WorkloadObserver(DefaultPerformanceConfiguration configuration) {
-        this.configuration = configuration;
-        this.timeSlot = DateTime.now();
-        this.subjects = Collections.synchronizedList(new ArrayList<>());
+    private WorkloadObserver() {
+        //this.configuration = configuration; TODO jwa check config
+        configuration = new DefaultPerformanceConfiguration();
+        timeSlot = DateTime.now();
+        subjects = Collections.synchronizedList(new ArrayList<>());
         try {
-            this.osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+            osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
             arch = osMBean.getArch();
-            LOG.warn("System Architecture: " + osMBean.getArch());
+            LOG.warn("System Architecture: " + arch);
             name = osMBean.getName();
             LOG.warn("OS Name: " + name);
             totalSwapSize = osMBean.getTotalSwapSpaceSize();
@@ -68,6 +67,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             e.printStackTrace();
         }
         df.setRoundingMode(RoundingMode.CEILING);
+        start();
+    }
+
+    public static WorkloadObserver getInstance() {
+        return instance;
     }
 
     @Override
@@ -84,25 +88,26 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     workloadMap.put(subject, subject.reportWorkload());
                 }
 
-                //average load of all slaves
-                systemAvgSlavesLoad = calcAvgSlavesLoad(workloadMap);
-                LOG.warn("The average load of a slave in this system is " + systemAvgSlavesLoad);
+                if (!workloadMap.isEmpty()) {
+                    //average load of all slaves
+                    systemAvgSlavesLoad = calcAvgSlavesLoad(workloadMap);
+                    LOG.warn("The average load of a slave in this system is " + systemAvgSlavesLoad);
 
-                //tweets per minute
-                currentTweetsPerTenSec += aggregateTweetCount(workloadMap);
-                tweetsPerMinList.add(new Pair<>(timeSlot, currentTweetsPerTenSec));
-                systemTweetsPerMin = currentTweetsPerTenSec * MIN_DIV_BY_TEN_SEC;
-                LOG.warn("The system processes " + systemTweetsPerMin + " tweets per minute!");
-                evaluateAction(workloadMap);
-
+                    //tweets per minute
+                    currentTweetsPerTenSec += aggregateTweetCount(workloadMap);
+                    tweetsPerMinList.add(new Pair<>(timeSlot, currentTweetsPerTenSec));
+                    systemTweetsPerMin = currentTweetsPerTenSec * MIN_DIV_BY_TEN_SEC;
+                    LOG.warn("The system processes " + systemTweetsPerMin + " tweets per minute!");
+                    evaluateAction(workloadMap);
+                }
 
                 loadAverage = osMBean.getSystemCpuLoad();
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-                LOG.warn("Free RAM (max "+ df.format(bytesToGigaBytes(totalSwapSize)) +"GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
+                LOG.warn("Free RAM (max " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
 
                 freePhysicalSize = osMBean.getTotalPhysicalMemorySize();
-                LOG.warn("Free Physical Memory (max "+ df.format(bytesToGigaBytes(totalPhysicalSize)) +"GB): " + df.format(bytesToGigaBytes(freePhysicalSize)) + "GB");
+                LOG.warn("Free Physical Memory (max " + df.format(bytesToGigaBytes(totalPhysicalSize)) + "GB): " + df.format(bytesToGigaBytes(freePhysicalSize)) + "GB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;
@@ -212,7 +217,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         return subjects.size();
     }
 
-    public SystemWorkload getSystemWorkload(){
+    public SystemWorkload getSystemWorkload() {
         return new SystemWorkload(arch, name, loadAverage, totalSwapSize, freeSwapSize, totalPhysicalSize, freePhysicalSize, systemAvgSlavesLoad, systemTweetsPerMin);
     }
 }

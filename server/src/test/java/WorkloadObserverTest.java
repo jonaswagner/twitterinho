@@ -27,14 +27,13 @@ public class WorkloadObserverTest {
     private static final int MAX_NR_OF_SLAVES = 42; //FIXME jwa calculate this value
 
 
-    WorkloadObserver observer;
+    WorkloadObserver observer = WorkloadObserver.getInstance();
     Blackboard blackboard = null;
     IWorkloadSubject subject;
 
     @Before
     public void before(){
-        observer = new WorkloadObserver();
-        subject = new SentimentEnglishKS(blackboard, observer);
+        subject = new SentimentEnglishKS(blackboard);
     }
 
     @After
