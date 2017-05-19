@@ -19,6 +19,9 @@ import java.util.*;
 
 /**
  * Created by jonas on 26.04.2017.
+ * <p>
+ * This class is a Singleton. It is a {@link Thread}, which periodically retrieves monitoring data from all registered {@link IWorkloadSubject}s.
+ * This data is used to decide if a {@link IWorkloadSubject} should aquire or release resources (Slaves).
  */
 public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
@@ -74,6 +77,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         return instance;
     }
 
+    /**
+     * This method loops through all registered {@link IWorkloadSubject}s within a given time interval.
+     */
     @Override
     public void run() {
 
@@ -116,12 +122,24 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
+    /**
+     * Given an amount of bytes, this method converts the value to gigabytes.
+     */
     private double bytesToGigaBytes(long number) {
         return (((double) number / 1024d) / 1024d) / 1024d;
     }
 
-    //this is public for testing reasons
-    public void evaluateAction(Map<IWorkloadSubject, Workload> workloadMap) {
+    /**
+     * <p>
+     * Given the {@link Workload} information, this method evaluates if a registered {@link IWorkloadSubject} needs
+     * to acquire or release more resources. Additionally, it initiates also the generation and release of resources on
+     * registered {@link IWorkloadSubject}s.
+     * </p>
+     * The generation of additional resources is done mulitplicative (Example: Additional Resources (Slaves) = (Existing Resources) * generation rate.
+     * The release of resources is done in a linear way by simply decreasing the amount of slaves by 1.
+      * @param workloadMap
+     */
+    public void evaluateAction(Map<IWorkloadSubject, Workload> workloadMap) { //this is public for testing reasons
         for (IWorkloadSubject subject : subjects) {
 
             Workload currentWorkload = workloadMap.get(subject);
@@ -190,11 +208,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             sum += workload.getValue().getOutTweetCount();
         }
         return sum;
-    }
-
-    @Override
-    public synchronized void notify(Workload workload, IWorkloadSubject subject) {
-        //TODO jwa implement this
     }
 
     @Override
