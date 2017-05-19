@@ -20,8 +20,6 @@ public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     private static Properties prop = new Properties();
     private static DB database;
-    private static final WorkloadObserver instance = WorkloadObserver.getInstance();
-
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);

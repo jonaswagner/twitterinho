@@ -40,14 +40,15 @@ public class WorkloadObserverTest {
     public void after(){
         observer = null;
         subject = null;
+    observer.getNumberOfSubjects();
     }
 
     @Test
     public void registerDeRegisterTest() {
         observer.register(subject);
-        Assert.assertEquals(observer.getNumberOfSubjects(), 1);
+        Assert.assertEquals(observer.getNumberOfSubjects(), 2);
         observer.register(subject);
-        Assert.assertEquals(observer.getNumberOfSubjects(), 1);
+        Assert.assertEquals(observer.getNumberOfSubjects(), 2);
         observer.deRegister(subject);
         Assert.assertEquals(observer.getNumberOfSubjects(), 0);
         observer.deRegister(subject);
