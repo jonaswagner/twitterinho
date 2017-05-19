@@ -73,7 +73,7 @@ public class MainController {
     @RequestMapping(value = "/twt/generate/start", method = RequestMethod.GET)
     public void startGenerateArtificialTweets() {
         String streamId = ""; //TODO flavio please add streamId to arguments
-        Blackboard board = StreamRegistry.getInstance().locateBlackboard(streamId);
+        Blackboard board = StreamRegistry.getInstance().getBlackBoard();
         for (int i = 0; i<100; i++) {
             board.addNewTweets(Sentiment.generateTweets(100));
         }

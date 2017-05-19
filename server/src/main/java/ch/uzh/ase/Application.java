@@ -1,7 +1,9 @@
 package ch.uzh.ase;
 
 
+import ch.uzh.ase.Blackboard.*;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
+import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.data.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -36,6 +39,23 @@ public class Application {
 
 
             database = new DB();
+
+            //Blackboard startup
+            StreamRegistry registry = StreamRegistry.getInstance();
+
+            Blackboard blackboard = new Blackboard();
+            AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard);
+            iks1.start();
+            AbstractKSMaster iks2 = new LanguageKS(blackboard);
+            iks2.start();
+            AbstractKSMaster iks3 = new SentimentGermanKS(blackboard);
+            iks3.start();
+            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2, iks3));
+            blackboardControl.start();
+            BlackboardPersist blackboardPersist = new BlackboardPersist(blackboard);
+            blackboardPersist.start();
+
+            registry.setBlackBoard(blackboard);
 
         } catch (IOException ex) {
             ex.printStackTrace();
