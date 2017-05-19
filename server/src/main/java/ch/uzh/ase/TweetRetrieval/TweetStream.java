@@ -4,28 +4,28 @@ import ch.uzh.ase.Application;
 import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import ch.uzh.ase.config.Configuration;
 import org.joda.time.DateTime;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+import java.util.Properties;
 
 public class TweetStream {
 
     private TwitterStream twitterStream;
     private StatusListener listener;
     private String searchID;
+    private Properties properties = Configuration.getInstance().getProp();
+    ConfigurationBuilder cb = new ConfigurationBuilder();
+
 
     public void startStream(String searchID) {
         this.searchID = searchID;
-        ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
-                //.setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
-                //.setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
-                //.setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
-                //.setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
-        .setOAuthConsumerKey(Application.getProp().getProperty("oauth.consumerKey"))
-                .setOAuthConsumerSecret(Application.getProp().getProperty("oauth.consumerSecret"))
-                .setOAuthAccessToken(Application.getProp().getProperty("oauth.accessToken"))
-                .setOAuthAccessTokenSecret(Application.getProp().getProperty("oauth.accessTokenSecret"));
+                .setOAuthConsumerKey(properties.getProperty("oauth.consumerKey"))
+                .setOAuthConsumerSecret(properties.getProperty("oauth.consumerSecret"))
+                .setOAuthAccessToken(properties.getProperty("oauth.accessToken"))
+                .setOAuthAccessTokenSecret(properties.getProperty("oauth.accessTokenSecret"));
         twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         listener = new StatusListener() {
 

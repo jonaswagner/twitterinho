@@ -23,31 +23,7 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
-
-        InputStream input = null;
-
-        try {
-            input = new FileInputStream("server/config.properties");
-            prop.load(input);
-
-            LOG.info(prop.getProperty("databaseconnection"));
-            LOG.info(prop.getProperty("dbname"));
-            LOG.info(prop.getProperty("database")); //TODO silvio - http://tinyurl.com/4poyc6x
-
-
-            database = new DB();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+       database = new DB();
     }
 
     public static DB getDatabase(){

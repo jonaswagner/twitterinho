@@ -15,7 +15,7 @@ public class WebMVCConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://twitterinho-client.azurewebsites.net", "http://localhost:4200")
+                .allowedOrigins(ch.uzh.ase.config.Configuration.getInstance().getProp().getProperty("clienturl"), "http://localhost:4200")
                 .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
 }

@@ -2,7 +2,6 @@ package ch.uzh.ase.TweetRetrieval;
 
 import ch.uzh.ase.Blackboard.*;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
-import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
