@@ -1,13 +1,13 @@
 <div class="performance-container">
   <div class="row">
     <div class="col-xs-12">
-      <h3 class="performance-header">Current Performance of the cloud</h3>
+      <h3 class="performance-header">Current Performance</h3>
     </div>
   </div>
   <div class="performance-content">
     <div class="row">
       <div class="col-xs-12">
-        <p>number of nodes: </p>
+        <h4>System Monitor</h4>
       </div>
     </div>
     <div class="row">
@@ -19,50 +19,52 @@
       </div>
     </div>
     <div class="row">
+      <div class="col-xs-6">
+        <p>Current CPU load: {{monitorData.loadAverage}}</p>
+        <p-chart type="doughnut" [data]="cpuDoughnutData"></p-chart>
+      </div>
+      <div class="col-xs-6">
+        <p>CPU over Time</p>
+        <p-chart type="line" [data]="cpuLineData"></p-chart>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <p>Current RAM used: {{monitorData.totalSwapSize - monitorData.freeSwapSize}}</p>
+        <p-chart type="doughnut" [data]="ramDoughnutData"></p-chart>
+      </div>
+      <div class="col-xs-6">
+        <p>RAM used over Time</p>
+        <p-chart type="line" [data]="ramLineData"></p-chart>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-xs-12">
-        <p>Average load: {{monitorData.loadAverage}}</p>
+        <h4>Tweet Processing Monitor</h4>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-6">
-        <p>Swap Size: {{monitorData.totalSwapSize}}</p>
+        <p>Tweet processing time</p>
       </div>
       <div class="col-xs-6">
-        <p>Free Swap: {{monitorData.freeSwapSize}}</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <p>Total Size: {{monitorData.totalPhysicalSize}}</p>
-      </div>
-      <div class="col-xs-6">
-        <p>Free size: {{monitorData.freePhysicalSize}}</p>
+        <p>{{monitorData.systemTweetsPerMin}}</p>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-6">
-        <p>Avg. Slave load: {{monitorData.systemAvgSlavesLoad}}</p>
+        <p>Time for sentiment analysis:</p>
       </div>
       <div class="col-xs-6">
-        <p>Tweets per Minute: {{monitorData.systemTweetsPerMin}}</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <p>Average load</p>
-        <p-chart type="doughnut" [data]="doughnutData"></p-chart>
-      </div>
-      <div class="col-xs-6">
-        <p>Load over Time</p>
-        <p-chart type="line" [data]="lineData"></p-chart>
+        <p>{{monitorData.systemTweetsPerMin}}</p>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-6">
-        <button class="btn btn-success btn-sm" (click)="startMonitorData()">Start Monitor</button>
+        <p>Time for language detection</p>
       </div>
       <div class="col-xs-6">
-        <button class="btn btn-danger btn-sm" (click)="stopMonitorData()">Stop Monitor</button>
+        <p>{{monitorData.systemTweetsPerMin}}</p>
       </div>
     </div>
   </div>
