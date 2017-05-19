@@ -231,6 +231,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     }
 
     public SystemWorkload getSystemWorkload() {
-        return new SystemWorkload(arch, name, loadAverage, totalSwapSize, freeSwapSize, totalPhysicalSize, freePhysicalSize, systemAvgSlavesLoad, systemTweetsPerMin);
+        return new SystemWorkload(arch,
+                name,
+                loadAverage,
+                bytesToGigaBytes(totalSwapSize),
+                bytesToGigaBytes(freeSwapSize),
+                bytesToGigaBytes(totalPhysicalSize),
+                bytesToGigaBytes(freePhysicalSize),
+                systemAvgSlavesLoad,
+                systemTweetsPerMin);
     }
 }

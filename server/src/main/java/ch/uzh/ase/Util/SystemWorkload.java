@@ -8,20 +8,20 @@ public class SystemWorkload {
     private final String arch;
     private final String name;
     private final double loadAverage;
-    private final long totalSwapSize;
-    private final long freeSwapSize;
-    private final long totalPhysicalSize;
-    private final long freePhysicalSize;
+    private final double totalSwapSize;
+    private final double freeSwapSize;
+    private final double totalPhysicalSize;
+    private final double freePhysicalSize;
     private final long systemAvgSlavesLoad;
     private final long systemTweetsPerMin;
 
     public SystemWorkload(String arch,
                           String name,
                           double loadAverage,
-                          long totalSwapSize,
-                          long freeSwapSize,
-                          long totalPhysicalSize,
-                          long freePhysicalSize,
+                          double totalSwapSize,
+                          double freeSwapSize,
+                          double totalPhysicalSize,
+                          double freePhysicalSize,
                           long systemAvgSlavesLoad,
                           long systemTweetsPerMin) {
 
@@ -37,38 +37,38 @@ public class SystemWorkload {
     }
 
     public String getArch() {
-        return arch;
+        return this.arch;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public double getLoadAverage() {
-        return loadAverage;
+        return this.loadAverage;
     }
 
-    public long getTotalSwapSize() {
-        return totalSwapSize;
+    public double getTotalSwapSize() {
+        return this.totalSwapSize;
     }
 
-    public long getFreeSwapSize() {
-        return freeSwapSize;
+    public double getFreeSwapSize() {
+        return this.freeSwapSize;
     }
 
-    public long getTotalPhysicalSize() {
-        return totalPhysicalSize;
+    public double getTotalPhysicalSize() {
+        return this.totalPhysicalSize;
     }
 
-    public long getFreePhysicalSize() {
-        return freePhysicalSize;
+    public double getFreePhysicalSize() {
+        return this.freePhysicalSize;
     }
 
     public long getSystemAvgSlavesLoad() {
-        return systemAvgSlavesLoad;
+        return this.systemAvgSlavesLoad;
     }
 
     public long getSystemTweetsPerMin() {
-        return systemTweetsPerMin;
+        return this.systemTweetsPerMin;
     }
 }
