@@ -28,9 +28,13 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   addTerm() {
-    this.addedTerm = {id: 1, name: this.addedTermName, values: []};
+    this.addedTerm = {id: 1, name: this.addedTermName, totalAvg: [], recentAvg: []};
     this.sentimentService.setStopStream(false);
-
+    let existingTerm = this.activeTerms.find(currentSentiment => currentSentiment.name == this.addedTermName)
+    //TODO check if that works
+    if (existingTerm) {
+      return;
+    }
     this.sentimentService.startStream(this.addedTerm).subscribe(
       data => {
         this.activeTerms.push(this.addedTerm);
@@ -90,7 +94,17 @@ export class SearchComponent implements OnInit, OnDestroy {
     return this.sentimentService.getStream(term).subscribe(
       data => {
         let currentSentiment = this.activeTerms.find(currentSentiment => currentSentiment.name == term.name);
-        currentSentiment.values.push(data);
+        if (currentSentiment.totalAvg) {
+          currentSentiment.totalAvg.push(data[0]);
+        } else {
+          currentSentiment.totalAvg = [data[0]];
+        }
+        if (currentSentiment.recentAvg) {
+          currentSentiment.recentAvg.push(data[1]);
+        }
+        else {
+          currentSentiment.recentAvg = [data[1]];
+        }
         this.sentimentService.displaySentiment(currentSentiment);
       },
       err => {

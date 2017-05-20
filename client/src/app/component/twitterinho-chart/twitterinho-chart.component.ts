@@ -23,9 +23,9 @@ export class TwitterinhoChartComponent implements OnChanges {
   msgs: Message[];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.data.datasets[0].label === this.currentTerm.name) {
-      this.data.datasets[0].data.concat(this.currentTerm.values);
-      this.data.datasets[1].data.concat(this.currentTerm.values);
+    if (this.data.datasets[0].label === this.currentTerm.name + ' - total avg.') {
+      this.data.datasets[0].data.concat(this.currentTerm.totalAvg);
+      this.data.datasets[1].data.concat(this.currentTerm.recentAvg);
       setTimeout(() => {
         if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
           this.data.datasets[0].data.shift();
@@ -38,8 +38,8 @@ export class TwitterinhoChartComponent implements OnChanges {
     } else {
       this.data.datasets[0].label = this.currentTerm.name + ' - total avg.';
       this.data.datasets[1].label = this.currentTerm.name + ' - recent avg.';
-      this.data.datasets[0].data = this.currentTerm.values;
-      this.data.datasets[1].data = this.currentTerm.values;
+      this.data.datasets[0].data = this.currentTerm.totalAvg;
+      this.data.datasets[1].data = this.currentTerm.recentAvg;
       setTimeout(() => {
         this.chart.reinit();
       }, 100);
@@ -58,15 +58,16 @@ export class TwitterinhoChartComponent implements OnChanges {
         {
           label: 'Total Average',
           data: [],
-          // fill: false,
+          fill: twitterblue,
           borderColor: twitterblue,
         },
         {
           label: 'Recent Average',
           data: [],
-          // fill: false,
+          fill: alterorange,
           borderColor: alterorange,
-        }],
+        },
+      ],
 
 
     };

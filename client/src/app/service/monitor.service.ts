@@ -4,7 +4,6 @@ import {Observable, Subject} from "rxjs";
 import {Injectable} from "@angular/core";
 import {Term} from "../model/term";
 import {MonitorData} from "../model/monitorData";
-import {Subscription} from "rxjs/Subscription";
 /**
  * Created by flaviokeller on 20.03.17.
  */
@@ -17,32 +16,24 @@ export class MonitorService {
   sentimentStream$ = this.sentimentSource.asObservable();
   private subscription: any;
   private stopMonitor: boolean = false;
+  private stopStatistics: boolean = false;
 
   constructor(private http: Http) {
 
   }
 
   getMonitorData(): Observable<MonitorData> {
-    this.subscription = Observable.interval(5000).takeWhile(x => !this.stopMonitor).flatMap(
+    return Observable.interval(5000).takeWhile(x => !this.stopMonitor).flatMap(
       () => this.http.get("/twt/monitor")
         .map((response: Response) => <MonitorData>response.json())
         .catch(
           (error: any) => Observable.throw(error.json().error || 'Server error')
-        )
-    );
-    return this.subscription;
+        ));
   }
 
-  getTermStatistics(): Observable<number> {
-
-    return this.http.get("/twt/monitor/statistics")
-      .map((response: Response) => <number>response.json())
-      .catch(
-        (error: any) => Observable.throw(error.json().error || 'Server error')
-      );
-  }
   setStopMonitor(isStopped: boolean) {
     this.stopMonitor = isStopped;
+    this.stopStatistics = isStopped;
   }
 
   scaleUp(): Observable<number> {

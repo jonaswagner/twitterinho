@@ -44,12 +44,12 @@ export class SentimentService {
     return this.http.post("/twt/term/" + term.name, options);
   }
 
-  getStream(term: Term): Observable<number> {
+  getStream(term: Term): Observable<number[]> {
     this.subscription = Observable
       .interval(10000).takeWhile(x => !this.isStreamStopped).flatMap(
         () =>
           this.http.get("/twt/term/" + term.name + "/stream")
-            .map((response: Response) => <number>response.json())
+            .map((response: Response) => <number[]>response.json())
             .catch((error: any) => Observable.throw(error.json().error || "Server error"))
       );
     return this.subscription;
@@ -62,16 +62,18 @@ export class SentimentService {
     return this.http.put("/twt/term/" + term.name + "/stream", options);
   }
 
-  startGenerateArtificialTweets() {
-    this.http.get('/twt/generate/start');
+  generateArtificialTweets(term: Term): any {
+    return this.http.get('/twt/generate/' + term.name);
   }
 
-  stopGenerateArtificialTweets() {
-    this.http.get('/twt/generate/stop');
-  }
 
   displaySentiment(sentiment: Term) {
-    let changedTerm: Term = {id: sentiment.id, name: sentiment.name, values: sentiment.values};
+    let changedTerm: Term = {
+      id: sentiment.id,
+      name: sentiment.name,
+      totalAvg: sentiment.totalAvg,
+      recentAvg: sentiment.recentAvg
+    };
     this.sentimentSource.next(changedTerm);
   }
 
