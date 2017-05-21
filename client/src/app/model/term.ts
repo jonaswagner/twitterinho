@@ -5,5 +5,6 @@
 export class Term{
   id: number;
   name: string;
-  values: number[];
+  totalAvg: number[];
+  recentAvg: number[];
 }

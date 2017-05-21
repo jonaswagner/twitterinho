@@ -41,3 +41,6 @@
   right: 25px;
 
 }
+.monitor-display{
+  overflow: auto;
+}

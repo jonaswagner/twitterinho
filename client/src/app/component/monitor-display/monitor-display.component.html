@@ -1,70 +1,54 @@
 <div class="performance-container">
-  <div class="row">
-    <div class="col-xs-12">
-      <h3 class="performance-header">Current Performance</h3>
-    </div>
-  </div>
   <div class="performance-content">
     <div class="row">
       <div class="col-xs-12">
-        <h4>System Monitor</h4>
+        <h3 class="performance-header">System Monitor</h3>
       </div>
     </div>
-    <div class="row">
+    <div class="row performance-row">
       <div class="col-xs-6">
-        <p>CPU type: {{monitorData.arch}}</p>
+        <p class="text-center">CPU type: {{monitorData.arch}}</p>
       </div>
       <div class="col-xs-6">
-        <p>Name: {{monitorData.name}}</p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <p>Current CPU load: {{monitorData.loadAverage}}</p>
-        <p-chart type="doughnut" [data]="cpuDoughnutData"></p-chart>
-      </div>
-      <div class="col-xs-6">
-        <p>CPU over Time</p>
-        <p-chart type="line" [data]="cpuLineData"></p-chart>
+        <p class="text-center">Name: {{monitorData.name}}</p>
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <p>Current RAM used: {{monitorData.totalSwapSize - monitorData.freeSwapSize}}</p>
-        <p-chart type="doughnut" [data]="ramDoughnutData"></p-chart>
-      </div>
-      <div class="col-xs-6">
-        <p>RAM used over Time</p>
-        <p-chart type="line" [data]="ramLineData"></p-chart>
-      </div>
+    <div class="row performance-row">
+      <h4 class="performance-header">Current CPU load: {{monitorData.loadAverage}}</h4>
+      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.loadAverage" [monitorMax]="1"></monitor-chart>
     </div>
-    <div class="row">
+    <div class="row performance-row">
+      <h4 class="performance-header">Current RAM used: {{monitorData.totalSwapSize-monitorData.freeSwapSize}}</h4>
+      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.totalSwapSize-monitorData.freeSwapSize"
+                     [monitorMax]="monitorData.totalSwapSize"></monitor-chart>
+    </div>
+    <div class="row performance-row">
       <div class="col-xs-12">
-        <h4>Tweet Processing Monitor</h4>
+        <h3 class="performance-header">Tweet Processing Monitor</h3>
       </div>
     </div>
-    <div class="row">
+    <div class="row performance-row">
       <div class="col-xs-6">
         <p>Tweet processing time</p>
       </div>
       <div class="col-xs-6">
-        <p>{{monitorData.systemTweetsPerMin}}</p>
+        <p class="performance-number">{{monitorData.processingTime}}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row performance-row">
       <div class="col-xs-6">
         <p>Time for sentiment analysis:</p>
       </div>
       <div class="col-xs-6">
-        <p>{{monitorData.systemTweetsPerMin}}</p>
+        <p class="performance-number">{{monitorData.sentimentDetectionDuration}}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row performance-row">
       <div class="col-xs-6">
         <p>Time for language detection</p>
       </div>
       <div class="col-xs-6">
-        <p>{{monitorData.systemTweetsPerMin}}</p>
+        <p class="performance-number">{{monitorData.languageDetectionDuration}}</p>
       </div>
     </div>
   </div>
