@@ -1,5 +1,7 @@
 package ch.uzh.ase.config;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -11,16 +13,21 @@ public class Configuration {
 
     private static Configuration configuration = new Configuration();
     private Properties prop = new Properties();
-    InputStream input = null;
-
 
     public static Configuration getInstance(){
         return configuration;
     }
 
     private Configuration() {
-        input = Configuration.class.getResourceAsStream("config.properties");
+        loadProperties();
+    }
+
+    private void loadProperties() {
+        InputStream input = null;
         try {
+            File file = new File("server\\src\\main\\java\\ch\\uzh\\ase\\config\\config.properties");
+            input = new FileInputStream(file);
+
             prop.load(input);
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,8 +46,4 @@ public class Configuration {
     public Properties getProp(){
         return prop;
     }
-
-
-
-
 }

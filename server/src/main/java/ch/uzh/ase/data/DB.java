@@ -1,7 +1,5 @@
 package ch.uzh.ase.data;
 
-import ch.uzh.ase.Application;
-import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.config.Configuration;
 import com.mongodb.BasicDBObject;
