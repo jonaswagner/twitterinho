@@ -2,10 +2,8 @@ package ch.uzh.ase.data;
 
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.config.Configuration;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.WriteConcern;
+import com.mongodb.*;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -14,6 +12,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by Silvio Fankhauser on 26.04.2017.
@@ -34,6 +33,11 @@ public class DB {
     private final String LANGUAGE_DETECTION_DURATION = "languageDetectionDuration";
     private final String SENTIMENT_DETECTION_DURATION = "sentimentDetectionDuration";
     private final String PROCESSING_TIME = "processingTime";
+    private final int QUEUE_SIZE = 5;
+
+    private Map<String, Queue<Double>> lastTweetSentMap = new HashMap<>();
+
+
 
 
     public DB() {
@@ -82,15 +86,41 @@ public class DB {
         int numberOfTweets = 0;
         BasicDBObject query = new BasicDBObject(SEARCH_ID, searchId);
         MongoCursor<Document> cursor = mc.find(query).iterator();
+        if (!lastTweetSentMap.containsKey(searchId)){
+           Queue<Double> lastTweets = new ArrayBlockingQueue<>(QUEUE_SIZE);
+           lastTweetSentMap.put(searchId, lastTweets) ;
+        }
         try {
             while (cursor.hasNext()) {
-                sum = sum + Double.parseDouble(cursor.next().getString(SENTIMENT));
+                Document next = cursor.next();
+                double sent = Double.parseDouble(next.getString(SENTIMENT));
+                sum = sum + sent;
                 numberOfTweets++;
+                insertInQueue(searchId, sent);
             }
+
+        }  catch(MongoCursorNotFoundException mcnf){
         } finally {
             cursor.close();
         }
         return Math.round((sum / (double) numberOfTweets) * 100.0) / 100.0;
+    }
+
+    private void insertInQueue(String searchId, Double sent) {
+        if (lastTweetSentMap.get(searchId).size() >= QUEUE_SIZE){
+            lastTweetSentMap.get(searchId).poll();
+        }
+        lastTweetSentMap.get(searchId).add(sent);
+    }
+
+
+    public double getCurrentSentiment(String searchId) {
+        Queue<Double> queue = lastTweetSentMap.get(searchId);
+        Double average = 0.0;
+        for(Double sent : queue){
+            average = average + sent;
+        }
+        return average/QUEUE_SIZE;
     }
 
 
@@ -131,17 +161,23 @@ public class DB {
         long langDetTime = 0;
         long sentDetTime = 0;
         long procTime = 0;
-        MongoCursor<Document> cursor = mc.find().iterator();
+
+        FindIterable<Document> findIterable = mc.find();
+        findIterable.noCursorTimeout(true);
+        MongoCursor<Document> cursor = findIterable.iterator();
         List<Long> langDetTimeList = new ArrayList<>();
         List<Long> sentDetTimeList = new ArrayList<>();
         List<Long> procTimeList = new ArrayList<>();
         try {
             while (cursor.hasNext()) {
-                langDetTimeList.add(Long.parseLong(cursor.next().getString(LANGUAGE_DETECTION_DURATION)));
-                sentDetTimeList.add(Long.parseLong(cursor.next().getString(SENTIMENT_DETECTION_DURATION)));
-                procTimeList.add(Long.parseLong(cursor.next().getString(PROCESSING_TIME)));
+                Document next = cursor.next();
+                langDetTimeList.add(Long.parseLong(next.getString(LANGUAGE_DETECTION_DURATION)));
+                sentDetTimeList.add(Long.parseLong(next.getString(SENTIMENT_DETECTION_DURATION)));
+                procTimeList.add(Long.parseLong(next.getString(PROCESSING_TIME)));
             }
-        } finally {
+        } catch(MongoCursorNotFoundException mcnf) {}
+        finally
+        {
             cursor.close();
         }
         for (int i = langDetTimeList.size()-10; i < langDetTimeList.size(); i++ ){
@@ -154,5 +190,6 @@ public class DB {
         resultMap.put(PROCESSING_TIME, procTime/10);
         return resultMap;
     }
+
 
 }

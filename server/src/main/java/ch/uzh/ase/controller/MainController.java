@@ -10,13 +10,14 @@ import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.domain.Term;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * This is the REST interface of the Application.
@@ -56,10 +57,9 @@ public class MainController {
     public List<Double> getStream(@PathVariable String name) {
         double averageSentiment = Application.getDatabase().getAverageSentiment(name);
         List<Double> averages = new ArrayList<>();
-        Random rand = new Random();
-        double d = rand.nextDouble();
+        double currentSentiment = Application.getDatabase().getCurrentSentiment(name);
         averages.add(averageSentiment);
-        averages.add(d);
+        averages.add(currentSentiment);
         return averages;
     }
 
