@@ -8,14 +8,15 @@ import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.domain.Term;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 public class MainController {
@@ -49,9 +50,14 @@ public class MainController {
     }
 
     @RequestMapping(value = "/twt/term/{name}/stream", method = RequestMethod.GET)
-    public double getStream(@PathVariable String name) {
+    public List<Double> getStream(@PathVariable String name) {
         double averageSentiment = Application.getDatabase().getAverageSentiment(name);
-        return Application.getDatabase().getAverageSentiment(name);
+        List<Double> averages = new ArrayList<>();
+        Random rand = new Random();
+        double d = rand.nextDouble();
+        averages.add(averageSentiment);
+        averages.add(d);
+        return averages;
     }
 
     @RequestMapping(value = "/twt/term/{name}/stream", method = RequestMethod.PUT)
@@ -62,24 +68,16 @@ public class MainController {
     @RequestMapping(value = "/twt/monitor", method = RequestMethod.GET)
     public ResponseEntity<SystemWorkload> getMonitorData() {
         SystemWorkload wl = WorkloadObserver.getInstance().getSystemWorkload();
+        wl.addStatistics(Application.getDatabase().getTermStatistics());
         return new ResponseEntity<SystemWorkload>(wl, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/twt/monitor/statistics", method = RequestMethod.GET)
-    public ResponseEntity<Object> getTermStatistics() {
-        Map<String, Long> termStats = Application.getDatabase().getTermStatistics();
-        return null;
-    }
-    @RequestMapping(value = "/twt/generate/start", method = RequestMethod.GET)
-    public void startGenerateArtificialTweets() {
-        String streamId = ""; //TODO flavio please add streamId to arguments
-        Blackboard board = StreamRegistry.getInstance().locateBlackboard(streamId);
-        for (int i = 0; i<100; i++) {
+    @RequestMapping(value = "/twt/generate/{term}", method = RequestMethod.GET)
+    public void generateArtificialTweets(@PathVariable String term) {
+        Blackboard board = StreamRegistry.getInstance().locateBlackboard(term);
+        for (int i = 0; i < 100; i++) {
             board.addNewTweets(Sentiment.generateTweets(100));
         }
     }
-    @RequestMapping(value = "/twt/generate/stop", method = RequestMethod.GET)
-    public void stopGenerateArtificialTweets() {
 
-    }
 }
