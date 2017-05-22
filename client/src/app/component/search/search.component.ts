@@ -6,7 +6,6 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Term} from "../../model/term";
 import {SentimentService} from "../../service/sentiment.service";
 import {Subscription} from "rxjs/Subscription";
-import {IntervalObservable} from "rxjs/observable/IntervalObservable";
 @Component({
   selector: 'search-component',
   templateUrl: './search.component.html',
@@ -19,26 +18,45 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.getTerms();
   }
 
+  private currentTerm: Term;
   private activeTerms: Term[] = [];
   private addedTerm: Term;
   private addedTermName: string;
   private sentimentSubscription: Subscription;
+  private status: string;
+  private alreadyUsed: string;
 
   constructor(private sentimentService: SentimentService) {
+    this.status = 'loading';
   }
 
   addTerm() {
-    this.addedTerm = {id: 1, name: this.addedTermName, totalAvg: [], recentAvg: []};
+    this.addedTerm = {id: 1, name: this.addedTermName, totalAvg: [], recentAvg: [], isStopped: false};
     this.sentimentService.setStopStream(false);
-    let existingTerm = this.activeTerms.find(currentSentiment => currentSentiment.name == this.addedTermName)
-    //TODO check if that works
+    let existingTerm = this.activeTerms.find(currentSentiment => currentSentiment.name.toLowerCase() === this.addedTermName.toLowerCase())
     if (existingTerm) {
+      this.alreadyUsed = 'This term is already in use!';
       return;
     }
+    this.alreadyUsed = '';
+    this.status = 'loading';
+    if (this.currentTerm) {
+      this.currentTerm.isStopped = true;
+      this.sentimentService.stopStream(this.currentTerm).subscribe(
+        data => {
+          console.log('stopped current term');
+
+        },
+        err => console.log(err),
+        () => console.log("done")
+      );
+    }
+
     this.sentimentService.startStream(this.addedTerm).subscribe(
       data => {
         this.activeTerms.push(this.addedTerm);
         this.sentimentSubscription = this.getStream(this.addedTerm);
+        this.currentTerm = this.addedTerm;
       },
       err => {
         console.log(err);
@@ -46,6 +64,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       () => {
         console.log("done");
         this.addedTermName = "";
+        this.status = 'active';
       });
   }
 
@@ -71,8 +90,10 @@ export class SearchComponent implements OnInit, OnDestroy {
       err => {
         console.log(err);
       },
-      () => console.log("done"))
-
+      () => {
+        console.log("done");
+        this.status = 'active';
+      });
   }
 
   sendToDisplay(term: Term) {
@@ -80,13 +101,31 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   activateStream(term: Term) {
-    this.sentimentService.setStopStream(false);
+    this.status = 'loading';
+    if (this.currentTerm) {
+      this.currentTerm.isStopped = true;
+      this.sentimentService.stopStream(this.currentTerm).subscribe(
+        data => {
+          console.log('stopped current term');
+
+        },
+        err => console.log(err),
+        () => console.log("done")
+      );
+    }
     this.sentimentService.startStream(term).subscribe(
       data => {
+        term.isStopped = false;
+        this.currentTerm = term;
+
       },
       err => console.log(err),
-      () => console.log("done")
+      () => {
+        console.log("done");
+        this.status = 'active';
+      }
     );
+    this.sentimentService.setStopStream(false);
     this.sentimentSubscription = this.getStream(term);
   }
 
@@ -110,7 +149,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       err => {
         console.log(err);
       },
-      () => console.log("done")
+      () => {
+        console.log("done");
+      }
     );
   }
 

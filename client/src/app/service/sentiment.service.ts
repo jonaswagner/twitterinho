@@ -46,7 +46,7 @@ export class SentimentService {
 
   getStream(term: Term): Observable<number[]> {
     this.subscription = Observable
-      .interval(10000).takeWhile(x => !this.isStreamStopped).flatMap(
+      .interval(10000).takeWhile(x => !term.isStopped).flatMap(
         () =>
           this.http.get("/twt/term/" + term.name + "/stream")
             .map((response: Response) => <number[]>response.json())
@@ -72,7 +72,8 @@ export class SentimentService {
       id: sentiment.id,
       name: sentiment.name,
       totalAvg: sentiment.totalAvg,
-      recentAvg: sentiment.recentAvg
+      recentAvg: sentiment.recentAvg,
+      isStopped: sentiment.isStopped
     };
     this.sentimentSource.next(changedTerm);
   }

@@ -1,36 +1,46 @@
-<div class="row">
-  <form>
-    <div class="col-xs-12">
-      <div class="form-group">
-        <label for="termSearch">Analyze Sentiments for:</label>
-        <input name="termSearch" id="termSearch" [(ngModel)]="addedTermName" type="text" class="form-control">
-      </div>
-      <div class="form-group pull-right">
-        <label for="evalBtn"></label>
-        <button id="evalBtn" (click)="addTerm()" class="btn btn-success btn-block form-control">Evaluate</button>
-        <div class="clearfix"></div>
+<div class="searchContainer" [ngSwitch]="status">
+  <div *ngSwitchCase="'loading'">
+    <loading-indicator></loading-indicator>
+  </div>
+  <div *ngSwitchCase="'active'">
+    <div class="row">
+      <form>
+        <div class="col-xs-12">
+          <div class="form-group">
+            <label for="termSearch">Analyze Sentiments for:</label>
+            <input name="termSearch" id="termSearch" [(ngModel)]="addedTermName" type="text" class="form-control">
+          </div>
+          <div class="form-group pull-right">
+            <label for="evalBtn"></label>
+            <button id="evalBtn" (click)="addTerm()" class="btn btn-success btn-block form-control">Evaluate</button>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="row">
+      <div class="col-xs-12"><h5 class="text-danger">{{alreadyUsed}}</h5></div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <ul class="active-terms">
+          <li *ngFor="let s of activeTerms">
+            <div class="pull-left">
+              <a (click)="activateStream(s)">{{s.name}}
+              </a></div>
+            <div class="pull-right">
+              <span>{{s.totalAvg[s.totalAvg.length-1]}}</span>
+              <a class="btn btn-danger btn-sm" (click)="deleteTerm(s)">&times;</a>
+            </div>
+            <div class="clearfix"></div>
+          </li>
+        </ul>
       </div>
     </div>
-  </form>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <ul class="active-terms">
-      <li *ngFor="let s of activeTerms">
-        <div class="pull-left">
-          <a (click)="activateStream(s)">{{s.name}}
-          </a></div>
-        <div class="pull-right">
-          <span>{{s.values[s.values.length-1]}}</span>
-          <a class="btn btn-danger btn-sm" (click)="deleteTerm(s)">&times;</a>
-        </div>
-        <div class="clearfix"></div>
-      </li>
-    </ul>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <button class="btn btn-danger btn-block" (click)="deleteAllTerms()">Delete All Terms</button>
+    <div class="row">
+      <div class="col-xs-12">
+        <button class="btn btn-danger btn-block" (click)="deleteAllTerms()">Delete All Terms</button>
+      </div>
+    </div>
   </div>
 </div>

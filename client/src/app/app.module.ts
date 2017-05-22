@@ -14,6 +14,7 @@ import {SentimentService} from "./service/sentiment.service";
 import {MonitorService} from "./service/monitor.service";
 import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterinho-chart.component";
 import {MonitorChartComponent} from "./component/monitor-chart/monitor-chart.component";
+import {LoadingIndicator} from "./util/loading-indicator.component";
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import {MonitorChartComponent} from "./component/monitor-chart/monitor-chart.com
     MonitorDisplayComponent,
     DevDisplayComponent,
     TwitterinhoChartComponent,
-    MonitorChartComponent
+    MonitorChartComponent,
+    LoadingIndicator
   ],
   imports: [
     BrowserModule,

@@ -7,4 +7,5 @@ export class Term{
   name: string;
   totalAvg: number[];
   recentAvg: number[];
+  isStopped: boolean = false;
 }

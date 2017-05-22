@@ -1,6 +1,5 @@
 package ch.uzh.ase.domain;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +13,13 @@ public class Term {
 
     private Long id;
     private String name;
-    private List<Double> values;
+    private List<Double> totalAvg;
 
 
     public Term(String name, Double value) {
         this.name = name;
-        this.values = new ArrayList<>();
-        this.values.add(Math.round(value * 100.0) / 100.0);
+        this.totalAvg = new ArrayList<>();
+        this.totalAvg.add(Math.round(value * 100.0) / 100.0);
     }
 
     public String getName() {
@@ -31,11 +30,11 @@ public class Term {
         this.name = name;
     }
 
-    public List<Double> getValues() {
-        return values;
+    public List<Double> getTotalAvg() {
+        return totalAvg;
     }
 
     public void addValue(Double value) {
-        this.values.add(value);
+        this.totalAvg.add(value);
     }
 }
