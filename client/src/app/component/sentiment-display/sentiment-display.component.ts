@@ -16,7 +16,6 @@ import {Subscription} from "rxjs";
 export class SentimentDisplayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
-
   selectedTerm: Term = new Term();
   subscription: Subscription;
 

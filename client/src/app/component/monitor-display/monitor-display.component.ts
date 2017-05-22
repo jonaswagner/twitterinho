@@ -2,11 +2,11 @@
  * Created by flaviokeller on 20.03.17.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {MonitorDisplayService} from './monitor-display.service';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {MonitorService} from "../../service/monitor.service";
 import {MonitorData} from "../../model/monitorData";
 import {Subscription} from "rxjs/Subscription";
+import {UIChart} from "primeng/primeng";
 @Component({
   selector: 'monitor-display-component',
   templateUrl: './monitor-display.component.html',
@@ -15,65 +15,22 @@ import {Subscription} from "rxjs/Subscription";
 })
 
 export class MonitorDisplayComponent implements OnInit, OnDestroy {
+  monitorData: MonitorData = new MonitorData();
+  private monitorSubscription: Subscription;
+  private statisticsSubscription: Subscription;
+  private requestCount = 0;
+
   ngOnInit(): void {
     this.getMonitorData();
   }
 
-
-  private monitorData: MonitorData = new MonitorData();
-  private subscription: Subscription;
-  doughnutData: any;
-  lineData: any;
-  barData: any;
-
-
   constructor(private monitorService: MonitorService) {
-    this.doughnutData = {
-      labels: ['A', 'B', 'C'],
-      datasets: [
-        {
-          data: [300, 50, 100],
-          backgroundColor: [
-            "#FF6384",
-            "#36A2EB",
-            "#FFCE56"
-          ],
-          hoverBackgroundColor: [
-            "#FF6384",
-            "#36A2EB",
-            "#FFCE56"
-          ]
-        }]
-    };
-    this.lineData = {
-      labels: ['1', '2', '3', '4', '5', '6', '7'],
-      datasets: [
-        {
-          label: 'A',
-          data: [35, 47, 96, 87, 64, 71, 32],
-          fill: false,
-          borderColor: "#FF6384"
-        },
-        {
-          label: 'B',
-          data: [4, 78, 62, 12, 36, 84, 55],
-          fill: false,
-          borderColor: "#36A2EB",
-        },
-        {
-          label: 'C',
-          data: [77, 42, 56, 31, 64, 11, 25],
-          fill: false,
-          borderColor: "#FFCE56"
-        }
-
-      ]
-    };
   }
 
   getMonitorData() {
-    this.subscription = this.monitorService.getMonitorData().subscribe(
+    this.monitorSubscription = this.monitorService.getMonitorData().subscribe(
       data => {
+        this.requestCount += 1;
         this.monitorData = data;
       },
       err => {
@@ -82,15 +39,18 @@ export class MonitorDisplayComponent implements OnInit, OnDestroy {
       () => console.log("done")
     );
   }
-  startMonitorData(){
+
+  startMonitorData() {
     this.monitorService.setStopMonitor(false);
     this.getMonitorData();
   }
-  stopMonitorData(){
+
+  stopMonitorData() {
     this.monitorService.setStopMonitor(true);
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.monitorSubscription.unsubscribe();
+    this.statisticsSubscription.unsubscribe();
   }
 }

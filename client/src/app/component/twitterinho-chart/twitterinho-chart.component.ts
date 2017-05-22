@@ -15,24 +15,6 @@ import {SentimentService} from "../../service/sentiment.service";
 export class TwitterinhoChartComponent implements OnChanges {
   @ViewChild('chart') chart: UIChart;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.data.datasets[0].label === this.currentTerm.name) {
-      this.data.datasets[0].data.concat(this.currentTerm.values);
-      setTimeout(() => {
-        if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
-          this.data.datasets[0].data.shift();
-        }
-        this.chart.refresh();
-      }, 100);
-    } else {
-      this.data.datasets[0].label = this.currentTerm.name;
-      this.data.datasets[0].data = this.currentTerm.values;
-      setTimeout(() => {
-        this.chart.reinit();
-      }, 100);
-    }
-  }
-
   @Input()
   currentTerm: Term = new Term();
   @Input()
@@ -40,19 +22,52 @@ export class TwitterinhoChartComponent implements OnChanges {
   options: any;
   msgs: Message[];
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.data.datasets[0].label === this.currentTerm.name + ' - total avg.') {
+      this.data.datasets[0].data.concat(this.currentTerm.totalAvg);
+      this.data.datasets[1].data.concat(this.currentTerm.recentAvg);
+      setTimeout(() => {
+        if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
+          this.data.datasets[0].data.shift();
+        }
+        if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
+          this.data.datasets[1].data.shift();
+        }
+        this.chart.refresh();
+      }, 100);
+    } else {
+      this.data.datasets[0].label = this.currentTerm.name + ' - total avg.';
+      this.data.datasets[1].label = this.currentTerm.name + ' - recent avg.';
+      this.data.datasets[0].data = this.currentTerm.totalAvg;
+      this.data.datasets[1].data = this.currentTerm.recentAvg;
+      setTimeout(() => {
+        this.chart.reinit();
+      }, 100);
+    }
+  }
+
+
   constructor() {
 
     let bodyStyles = window.getComputedStyle(document.body);
     let twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
+    let alterorange = bodyStyles.getPropertyValue('--alterorange').trim();
     this.data = {
       labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', ''],
       datasets: [
         {
-          label: 'First Dataset',
+          label: 'Total Average',
           data: [],
-          fill: false,
+          fill: twitterblue,
           borderColor: twitterblue,
-        }],
+        },
+        {
+          label: 'Recent Average',
+          data: [],
+          fill: alterorange,
+          borderColor: alterorange,
+        },
+      ],
 
 
     };

@@ -1,8 +1,7 @@
 package ch.uzh.ase.data;
 
-import ch.uzh.ase.Application;
-import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
+import ch.uzh.ase.config.Configuration;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -21,6 +20,7 @@ import java.util.*;
  */
 public class DB {
 
+    private Properties properties = Configuration.getInstance().getProp();
     private final MongoDatabase mdb;
     private final MongoClient mongoClient;
     private final MongoCollection mc;
@@ -35,9 +35,10 @@ public class DB {
     private final String SENTIMENT_DETECTION_DURATION = "sentimentDetectionDuration";
     private final String PROCESSING_TIME = "processingTime";
 
+
     public DB() {
-        mongoClient = new MongoClient(new MongoClientURI(Application.getProp().getProperty("databaseconnection")));
-        mdb = mongoClient.getDatabase(Application.getProp().getProperty("dbname"));
+        mongoClient = new MongoClient(new MongoClientURI(properties.getProperty("databaseconnection")));
+        mdb = mongoClient.getDatabase(properties.getProperty("dbname"));
         mdb.withWriteConcern(WriteConcern.JOURNALED);
         mc = mdb.getCollection(COLLECTION_NAME);
     }
@@ -125,34 +126,33 @@ public class DB {
         mc.deleteMany(query);
     }
 
-    public long getEvaluationTime(String key) {
-        long sum = 0;
-        int numberOfTweets = 0;
+    public Map<String, Long> getTermStatistics()  {
+        Map<String, Long> resultMap = new HashMap<>();
+        long langDetTime = 0;
+        long sentDetTime = 0;
+        long procTime = 0;
         MongoCursor<Document> cursor = mc.find().iterator();
+        List<Long> langDetTimeList = new ArrayList<>();
+        List<Long> sentDetTimeList = new ArrayList<>();
+        List<Long> procTimeList = new ArrayList<>();
         try {
             while (cursor.hasNext()) {
-                sum = sum + Long.parseLong(cursor.next().getString(key));
-                numberOfTweets++;
+                langDetTimeList.add(Long.parseLong(cursor.next().getString(LANGUAGE_DETECTION_DURATION)));
+                sentDetTimeList.add(Long.parseLong(cursor.next().getString(SENTIMENT_DETECTION_DURATION)));
+                procTimeList.add(Long.parseLong(cursor.next().getString(PROCESSING_TIME)));
             }
         } finally {
             cursor.close();
         }
-        return sum / numberOfTweets;
-    }
-
-    public Map<String, Long> getTermStatistics() {
-        Map<String, Long> resultMap = new HashMap<>();
-
-        long langDetTime = getEvaluationTime(LANGUAGE_DETECTION_DURATION);
-        long sentDetTime = getEvaluationTime(SENTIMENT_DETECTION_DURATION);
-        long procTime = getEvaluationTime(PROCESSING_TIME);
-
-        resultMap.put(LANGUAGE_DETECTION_DURATION, langDetTime);
-        resultMap.put(SENTIMENT_DETECTION_DURATION, sentDetTime);
-        resultMap.put(PROCESSING_TIME, procTime);
-
+        for (int i = langDetTimeList.size()-10; i < langDetTimeList.size(); i++ ){
+            langDetTime = langDetTime + langDetTimeList.get(i);
+            sentDetTime = sentDetTime + sentDetTimeList.get(i);
+            procTime = procTime + procTimeList.get(i);
+        }
+        resultMap.put(LANGUAGE_DETECTION_DURATION, langDetTime/10);
+        resultMap.put(SENTIMENT_DETECTION_DURATION, sentDetTime/10);
+        resultMap.put(PROCESSING_TIME, procTime/10);
         return resultMap;
     }
-
 
 }

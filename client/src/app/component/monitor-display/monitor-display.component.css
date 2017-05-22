@@ -13,15 +13,22 @@
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 .performance-container{
-  margin-top: 80px;
-  padding: 0px 20px;
+  padding: 0 20px;
+  overflow: auto;
+}
+.performance-row{
+  border-bottom: 1px solid var(--twitterblue);
+  margin-bottom:10px;
 }
 .performance-header{
   padding: 10px 20px;
   text-align: center;
 }
 .performance-content{
-  margin-top: 20px;
+}
+.performance-number{
+  font-weight:bold;
+  font-size: 15px;
 }
 ul {
   font-size: 18px;

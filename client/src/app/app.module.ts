@@ -8,13 +8,12 @@ import {SearchComponent} from "./component/search/search.component";
 import {SentimentDisplayComponent} from "./component/sentiment-display/sentiment-display.component";
 import {MonitorDisplayComponent} from "./component/monitor-display/monitor-display.component";
 import {DevDisplayComponent} from "./component/dev-display/dev-display.component";
-import {SentimentDisplayService} from "./component/sentiment-display/sentiment-display.service";
-import {MonitorDisplayService} from "./component/monitor-display/monitor-display.service";
 import {ModalModule} from "ng2-bootstrap";
 import {ChartModule, GrowlModule} from "primeng/primeng";
 import {SentimentService} from "./service/sentiment.service";
 import {MonitorService} from "./service/monitor.service";
 import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterinho-chart.component";
+import {MonitorChartComponent} from "./component/monitor-chart/monitor-chart.component";
 
 
 @NgModule({
@@ -24,7 +23,8 @@ import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterin
     SentimentDisplayComponent,
     MonitorDisplayComponent,
     DevDisplayComponent,
-    TwitterinhoChartComponent
+    TwitterinhoChartComponent,
+    MonitorChartComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +34,7 @@ import {TwitterinhoChartComponent} from "./component/twitterinho-chart/twitterin
     ChartModule,
     GrowlModule
   ],
-  providers: [SentimentService, SentimentDisplayService, MonitorDisplayService, MonitorService],
+  providers: [SentimentService, MonitorService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
