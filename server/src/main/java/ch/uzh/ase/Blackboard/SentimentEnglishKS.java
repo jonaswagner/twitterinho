@@ -40,7 +40,25 @@ public class SentimentEnglishKS extends AbstractKSMaster {
 
     @Override
     public boolean execCondition(Tweet tweet) {
-        return tweet.getIso() != null && (tweet.getIso().equals(LanguageCode.en));
+        return tweet.getIso() != null && checkSupportedLang(tweet);
+    }
+
+    private boolean checkSupportedLang(Tweet tweet) {
+        boolean isSupportedLang = false;
+
+        if (tweet.getIso().equals(LanguageCode.en)){
+            isSupportedLang = true;
+        }
+
+        if (tweet.getIso().equals(LanguageCode.de)) {
+            isSupportedLang = true;
+        }
+
+        if (tweet.getIso().equals(LanguageCode.fr)) {
+            isSupportedLang = true;
+        }
+
+        return isSupportedLang;
     }
 
     @Override
