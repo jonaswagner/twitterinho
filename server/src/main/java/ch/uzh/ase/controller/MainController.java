@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * This is the REST interface of the Application.
+ */
 @RestController
 public class MainController {
 
@@ -76,8 +79,7 @@ public class MainController {
     public void generateArtificialTweets(@PathVariable String term) {
         Blackboard board = StreamRegistry.getInstance().getBlackBoard();
         for (int i = 0; i < 100; i++) {
-            board.addNewTweets(Sentiment.generateTweets(100));
+            board.addNewTweets(Sentiment.generateTweets(100, term));
         }
     }
-
 }

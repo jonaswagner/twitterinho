@@ -37,9 +37,12 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
                 Tweet nextTweet = taskQueue.poll();
                 nextTweet.setStartLangDetection(DateTime.now());
                 String text = nextTweet.getText();
+
                 String languageCode = detector.detect(text).getLanguage();
                 nextTweet.setIso(LanguageCode.getByCode(languageCode));
                 nextTweet.setEndLangDetection(DateTime.now());
+
+                LOG.info(this.getName() + "; " +nextTweet.getText() + ", " + nextTweet.getIso().getName());
                 master.reportResult(nextTweet);
             }
         }
@@ -47,7 +50,6 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
 
     @Override
     public void subservice(List<Tweet> tasks) {
-        LOG.info(tasks.size() + " new tasks added to the taskList");
         taskQueue.addAll(tasks);
     }
 

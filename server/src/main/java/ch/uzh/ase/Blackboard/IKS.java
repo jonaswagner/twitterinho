@@ -12,6 +12,5 @@ public interface IKS {
     boolean execCondition(Tweet tweet);
     void execAction(Tweet tweet);
     void updateBlackboard(Queue<Tweet> queue);
-
 }
 

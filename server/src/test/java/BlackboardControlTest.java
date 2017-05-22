@@ -25,6 +25,7 @@ import java.util.Properties;
  */
 public class BlackboardControlTest {
 
+    private final String SEARCH_ID = "TEST";
     private final Blackboard blackboard = new Blackboard();
     private WorkloadObserver observer;
     private BlackboardControl blackboardControl;
@@ -38,7 +39,7 @@ public class BlackboardControlTest {
     public void before(){
 
 
-        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10);
+        List<Tweet> newTweets = Sentiment.generateTweets(BlackboardTest.INITIAL_NUMBER_OF_TWEETS*10,SEARCH_ID);
 
         for (Tweet tweet : newTweets) {
             tweet.setIso(LanguageCode.en);

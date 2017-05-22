@@ -64,7 +64,6 @@ public class SentimentEnglishKSSlave extends AbstractLanguageSlave implements IK
 
     @Override
     public void subservice(List<Tweet> tasks) {
-        LOG.info(tasks.size() + " new tasks added to the taskList");
         taskQueue.addAll(tasks);
     }
 

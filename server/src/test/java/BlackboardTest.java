@@ -18,13 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BlackboardTest {
 
+    private static final String SEARCH_ID = "TEST";
     public static final int INITIAL_NUMBER_OF_TWEETS = 100;
     public static final int ADDITIONAL_NUMBER_OF_TWEETS = 20;
     private final Blackboard blackboard = new Blackboard();
 
     @Before
     public void before(){
-        List<Tweet> newTweets = Sentiment.generateTweets(INITIAL_NUMBER_OF_TWEETS);
+        List<Tweet> newTweets = Sentiment.generateTweets(INITIAL_NUMBER_OF_TWEETS,SEARCH_ID);
 
         for (Tweet tweet : newTweets) {
             blackboard.getTweetMap().put(tweet, TweetStatus.NEW);
@@ -40,7 +41,7 @@ public class BlackboardTest {
     public void blackboardTest() {
 
         Assert.assertEquals(INITIAL_NUMBER_OF_TWEETS, blackboard.getTweetMap().size());
-        List<Tweet> testTweets = Sentiment.generateTweets(20);
+        List<Tweet> testTweets = Sentiment.generateTweets(20,SEARCH_ID);
         Map<Tweet, TweetStatus> testTweetStatusMap = new ConcurrentHashMap<>();
         for (Tweet tweet : testTweets) {
             testTweetStatusMap.put(tweet, TweetStatus.NEW);
@@ -48,7 +49,7 @@ public class BlackboardTest {
         blackboard.addNewTweets(testTweetStatusMap);
         Assert.assertEquals(ADDITIONAL_NUMBER_OF_TWEETS + INITIAL_NUMBER_OF_TWEETS, blackboard.getTweetMap().size());
 
-        Tweet testTweet = Sentiment.generateTweets(1).get(0);
+        Tweet testTweet = Sentiment.generateTweets(1,SEARCH_ID).get(0);
         blackboard.addNewTweet(testTweet, TweetStatus.EVALUATED);
         Assert.assertEquals(blackboard.getTweetMap().get(testTweet), TweetStatus.EVALUATED);
 

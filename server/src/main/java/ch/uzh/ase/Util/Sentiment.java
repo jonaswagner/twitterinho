@@ -45,30 +45,30 @@ public enum Sentiment {
         return assignedSentiment;
     }
 
-    public static Tweet generateTweet(Sentiment sentiment) {
+    public static Tweet generateTweet(Sentiment sentiment, String streamId) {
         switch (sentiment) {
 
             case FULLY_NEGATIVE: {
-                return new Tweet("I don't agree with you. Your argument is bad and you should feel bad!", "Mr.Disagree", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("I don't agree with you. Your argument is bad and you should feel bad!", "Mr.Disagree", DateTime.now(), streamId);
             }
             case NEGATIVE: {
-                return new Tweet("I HATE YOU AND YOUR FAMILY. PLEASE KILL YOURSELF!", "hater666", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("I HATE YOU AND YOUR FAMILY. PLEASE KILL YOURSELF!", "hater666", DateTime.now(), streamId);
             }
             case NEUTRAL: {
-                return new Tweet("I went to zoo, yesterday", "Mr.Neutral", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("I went to zoo, yesterday", "Mr.Neutral", DateTime.now(), streamId);
             }
             case POSITIVE: {
-                return new Tweet("Thank you so much for coming. We are looking forward to see you again.", "thinkPositive", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("Thank you so much for coming. We are looking forward to see you again.", "thinkPositive", DateTime.now(), streamId);
             }
             case FULLY_POSITIVE: {
-                return new Tweet("Today is the best day of my life so far! OMG SO EXITED!", "pureExitement", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("Today is the best day of my life so far! OMG SO EXITED!", "pureExitement", DateTime.now(), streamId);
             }
             default:
-                return new Tweet("I HATE YOU AND YOUR FAMILY. PLEASE KILL YOURSELF!", "hater666", DateTime.now(), Tweet.TEST_SEARCH_TERM);
+                return new Tweet("I HATE YOU AND YOUR FAMILY. PLEASE KILL YOURSELF!", "hater666", DateTime.now(), streamId);
         }
     }
 
-    public static List<Tweet> generateTweets(int numberOfTweets) throws IllegalArgumentException {
+    public static List<Tweet> generateTweets(int numberOfTweets, String streamId) throws IllegalArgumentException {
 
         if (numberOfTweets < 1 || numberOfTweets > 100000) {
             throw new IllegalArgumentException("Tweet generator can only generate tweets between 1 and 100000");
@@ -77,7 +77,7 @@ public enum Sentiment {
         List<Tweet> tweetList = new ArrayList<>(numberOfTweets);
 
         for (int i = 0; i<numberOfTweets; i++) {
-            tweetList.add(Sentiment.generateTweet(Sentiment.assignSentiment(RAND.nextInt(5))));
+            tweetList.add(Sentiment.generateTweet(Sentiment.assignSentiment(RAND.nextInt(5)), streamId));
         }
 
         return tweetList;

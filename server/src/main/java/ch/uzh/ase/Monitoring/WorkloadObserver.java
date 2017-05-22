@@ -112,9 +112,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
                 LOG.warn("Free RAM (max " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
 
-                freePhysicalSize = osMBean.getTotalPhysicalMemorySize();
-                LOG.warn("Free Physical Memory (max " + df.format(bytesToGigaBytes(totalPhysicalSize)) + "GB): " + df.format(bytesToGigaBytes(freePhysicalSize)) + "GB");
-
                 //reset counter & currentTweets/10s
                 timeSlot = current;
                 currentTweetsPerTenSec = 0; //reset
@@ -149,11 +146,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 if (inOutRatio > configuration.IN_OUT_PARITY) {
                     generateSlaves(subject, inOutRatio);
                 } else {
-                    LOG.warn("Hold number of Slaves");
+                    LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
                 }
             } else {
                 if (inOutRatio > configuration.IN_OUT_PARITY) {
-                    LOG.warn("Hold number of Slaves");
+                    LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
                 } else {
                     releaseSlaves(subject, inOutRatio);
                 }
@@ -164,8 +161,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private void releaseSlaves(IWorkloadSubject subject, double inOutRatio) {
         if (subject.getNumberOfSlaves() > AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES) {
             subject.shutdownSlavesGracefully(1);
+            LOG.warn(subject.getClass().getName() + ": "+"Release 1 slave");
         } else {
-            LOG.warn("Hold number of Slaves");
+            LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
         }
     }
 
@@ -174,11 +172,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
             if (inOutRatio > configuration.IN_OUT_UPPER_THRESHHOLD) {
                 subject.generateSlaves(calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()));
+                LOG.warn(subject.getClass().getName() + ": "+"generating " + calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()) + " additional slaves");
             } else {
                 subject.generateSlaves(1);
+                LOG.warn(subject.getClass().getName() + ": "+"generating 1 additional slave");
             }
         } else {
-            LOG.warn("Hold number of Slaves");
+            LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
+
         }
     }
 
