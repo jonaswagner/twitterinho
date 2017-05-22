@@ -1,5 +1,7 @@
 package ch.uzh.ase.Util;
 
+import java.util.Map;
+
 /**
  * Created by jonas on 15.05.2017.
  */
@@ -14,6 +16,9 @@ public class SystemWorkload {
     private final double freePhysicalSize;
     private final long systemAvgSlavesLoad;
     private final long systemTweetsPerMin;
+    private long languageDetectionDuration;
+    private long sentimentDetectionDuration;
+    private long processingTime;
 
     public SystemWorkload(String arch,
                           String name,
@@ -34,6 +39,12 @@ public class SystemWorkload {
         this.freePhysicalSize = freePhysicalSize;
         this.systemAvgSlavesLoad = systemAvgSlavesLoad;
         this.systemTweetsPerMin = systemTweetsPerMin;
+    }
+
+    public void addStatistics(Map<String, Long> statistics) {
+        this.languageDetectionDuration = statistics.get("languageDetectionDuration");
+        this.sentimentDetectionDuration = statistics.get("sentimentDetectionDuration");
+        this.processingTime = statistics.get("processingTime");
     }
 
     public String getArch() {
@@ -71,4 +82,17 @@ public class SystemWorkload {
     public long getSystemTweetsPerMin() {
         return this.systemTweetsPerMin;
     }
+
+    public long getLanguageDetectionDuration() {
+        return languageDetectionDuration;
+    }
+
+    public long getSentimentDetectionDuration() {
+        return sentimentDetectionDuration;
+    }
+
+    public long getProcessingTime() {
+        return processingTime;
+    }
+
 }
