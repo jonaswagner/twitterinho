@@ -49,27 +49,27 @@ public class StreamRegistryTest {
 
         registry.register(STREAM_ID_1);
         TweetStream stream = registry.locateStream(STREAM_ID_1);
-        Blackboard blackboard = registry.locateBlackboard(STREAM_ID_1);
+        Blackboard blackboard = registry.getBlackBoard();
         Assert.assertNotNull(stream);
         Assert.assertNotNull(blackboard);
 
         registry.register(STREAM_ID_1);
         Assert.assertEquals(stream, registry.locateStream(STREAM_ID_1));
-        Assert.assertEquals(blackboard, registry.locateBlackboard(STREAM_ID_1));
+        Assert.assertEquals(blackboard, registry.getBlackBoard());
 
         registry.register(STREAM_ID_2);
         Assert.assertEquals(stream, registry.locateStream(STREAM_ID_2));
-        Assert.assertEquals(blackboard, registry.locateBlackboard(STREAM_ID_2));
+        Assert.assertEquals(blackboard,  registry.getBlackBoard());
 
-        Assert.assertNull(registry.locateBlackboard(NON_EXISTENT_STREAM_ID));
+        Assert.assertNull( registry.getBlackBoard());
         Assert.assertNull(registry.locateStream(NON_EXISTENT_STREAM_ID));
 
         registry.unRegister(STREAM_ID_1);
         registry.unRegister(STREAM_ID_2);
         Assert.assertNull(registry.locateStream(STREAM_ID_1));
-        Assert.assertNull(registry.locateBlackboard(STREAM_ID_1));
+        Assert.assertNull( registry.getBlackBoard());
         Assert.assertNull(registry.locateStream(STREAM_ID_2));
-        Assert.assertNull(registry.locateBlackboard(STREAM_ID_2));
+        Assert.assertNull( registry.getBlackBoard());
 
 
     }

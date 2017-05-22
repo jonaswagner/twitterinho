@@ -74,7 +74,7 @@ public class MainController {
 
     @RequestMapping(value = "/twt/generate/{term}", method = RequestMethod.GET)
     public void generateArtificialTweets(@PathVariable String term) {
-        Blackboard board = StreamRegistry.getInstance().locateBlackboard(term);
+        Blackboard board = StreamRegistry.getInstance().getBlackBoard();
         for (int i = 0; i < 100; i++) {
             board.addNewTweets(Sentiment.generateTweets(100));
         }

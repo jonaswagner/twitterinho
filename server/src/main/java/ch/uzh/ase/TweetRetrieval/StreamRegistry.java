@@ -20,27 +20,14 @@ public class StreamRegistry {
     private StreamRegistry(){
     }
 
-    private List<Blackboard> blackboardList =  Collections.synchronizedList(new ArrayList<>());
+    Blackboard blackboard = null;
     private Map<String, TweetStream> streamMap = new ConcurrentHashMap<>();
-    private Map<Blackboard, List<String>> blackboardMap = new ConcurrentHashMap<>();
 
     public void register(String streamId){
         TweetStream tweetStream = new TweetStream();
         tweetStream.startStream(streamId);
         streamMap.put(streamId, tweetStream);
-
-        if (blackboardMap.isEmpty()){
-            setBlackboard();
-            blackboardMap.put(blackboardList.get(0), Arrays.asList(streamId)); //FIXME pls consider concurrency
-        } else {
-            List<String> streams = blackboardMap.get(locateBlackboard(streamId));
-            if (!streams.contains(streamId)) {
-                streams.add(streamId);
-            }
         }
-
-        //TODO jwa add Stream to WorkloadObserver
-    }
 
     public void unRegister(String streamId){
         streamMap.remove(streamId);
@@ -50,46 +37,11 @@ public class StreamRegistry {
         return streamMap.get(streamId);
     }
 
-    public Blackboard locateBlackboard(String streamId){
-        for(Map.Entry<Blackboard, List<String>> element : blackboardMap.entrySet()) {
-            if (element.getValue().contains(streamId)) {
-                return element.getKey();
-            }
-        }
-        //TODO handle return null
-        return null;
+    public void setBlackBoard(Blackboard blackboard) {
+        this.blackboard = blackboard;
     }
 
-    //TODO jwa delete this pls
-    public Blackboard locateDefaultBlackboard() {
-        if (!blackboardList.isEmpty()) {
-            return blackboardList.get(0);
-        } else {
-            return null;
-        }
+    public Blackboard getBlackBoard() {
+        return this.blackboard;
     }
-
-    private Blackboard setBlackboard(){
-        if(blackboardList.isEmpty()){
-            Blackboard blackboard = new Blackboard();
-            AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard);
-            iks1.start();
-            AbstractKSMaster iks2 = new LanguageKS(blackboard);
-            iks2.start();
-            AbstractKSMaster iks3 = new SentimentGermanKS(blackboard);
-            iks3.start();
-            BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2, iks3));
-            blackboardControl.start();
-            BlackboardPersist blackboardPersist = new BlackboardPersist(blackboard);
-            blackboardPersist.start();
-
-            blackboardList.add(blackboard);
-            return blackboard;
-        }
-        else {
-            //TODO: handle workload of blackboard
-            return blackboardList.get(0);
-        }
-    }
-
 }

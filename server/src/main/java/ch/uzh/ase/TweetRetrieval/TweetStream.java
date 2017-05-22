@@ -37,7 +37,7 @@ public class TweetStream {
                 DateTime date = new DateTime(status.getCreatedAt().getTime());
                 Tweet tweet = new Tweet(text, author, date, searchID);
                 tweet.setFlaggedNew(DateTime.now());
-                StreamRegistry.getInstance().locateBlackboard(searchID).addNewTweet(tweet, TweetStatus.NEW);
+                StreamRegistry.getInstance().getBlackBoard().addNewTweet(tweet, TweetStatus.NEW);
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {

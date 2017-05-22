@@ -7,7 +7,6 @@ import ch.uzh.ase.Util.Workload;
  */
 public interface IWorkloadObserver {
 
-     void notify(Workload workload, IWorkloadSubject subject);
      void register(IWorkloadSubject subject);
      void deRegister(IWorkloadSubject subject);
 
