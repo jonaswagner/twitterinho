@@ -25,7 +25,7 @@ public class Configuration {
     private void loadProperties() {
         InputStream input = null;
         try {
-            File file = new File("server\\src\\main\\java\\ch\\uzh\\ase\\config\\config.properties");
+            File file = new File("server/src/main/java/ch/uzh/ase/config/config.properties");
             input = new FileInputStream(file);
 
             prop.load(input);
