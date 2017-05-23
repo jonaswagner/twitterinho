@@ -115,12 +115,6 @@
             <version>RELEASE</version>
         </dependency>
 
-        <!-- Microsoft Azure Logs-->
-        <dependency>
-            <groupId>com.microsoft.azure</groupId>
-            <artifactId>applicationinsights-logging-logback</artifactId>
-            <version>[1.0,)</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
