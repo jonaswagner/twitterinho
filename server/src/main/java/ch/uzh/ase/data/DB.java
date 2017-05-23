@@ -3,13 +3,14 @@ package ch.uzh.ase.data;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.config.Configuration;
 import com.mongodb.*;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,6 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class DB {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DB.class);
     private Properties properties = Configuration.getInstance().getProp();
     private final MongoDatabase mdb;
     private final MongoClient mongoClient;
@@ -36,6 +38,7 @@ public class DB {
     private final int QUEUE_SIZE = 5;
 
     private Map<String, Queue<Double>> lastTweetSentMap = new HashMap<>();
+    private Queue<Document> lastPersistedTweets = new ArrayBlockingQueue<>(QUEUE_SIZE);
 
 
 
@@ -61,13 +64,9 @@ public class DB {
         DateTime newTweetTime = tweet.getFlaggedNew();
         DateTime finishedTweetTime = tweet.getFlaggedFinished();
 
-        Interval langDetTimeInterval = new Interval(startLangDetTime, endLangDetTime);
-        Interval sentDetTimeInterval = new Interval(startSentDetTime, endSentDetTime);
-        Interval processingTimeInterval = new Interval(newTweetTime, finishedTweetTime);
-
-        String langDetTime = String.valueOf(langDetTimeInterval.toDurationMillis());
-        String sentDetTime = String.valueOf(sentDetTimeInterval.toDurationMillis());
-        String processingTime = String.valueOf(processingTimeInterval.toDurationMillis());
+        long langDetTimeInterval = getTimeInterval(startLangDetTime, endLangDetTime);
+        long sentDetTimeInterval = getTimeInterval(startSentDetTime, endSentDetTime);
+        long processingTimeInterval = getTimeInterval(newTweetTime, finishedTweetTime);
 
         Document doc = new Document(ISO, iso)
                 .append(SENTIMENT, sentiment)
@@ -75,10 +74,26 @@ public class DB {
                 .append(AUTHOR, author)
                 .append(DATE, date)
                 .append(SEARCH_ID, searchID)
-                .append(LANGUAGE_DETECTION_DURATION, langDetTime)
-                .append(SENTIMENT_DETECTION_DURATION, sentDetTime)
-                .append(PROCESSING_TIME, processingTime);
+                .append(LANGUAGE_DETECTION_DURATION, String.valueOf(langDetTimeInterval))
+                .append(SENTIMENT_DETECTION_DURATION, String.valueOf(sentDetTimeInterval))
+                .append(PROCESSING_TIME, String.valueOf(processingTimeInterval));
         mc.insertOne(doc);
+        insertInTweetQueue(doc);
+
+    }
+
+    private long getTimeInterval(DateTime start,DateTime end){
+        long interval = 0;
+        Interval timeInterval = new Interval(start, end);
+        interval = timeInterval.toDurationMillis();
+        return interval;
+    }
+
+    private void insertInTweetQueue(Document doc) {
+        if (lastPersistedTweets.size() >= QUEUE_SIZE){
+            lastPersistedTweets.poll();
+        }
+        lastPersistedTweets.add(doc);
     }
 
     public double getAverageSentiment(String searchId) {
@@ -98,7 +113,6 @@ public class DB {
                 numberOfTweets++;
                 insertInQueue(searchId, sent);
             }
-
         }  catch(MongoCursorNotFoundException mcnf){
         } finally {
             cursor.close();
@@ -162,25 +176,17 @@ public class DB {
         long sentDetTime = 0;
         long procTime = 0;
 
-        FindIterable<Document> findIterable = mc.find();
-        findIterable.noCursorTimeout(true);
-        MongoCursor<Document> cursor = findIterable.iterator();
         List<Long> langDetTimeList = new ArrayList<>();
         List<Long> sentDetTimeList = new ArrayList<>();
         List<Long> procTimeList = new ArrayList<>();
-        try {
-            while (cursor.hasNext()) {
-                Document next = cursor.next();
+
+        for (Document next : lastPersistedTweets){
                 langDetTimeList.add(Long.parseLong(next.getString(LANGUAGE_DETECTION_DURATION)));
                 sentDetTimeList.add(Long.parseLong(next.getString(SENTIMENT_DETECTION_DURATION)));
                 procTimeList.add(Long.parseLong(next.getString(PROCESSING_TIME)));
-            }
-        } catch(MongoCursorNotFoundException mcnf) {}
-        finally
-        {
-            cursor.close();
         }
-        for (int i = langDetTimeList.size()-10; i < langDetTimeList.size(); i++ ){
+
+        for (int i = 0; i < langDetTimeList.size(); i++ ){
             langDetTime = langDetTime + langDetTimeList.get(i);
             sentDetTime = sentDetTime + sentDetTimeList.get(i);
             procTime = procTime + procTimeList.get(i);
