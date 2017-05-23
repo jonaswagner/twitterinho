@@ -52,12 +52,6 @@
             <version>3.7.0</version>
             <classifier>models-english</classifier>
         </dependency>
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>3.7.0</version>
-            <classifier>models-german</classifier>
-        </dependency>
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.slf4j/slf4j-simple &ndash;&gt;-->
         <dependency>
             <groupId>org.slf4j</groupId>

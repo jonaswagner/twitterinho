@@ -50,14 +50,6 @@ public class SentimentEnglishKS extends AbstractKSMaster {
             isSupportedLang = true;
         }
 
-        if (tweet.getIso().equals(LanguageCode.de)) {
-            isSupportedLang = true;
-        }
-
-        if (tweet.getIso().equals(LanguageCode.fr)) {
-            isSupportedLang = true;
-        }
-
         return isSupportedLang;
     }
 
