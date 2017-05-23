@@ -16,6 +16,7 @@ public class SystemWorkload {
     private final double freePhysicalSize;
     private final long systemAvgSlavesLoad;
     private final long systemTweetsPerMin;
+    private final long slaveCount;
     private long languageDetectionDuration;
     private long sentimentDetectionDuration;
     private long processingTime;
@@ -28,7 +29,8 @@ public class SystemWorkload {
                           double totalPhysicalSize,
                           double freePhysicalSize,
                           long systemAvgSlavesLoad,
-                          long systemTweetsPerMin) {
+                          long systemTweetsPerMin,
+                          long slaveCount) {
 
         this.arch = arch;
         this.name = name;
@@ -39,6 +41,7 @@ public class SystemWorkload {
         this.freePhysicalSize = freePhysicalSize;
         this.systemAvgSlavesLoad = systemAvgSlavesLoad;
         this.systemTweetsPerMin = systemTweetsPerMin;
+        this.slaveCount = slaveCount;
     }
 
     public void addStatistics(Map<String, Long> statistics) {

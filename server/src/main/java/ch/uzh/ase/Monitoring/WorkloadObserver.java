@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.rmi.runtime.Log;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private long freeSwapSize = -1;
     private double loadAverage = 0.0d;
     private long freePhysicalSize = -1;
+    private long slaveCount = 0;
 
     private WorkloadObserver() {
         //this.configuration = configuration; TODO jwa check config
@@ -99,6 +101,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     systemAvgSlavesLoad = calcAvgSlavesLoad(workloadMap);
                     LOG.warn("The average load of a slave in this system is " + systemAvgSlavesLoad);
 
+                    slaveCount = calcSlaves(workloadMap);
+                    LOG.warn("There are " + slaveCount + " slaves running");
+
                     //tweets per minute
                     currentTweetsPerTenSec += aggregateTweetCount(workloadMap);
                     tweetsPerMinList.add(new Pair<>(timeSlot, currentTweetsPerTenSec));
@@ -117,6 +122,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 currentTweetsPerTenSec = 0; //reset
             }
         }
+    }
+
+    private long calcSlaves(Map<IWorkloadSubject, Workload> workloadMap) {
+        long sum = 0;
+        for (Map.Entry<IWorkloadSubject, Workload> element : workloadMap.entrySet()) {
+            sum += element.getKey().getNumberOfSlaves();
+        }
+        return sum;
     }
 
     /**
@@ -240,6 +253,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 bytesToGigaBytes(totalPhysicalSize),
                 bytesToGigaBytes(freePhysicalSize),
                 systemAvgSlavesLoad,
-                systemTweetsPerMin);
+                systemTweetsPerMin,
+                slaveCount);
     }
 }
