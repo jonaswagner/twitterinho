@@ -1,15 +1,17 @@
 package ch.uzh.ase.TweetRetrieval;
 
-import ch.uzh.ase.Application;
-import ch.uzh.ase.TestDriver;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
 import ch.uzh.ase.config.Configuration;
 import org.joda.time.DateTime;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+
 import java.util.Properties;
 
+/**
+ * This class is responsible for the Twitter4j API calls
+ */
 public class TweetStream {
 
     private TwitterStream twitterStream;
@@ -18,9 +20,14 @@ public class TweetStream {
     private Properties properties = Configuration.getInstance().getProp();
     ConfigurationBuilder cb = new ConfigurationBuilder();
 
-
-    public void startStream(String searchID) {
-        this.searchID = searchID;
+    /**
+     * This method initializes the {@link TwitterStream} with the respective {@link ch.uzh.ase.Util.Term}.
+     * The retrieved changes are pushed to the {@link ch.uzh.ase.Blackboard.Blackboard}
+     *
+     * @param searchId
+     */
+    public void startStream(String searchId) {
+        this.searchID = searchId;
         cb.setDebugEnabled(true)
                 .setOAuthConsumerKey(properties.getProperty("oauth.consumerKey"))
                 .setOAuthConsumerSecret(properties.getProperty("oauth.consumerSecret"))
@@ -30,29 +37,30 @@ public class TweetStream {
         listener = new StatusListener() {
 
             public void onStatus(Status status) {
-               // System.out.println(status.getText());
 
                 String text = status.getText();
                 String author = status.getUser().getName();
                 DateTime date = new DateTime(status.getCreatedAt().getTime());
-                Tweet tweet = new Tweet(text, author, date, searchID);
+                Tweet tweet = new Tweet(text, author, date, searchId);
                 tweet.setFlaggedNew(DateTime.now());
                 StreamRegistry.getInstance().getBlackBoard().addNewTweet(tweet, TweetStatus.NEW);
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-//                System.out.println("Got a status deletion notice id:" + statusDeletionNotice.getStatusId());
+                //do nothing
             }
 
             public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
-//                System.out.println("Got track limitation notice:" + numberOfLimitedStatuses);
+                //do nothing
             }
 
             public void onScrubGeo(long userId, long upToStatusId) {
-//                System.out.println("Got scrub_geo event userId:" + userId + " upToStatusId:" + upToStatusId);
+                //do nothing
             }
 
-            public void onStallWarning(StallWarning stallWarning) {}
+            public void onStallWarning(StallWarning stallWarning) {
+                //do nothing
+            }
 
             public void onException(Exception ex) {
                 ex.printStackTrace();
@@ -60,13 +68,13 @@ public class TweetStream {
         };
 
         FilterQuery fq = new FilterQuery();
-        String keywords[] = {searchID};
+        String keywords[] = {searchId};
         fq.track(keywords);
         twitterStream.addListener(listener);
         twitterStream.filter(fq);
     }
 
-    public void stopStream(){
+    public void stopStream() {
         if (twitterStream != null) {
             twitterStream.shutdown();
             twitterStream.cleanUp();

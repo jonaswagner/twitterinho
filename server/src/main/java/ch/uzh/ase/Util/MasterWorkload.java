@@ -1,10 +1,6 @@
 package ch.uzh.ase.Util;
 
 /**
- * Created by jonas on 26.04.2017.
- */
-
-/**
  * This class holds monitoring data of the Blackboard components.
  */
 public class MasterWorkload {

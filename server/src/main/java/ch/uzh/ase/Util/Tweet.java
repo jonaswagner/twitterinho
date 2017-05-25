@@ -3,11 +3,6 @@ package ch.uzh.ase.Util;
 import com.neovisionaries.i18n.LanguageCode;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 /**
  * Created by jonas on 24.04.2017.
  */
