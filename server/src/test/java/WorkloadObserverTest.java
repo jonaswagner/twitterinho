@@ -2,7 +2,7 @@ import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Blackboard.SentimentEnglishKS;
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
-import ch.uzh.ase.Util.Workload;
+import ch.uzh.ase.Util.MasterWorkload;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,7 +59,7 @@ public class WorkloadObserverTest {
     @Test
     public void montitoringTest() {
 
-        Map<IWorkloadSubject, Workload> workloadMap = new HashMap<>();
+        Map<IWorkloadSubject, MasterWorkload> workloadMap = new HashMap<>();
         workloadMap.put(subject, generateNeutralWorkload());
         observer.evaluateAction(workloadMap);
         Assert.assertEquals(subject.getNumberOfSlaves(), DEFAULT_SLAVES_COUNT);
@@ -81,8 +81,8 @@ public class WorkloadObserverTest {
         Assert.assertEquals(DEFAULT_SLAVES_COUNT, subject.getNumberOfSlaves());
     }
 
-    private Workload generateNeutralWorkload() {
-            Workload workload = new Workload();
+    private MasterWorkload generateNeutralWorkload() {
+            MasterWorkload workload = new MasterWorkload();
             workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT);
             workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
             workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT);
@@ -91,8 +91,8 @@ public class WorkloadObserverTest {
             return workload;
     }
 
-    private Workload generateHighWorkload() {
-        Workload workload = new Workload();
+    private MasterWorkload generateHighWorkload() {
+        MasterWorkload workload = new MasterWorkload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
         workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);
@@ -101,8 +101,8 @@ public class WorkloadObserverTest {
         return workload;
     }
 
-    private Workload generateLowWorkload() {
-        Workload workload = new Workload();
+    private MasterWorkload generateLowWorkload() {
+        MasterWorkload workload = new MasterWorkload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
         workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);

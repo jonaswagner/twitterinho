@@ -2,14 +2,13 @@ package ch.uzh.ase.Monitoring;
 
 import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
+import ch.uzh.ase.Util.MasterWorkload;
 import ch.uzh.ase.Util.SystemWorkload;
-import ch.uzh.ase.Util.Workload;
 import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -91,7 +90,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             if (current.minusSeconds(configuration.TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
 
                 //get all Workloads from all slaves
-                Map<IWorkloadSubject, Workload> workloadMap = new HashMap<>(subjects.size());
+                Map<IWorkloadSubject, MasterWorkload> workloadMap = new HashMap<>(subjects.size());
                 for (IWorkloadSubject subject : subjects) {
                     workloadMap.put(subject, subject.reportWorkload());
                 }
@@ -124,9 +123,9 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
-    private long calcSlaves(Map<IWorkloadSubject, Workload> workloadMap) {
+    private long calcSlaves(Map<IWorkloadSubject, MasterWorkload> workloadMap) {
         long sum = 0;
-        for (Map.Entry<IWorkloadSubject, Workload> element : workloadMap.entrySet()) {
+        for (Map.Entry<IWorkloadSubject, MasterWorkload> element : workloadMap.entrySet()) {
             sum += element.getKey().getNumberOfSlaves();
         }
         return sum;
@@ -141,7 +140,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     /**
      * <p>
-     * Given the {@link Workload} information, this method evaluates if a registered {@link IWorkloadSubject} needs
+     * Given the {@link MasterWorkload} information, this method evaluates if a registered {@link IWorkloadSubject} needs
      * to acquire or release more resources. Additionally, it initiates also the generation and release of resources on
      * registered {@link IWorkloadSubject}s.
      * </p>
@@ -149,10 +148,10 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
      * The release of resources is done in a linear way by simply decreasing the amount of slaves by 1.
       * @param workloadMap
      */
-    public void evaluateAction(Map<IWorkloadSubject, Workload> workloadMap) { //this is public for testing reasons
+    public void evaluateAction(Map<IWorkloadSubject, MasterWorkload> workloadMap) { //this is public for testing reasons
         for (IWorkloadSubject subject : subjects) {
 
-            Workload currentWorkload = workloadMap.get(subject);
+            MasterWorkload currentWorkload = workloadMap.get(subject);
             double inOutRatio = (double) currentWorkload.getInTweetCount() / (double) currentWorkload.getOutTweetCount();
 
             if (currentWorkload.getAvgSlaveLoad() > configuration.LOAD_THRESHHOLD) {
@@ -207,18 +206,18 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
-    private long calcAvgSlavesLoad(Map<IWorkloadSubject, Workload> workloadMap) {
+    private long calcAvgSlavesLoad(Map<IWorkloadSubject, MasterWorkload> workloadMap) {
         long sum = 0;
-        for (Map.Entry<IWorkloadSubject, Workload> workload : workloadMap.entrySet()) {
+        for (Map.Entry<IWorkloadSubject, MasterWorkload> workload : workloadMap.entrySet()) {
             sum += workload.getValue().getAvgSlaveLoad();
         }
         return Math.round(sum / workloadMap.size());
     }
 
-    private Long aggregateTweetCount(Map<IWorkloadSubject, Workload> workloadMap) {
+    private Long aggregateTweetCount(Map<IWorkloadSubject, MasterWorkload> workloadMap) {
 
         long sum = 0;
-        for (Map.Entry<IWorkloadSubject, Workload> workload : workloadMap.entrySet()) {
+        for (Map.Entry<IWorkloadSubject, MasterWorkload> workload : workloadMap.entrySet()) {
             sum += workload.getValue().getOutTweetCount();
         }
         return sum;

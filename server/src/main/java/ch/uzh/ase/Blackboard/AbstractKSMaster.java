@@ -1,11 +1,9 @@
 package ch.uzh.ase.Blackboard;
 
-import ch.uzh.ase.Monitoring.IWorkloadObserver;
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
-import ch.uzh.ase.Util.Workload;
-import org.joda.time.DateTime;
+import ch.uzh.ase.Util.MasterWorkload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +74,8 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
         return Math.round(rawNumberOfUncompletedTasks / (double) slaveList.size());
     }
 
-    protected Workload createWorkload(long inTweetCount, long outTweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
-        Workload current = new Workload();
+    protected MasterWorkload createWorkload(long inTweetCount, long outTweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
+        MasterWorkload current = new MasterWorkload();
         current.setOutTweetCount(outTweetCount);
         current.setInTweetCount(inTweetCount);
         current.setNumberOfSlaves(slaveList.size());

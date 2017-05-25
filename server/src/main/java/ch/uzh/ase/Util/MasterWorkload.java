@@ -1,12 +1,9 @@
 package ch.uzh.ase.Util;
 
-import ch.uzh.ase.Monitoring.IWorkloadSubject;
-import org.joda.time.DateTime;
-
 /**
  * Created by jonas on 26.04.2017.
  */
-public class Workload {
+public class MasterWorkload {
 
     private long outTweetCount;
     private long inTweetCount;

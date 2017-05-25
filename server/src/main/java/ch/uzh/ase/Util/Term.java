@@ -1,4 +1,4 @@
-package ch.uzh.ase.domain;
+package ch.uzh.ase.Util;
 
 import java.util.ArrayList;
 import java.util.List;

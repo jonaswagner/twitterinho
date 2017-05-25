@@ -1,5 +1,6 @@
 package ch.uzh.ase.data;
 
+import ch.uzh.ase.Util.Term;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.config.Configuration;
 import com.mongodb.*;
@@ -103,7 +104,7 @@ public class DB {
     }
 
     /**
-     * This method retrieves all {@link Tweet}s for the corresponding {@link ch.uzh.ase.domain.Term} and calculates the average Sentiment.
+     * This method retrieves all {@link Tweet}s for the corresponding {@link Term} and calculates the average Sentiment.
      *
      * @param searchId
      * @return
@@ -140,7 +141,7 @@ public class DB {
     }
 
     /**
-     * This method calculates the average sentiment of the retrieved {@link Tweet}s given the {@link ch.uzh.ase.domain.Term}.
+     * This method calculates the average sentiment of the retrieved {@link Tweet}s given the {@link Term}.
      * @param searchId
      * @return
      */

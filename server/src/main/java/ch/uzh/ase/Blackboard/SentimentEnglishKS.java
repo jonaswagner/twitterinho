@@ -1,9 +1,8 @@
 package ch.uzh.ase.Blackboard;
 
-import ch.uzh.ase.Monitoring.IWorkloadObserver;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.Tweet;
-import ch.uzh.ase.Util.Workload;
+import ch.uzh.ase.Util.MasterWorkload;
 import com.neovisionaries.i18n.LanguageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +66,8 @@ public class SentimentEnglishKS extends AbstractKSMaster {
 
     //TODO jwa this method might not be needed
     @Override
-    public Workload reportWorkload() {
-        Workload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
+    public MasterWorkload reportWorkload() {
+        MasterWorkload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
         outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
         inTweetCount = 0;
         return workload;
