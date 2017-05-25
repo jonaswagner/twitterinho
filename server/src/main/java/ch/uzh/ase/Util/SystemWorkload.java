@@ -10,10 +10,7 @@ public class SystemWorkload {
     private final String arch;
     private final String name;
     private final double loadAverage;
-    private final double totalSwapSize;
-    private final double freeSwapSize;
-    private final double totalPhysicalSize;
-    private final double freePhysicalSize;
+    private final double swapUsage;
     private final long systemAvgSlavesLoad;
     private final long systemTweetsPerMin;
     private final long slaveCount;
@@ -24,10 +21,7 @@ public class SystemWorkload {
     public SystemWorkload(String arch,
                           String name,
                           double loadAverage,
-                          double totalSwapSize,
-                          double freeSwapSize,
-                          double totalPhysicalSize,
-                          double freePhysicalSize,
+                          double swapUsage,
                           long systemAvgSlavesLoad,
                           long systemTweetsPerMin,
                           long slaveCount) {
@@ -35,19 +29,18 @@ public class SystemWorkload {
         this.arch = arch;
         this.name = name;
         this.loadAverage = loadAverage;
-        this.totalSwapSize = totalSwapSize;
-        this.freeSwapSize = freeSwapSize;
-        this.totalPhysicalSize = totalPhysicalSize;
-        this.freePhysicalSize = freePhysicalSize;
+        this.swapUsage = swapUsage;
         this.systemAvgSlavesLoad = systemAvgSlavesLoad;
         this.systemTweetsPerMin = systemTweetsPerMin;
         this.slaveCount = slaveCount;
     }
 
     public void addStatistics(Map<String, Long> statistics) {
-        this.languageDetectionDuration = statistics.get("languageDetectionDuration");
-        this.sentimentDetectionDuration = statistics.get("sentimentDetectionDuration");
-        this.processingTime = statistics.get("processingTime");
+        if (!statistics.isEmpty()) {
+            this.languageDetectionDuration = statistics.get("languageDetectionDuration");
+            this.sentimentDetectionDuration = statistics.get("sentimentDetectionDuration");
+            this.processingTime = statistics.get("processingTime");
+        }
     }
 
     public String getArch() {
@@ -62,20 +55,8 @@ public class SystemWorkload {
         return this.loadAverage;
     }
 
-    public double getTotalSwapSize() {
-        return this.totalSwapSize;
-    }
-
-    public double getFreeSwapSize() {
-        return this.freeSwapSize;
-    }
-
-    public double getTotalPhysicalSize() {
-        return this.totalPhysicalSize;
-    }
-
     public double getFreePhysicalSize() {
-        return this.freePhysicalSize;
+        return this.swapUsage;
     }
 
     public long getSystemAvgSlavesLoad() {

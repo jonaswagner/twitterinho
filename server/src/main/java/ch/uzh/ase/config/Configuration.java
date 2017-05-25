@@ -9,7 +9,7 @@ import java.util.Properties;
 /**
  * Created by Silvio Fankhauser on 17.05.2017.
  *
- * This class is a Singleton. It is responsible for the system properties.
+ * This class is is a
  */
 public class Configuration {
 

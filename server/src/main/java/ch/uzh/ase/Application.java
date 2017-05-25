@@ -47,4 +47,8 @@ public class Application {
     public static DB getDatabase() {
         return database;
     }
+
+    public static void setDB(DB db) {
+        database = db;
+    }
 }

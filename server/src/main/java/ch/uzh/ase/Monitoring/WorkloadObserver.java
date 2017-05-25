@@ -7,11 +7,13 @@ import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.config.Configuration;
 import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanServerConnection;
+import javax.management.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.math.RoundingMode;
@@ -36,15 +38,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     public static final int DEFAULT_SLAVE_THRESHHOLD = Integer.parseInt(props.getProperty("default_slave_threshold"));
     public static final double IN_OUT_PARITY = Double.parseDouble(props.getProperty("in_out_parity"));
     public static final double IN_OUT_UPPER_THRESHHOLD = Double.parseDouble(props.getProperty("in_out_upper_threshold"));
-    public static final int TIME_SLOT_DURATION_SEC = Integer.parseInt(props.getProperty("time_slot_duration_slot"));
+    public static final int TIME_SLOT_DURATION_SEC = 10;
 
     //static monitoring
-    private final MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
+    private MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
     private OperatingSystemMXBean osMBean;
     private String arch = "";
     private String name = "";
     private long totalSwapSize = -1;
-    private long totalPhysicalSize = -1;
     private static final int MIN_DIV_BY_TEN_SEC = 6;
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
     private final DecimalFormat df = new DecimalFormat("#.##");
@@ -53,28 +54,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private DateTime timeSlot;
     private long systemAvgSlavesLoad = 0;
     private long systemTweetsPerMin = 0;
-    private long freeSwapSize = -1;
+    private double swapUsage = -1;
     private double loadAverage = 0.0d;
-    private long freePhysicalSize = -1;
     private long slaveCount = 0;
+    private long freeSwapSize = -1;
 
     private WorkloadObserver() {
         timeSlot = DateTime.now();
         subjects = Collections.synchronizedList(new ArrayList<>());
-        try {
-            osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-            arch = osMBean.getArch();
-            LOG.warn("System Architecture: " + arch);
-            name = osMBean.getName();
-            LOG.warn("OS Name: " + name);
-            totalSwapSize = osMBean.getTotalSwapSpaceSize();
-            LOG.warn("Total Swap size: " + totalSwapSize);
-            totalPhysicalSize = osMBean.getFreePhysicalMemorySize();
-            LOG.warn("Total Physical Memory size: " + totalPhysicalSize);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        df.setRoundingMode(RoundingMode.CEILING);
         start();
     }
 
@@ -87,6 +74,20 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
      */
     @Override
     public void run() {
+
+        try {
+            osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+            arch = osMBean.getArch();
+            LOG.warn("System Architecture: " + arch);
+            name = osMBean.getName();
+            LOG.warn("OS Name: " + name);
+            totalSwapSize = osMBean.getTotalSwapSpaceSize();
+            LOG.warn("Total Swap size: " + totalSwapSize);
+            df.setRoundingMode(RoundingMode.CEILING);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+            e.printStackTrace();
+        }
 
         long currentTweetsPerTenSec = 0;
         while (!Blackboard.isShutdown()) {
@@ -115,10 +116,17 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     evaluateAction(workloadMap);
                 }
 
-                loadAverage = osMBean.getSystemCpuLoad();
-                freeSwapSize = osMBean.getFreeSwapSpaceSize();
+                //loadAverage = osMBean.getProcessCpuLoad();
+                loadAverage = getProcessCpuLoad();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-                LOG.warn("Free RAM (max " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
+
+                freeSwapSize = osMBean.getFreeSwapSpaceSize();
+                totalSwapSize = osMBean.getTotalSwapSpaceSize();
+
+                if (freeSwapSize > 0 && totalSwapSize > 0) {
+                    swapUsage = (double) freeSwapSize/ (double) totalSwapSize;
+                }
+                LOG.warn("Free RAM: " + swapUsage * 100d + "%" );
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;
@@ -127,8 +135,41 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
+    public static double getProcessCpuLoad() {
+
+        MBeanServer mbs    = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name    = null;
+        try {
+            name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+        } catch (MalformedObjectNameException e) {
+            LOG.error(e.getMessage());
+            e.printStackTrace();
+        }
+        AttributeList list = null;
+        try {
+            list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+        } catch (InstanceNotFoundException e) {
+            e.printStackTrace();
+            LOG.error(e.getMessage());
+        } catch (ReflectionException e) {
+            e.printStackTrace();
+            LOG.error(e.getMessage());
+        }
+
+        if (list.isEmpty())     return Double.NaN;
+
+        Attribute att = (Attribute)list.get(0);
+        Double value  = (Double)att.getValue();
+
+        // usually takes a couple of seconds before we get real values
+        if (value == -1.0)      return Double.NaN;
+        // returns a percentage value with 1 decimal point precision
+        return ((int)(value * 1000) / 10.0);
+    }
+
     /**
      * This method calculates the number of slaves, which are currently alive.
+     *
      * @param workloadMap
      * @return
      */
@@ -138,14 +179,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             sum += element.getKey().getNumberOfSlaves();
         }
         return sum;
-    }
-
-    //TODO jwa MXBEAN does not work!
-    /**
-     * Given an amount of bytes, this method converts the value to gigabytes.
-     */
-    private double bytesToGigaBytes(long number) {
-        return (((double) number / 1024d) / 1024d) / 1024d;
     }
 
     /**
@@ -208,6 +241,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
     /**
      * This method evaluates the number of slaves, which need to be generated or released
+     *
      * @param inOutRatio
      * @param numberOfSlaves
      * @return
@@ -260,10 +294,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         return new SystemWorkload(arch,
                 name,
                 loadAverage,
-                bytesToGigaBytes(totalSwapSize),
-                bytesToGigaBytes(freeSwapSize),
-                bytesToGigaBytes(totalPhysicalSize),
-                bytesToGigaBytes(freePhysicalSize),
+                swapUsage,
                 systemAvgSlavesLoad,
                 systemTweetsPerMin,
                 slaveCount);
