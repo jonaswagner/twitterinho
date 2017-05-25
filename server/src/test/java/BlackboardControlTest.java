@@ -84,8 +84,6 @@ public class BlackboardControlTest {
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.FLAGGED));
         Assert.assertFalse(blackboard.getTweetMap().containsValue(TweetStatus.STOPPED));
 
-        Blackboard.shutdown = true;
-
         System.out.println("Test Finished");
     }
 }

@@ -15,22 +15,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by jonas on 03.05.2017.
- */
-public abstract class AbstractLanguageSlave extends Thread implements IKSSlave {
+public abstract class AbstractSentimentSlave extends Thread implements IKSSlave {
 
-    public static final Logger LOG = LoggerFactory.getLogger(AbstractLanguageSlave.class);
+    public static final Logger LOG = LoggerFactory.getLogger(AbstractSentimentSlave.class);
+    public static final double MIN_SENTIMENT = 0.0;
+    public static final double MAX_SENTIMENT = 4.0;
 
-
-    //mapping of the sentiments (0-4) to a value between 0 and 1
+    /**
+     * mapping of the sentiments (0-4) to a value between 0 and 1
+     * @param sentiment
+     * @return normSentiment
+     */
     protected double normalize(double sentiment) {
-        double min = 0.0;
-        double max = 4.0;
-        double normSentiment = (((double) sentiment - min) / (max - min));
+        double normSentiment = (((double) sentiment - MIN_SENTIMENT) / (MAX_SENTIMENT - MIN_SENTIMENT));
         return normSentiment;
     }
 
+    /**
+     * This method extracts the Sentiment via {@link StanfordCoreNLP}.
+     * @param nextTweet
+     * @param pipeline
+     */
     protected void detectSentiment(Tweet nextTweet, StanfordCoreNLP pipeline) {
         String tweetText = nextTweet.getText();
 

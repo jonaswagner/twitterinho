@@ -1,18 +1,14 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
+import ch.uzh.ase.Util.MasterWorkload;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
-import ch.uzh.ase.Util.MasterWorkload;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * Created by jonas on 25.04.2017.
- */
 public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWorkloadSubject, IKS {
 
     public static final int DEFAULT_TWEET_CHUNK_SIZE = 100;
@@ -20,7 +16,7 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
 
     protected final Blackboard blackboard;
 
-    public AbstractKSMaster(Blackboard blackboard) {
+    public AbstractKSMaster(final Blackboard blackboard) {
         this.blackboard = blackboard;
     }
 
@@ -32,8 +28,7 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
     }
 
     @Override
-    public void updateBlackboard(Queue<Tweet> treatedTweets) {
-        //LOG.info("Blackboard update started");
+    public void updateBlackboard(final Queue<Tweet> treatedTweets) {
         if (treatedTweets.size() == 0) {
             return;
         } else {
@@ -47,12 +42,10 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
                 }
             }
         }
-        //LOG.info("Blackboard update finished");
     }
 
     @Override
-    public void splitWork(Queue<Tweet> untreatedTweets, List<IKSSlave> slaveList) throws Exception {
-        //LOG.info("splitwork started");
+    public void splitWork(final Queue<Tweet> untreatedTweets, final List<IKSSlave> slaveList) throws Exception {
         final List<Tweet> assignedTweets = new ArrayList<>(DEFAULT_TWEET_CHUNK_SIZE);
         if (untreatedTweets.size() == 0) {
             return;
@@ -63,10 +56,14 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
             IKSSlave leastBusySlave = getLeastBusySlave(slaveList);
             leastBusySlave.subservice(assignedTweets);
         }
-        //LOG.info("splitwork finished");
     }
 
-    protected long calcAvgSlaveLoad(List<IKSSlave> slaveList) {
+    /**
+     * This method calculates the average number of pending tasks on all slaves.
+     * @param slaveList
+     * @return numberOfUncompletedTasks
+     */
+    protected long calcAvgSlaveLoad(final List<IKSSlave> slaveList) {
         double rawNumberOfUncompletedTasks = 0;
         for (IKSSlave slave : slaveList) {
             rawNumberOfUncompletedTasks += slave.getUncompletedTasks();
@@ -74,7 +71,9 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
         return Math.round(rawNumberOfUncompletedTasks / (double) slaveList.size());
     }
 
-    protected MasterWorkload createWorkload(long inTweetCount, long outTweetCount, List<IKSSlave> slaveList, ConcurrentLinkedQueue<Tweet> untreatedTweets) {
+    protected MasterWorkload createMasterWorkload(final long inTweetCount,
+                                                  final long outTweetCount,
+                                                  final List<IKSSlave> slaveList) {
         MasterWorkload current = new MasterWorkload();
         current.setOutTweetCount(outTweetCount);
         current.setInTweetCount(inTweetCount);
@@ -83,7 +82,7 @@ public abstract class AbstractKSMaster extends Thread implements IKSMaster, IWor
         return current;
     }
 
-    protected IKSSlave getLeastBusySlave(List<IKSSlave> slaveList) {
+    protected IKSSlave getLeastBusySlave(final List<IKSSlave> slaveList) {
 
         IKSSlave leastBusy = slaveList.get(0);
         for (IKSSlave slave : slaveList) {

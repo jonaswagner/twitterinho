@@ -4,11 +4,12 @@ import ch.uzh.ase.Util.Tweet;
 
 import java.util.List;
 
-/**
- * Created by jonas on 25.04.2017.
- */
 public interface IKSSlave {
-     static final String NLP_ANNOTATORS = "tokenize, ssplit, parse, sentiment";
+     /**
+      * These annotators are needed for the sentiment analysis.
+      * (see also https://stanfordnlp.github.io/CoreNLP/annotators.html)
+      */
+     String NLP_ANNOTATORS = "tokenize, ssplit, parse, sentiment";
 
      void subservice(List<Tweet> tasks);
      int getUncompletedTasks();

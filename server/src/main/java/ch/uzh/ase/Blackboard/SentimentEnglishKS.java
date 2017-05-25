@@ -1,8 +1,8 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.WorkloadObserver;
-import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.MasterWorkload;
+import ch.uzh.ase.Util.Tweet;
 import com.neovisionaries.i18n.LanguageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,21 +12,19 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created by jonas on 25.04.2017.
+ * This Knowledge source detects the sentiments for all {@link Tweet}s, which are written in english.
  */
 public class SentimentEnglishKS extends AbstractKSMaster {
 
-    //TODO jwa check lifecycle of slaves
     private final List<IKSSlave> slaveList;
     private static final Logger LOG = LoggerFactory.getLogger(SentimentEnglishKS.class);
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
 
-
     private long outTweetCount = 0;
     private long inTweetCount = 0;
 
-    public SentimentEnglishKS(Blackboard blackboard) {
+    public SentimentEnglishKS(final Blackboard blackboard) {
         super(blackboard);
         this.untreatedTweets = new ConcurrentLinkedQueue<Tweet>();
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
@@ -38,11 +36,11 @@ public class SentimentEnglishKS extends AbstractKSMaster {
     }
 
     @Override
-    public boolean execCondition(Tweet tweet) {
+    public boolean execCondition(final Tweet tweet) {
         return tweet.getIso() != null && checkSupportedLang(tweet);
     }
 
-    private boolean checkSupportedLang(Tweet tweet) {
+    private boolean checkSupportedLang(final Tweet tweet) {
         boolean isSupportedLang = false;
 
         if (tweet.getIso().equals(LanguageCode.en)){
@@ -53,7 +51,7 @@ public class SentimentEnglishKS extends AbstractKSMaster {
     }
 
     @Override
-    public synchronized void execAction(Tweet tweet) {
+    public synchronized void execAction(final Tweet tweet) {
         untreatedTweets.add(tweet);
         inTweetCount++;
     }
@@ -64,11 +62,10 @@ public class SentimentEnglishKS extends AbstractKSMaster {
         shutdownSlaves();
     }
 
-    //TODO jwa this method might not be needed
     @Override
     public MasterWorkload reportWorkload() {
-        MasterWorkload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
-        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        MasterWorkload workload  = createMasterWorkload(inTweetCount, outTweetCount, slaveList);
+        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/MIN_SENTIMENT
         inTweetCount = 0;
         return workload;
     }
@@ -94,12 +91,12 @@ public class SentimentEnglishKS extends AbstractKSMaster {
     }
 
     @Override
-    public synchronized void reportResult(Tweet tweet) {
+    public synchronized void reportResult(final Tweet tweet) {
         this.treatedTweets.add(tweet);
         outTweetCount++;
     }
 
-    public void generateSlaves(int numberOfSlaves) {
+    public void generateSlaves(final int numberOfSlaves) {
         List<IKSSlave> newSlaves = new ArrayList<>(numberOfSlaves);
         for (int i = 0; i < numberOfSlaves; i++) {
             SentimentEnglishKSSlave slave = new SentimentEnglishKSSlave(this);
@@ -109,17 +106,16 @@ public class SentimentEnglishKS extends AbstractKSMaster {
         }
     }
 
-    //TODO jwa this might not be needed
-    @Deprecated
+    /**
+     * This method seems to be duplicated by {@link LanguageKS}, but it needs to access it's own slavelist.
+     * @param numberOfSlaves
+     */
     @Override
-    public void shutdownSlavesGracefully(int numberOfSlaves) {
+    public void shutdownSlavesGracefully(final int numberOfSlaves) {
         for (int i = 0; i < numberOfSlaves; i++) {
             LOG.warn("graceful shutdown of slave initiated!");
             IKSSlave shutdownSlave = getLeastBusySlave(slaveList);
             slaveList.remove(shutdownSlave);
-            while (shutdownSlave.getUncompletedTasks() > 0) {
-                //wait
-            }
             shutdownSlave.kill();
         }
     }

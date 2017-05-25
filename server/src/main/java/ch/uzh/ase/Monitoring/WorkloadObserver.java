@@ -89,7 +89,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     public void run() {
 
         long currentTweetsPerTenSec = 0;
-        while (!Blackboard.shutdown) { //FIXME jwa replace with shutdownGracefully
+        while (!Blackboard.isShutdown()) {
             DateTime current = DateTime.now();
             if (current.minusSeconds(TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
 
@@ -118,7 +118,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 loadAverage = osMBean.getSystemCpuLoad();
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-                LOG.warn("Free RAM (max " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
+                LOG.warn("Free RAM (MAX_SENTIMENT " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;

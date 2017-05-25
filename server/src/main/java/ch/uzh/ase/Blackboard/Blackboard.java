@@ -9,37 +9,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by jonas on 24.04.2017.
- */
 public class Blackboard {
-    public static volatile boolean shutdown = false;
 
+    private static volatile boolean shutdown = false; //this variable is needed for the shutdown of all corresponding Threads
     private final Map<Tweet, TweetStatus> tweetMap = new ConcurrentHashMap<Tweet, TweetStatus>();
 
-    public Map<Tweet, TweetStatus> getTweetMap() {
-        return tweetMap;
-    }
-
-    public synchronized void changeTweetStatus(Tweet tweet, TweetStatus status) {
+    public synchronized void changeTweetStatus(final Tweet tweet, final TweetStatus status) {
         tweetMap.put(tweet, status);
     }
 
-    public synchronized void removeTweet(List<Tweet> tweetList) {
+    public synchronized void removeTweet(final List<Tweet> tweetList) {
         for (Tweet tweet: tweetList) {
             tweetMap.remove(tweet);
         }
     }
 
-    public void addNewTweets(Map<Tweet, TweetStatus> tweets) {
+    public void addNewTweets(final Map<Tweet, TweetStatus> tweets) {
         tweetMap.putAll(tweets);
     }
 
-    public void addNewTweet(Tweet tweet, TweetStatus status) {
+    public void addNewTweet(final Tweet tweet, TweetStatus status) {
         tweetMap.put(tweet, status);
     }
 
-    public void addNewTweets(List<Tweet> tweets) {
+    public void addNewTweets(final List<Tweet> tweets) {
         for (Tweet tweet: tweets) {
             addNewTweet(tweet, TweetStatus.NEW);
         }
@@ -49,8 +42,13 @@ public class Blackboard {
         return shutdown;
     }
 
+    /**
+     * This method filters all {@link Tweet}s, which are flagged with {@link TweetStatus} FINISHED.
+     * Afterwards the respective {@link Tweet}s are removed from the {@link Blackboard} and persisted.
+     * @return finishedTweets
+     */
     public List<Tweet> removeAndPassFinishedTweets() {
-        List<Tweet> finishedTweets = new ArrayList<>();
+        final List<Tweet> finishedTweets = new ArrayList<>();
         for (Map.Entry<Tweet, TweetStatus> element : tweetMap.entrySet()) {
             if (element.getValue()==TweetStatus.FINISHED) {
                 removeTweet(Arrays.asList(element.getKey()));
@@ -58,6 +56,10 @@ public class Blackboard {
             }
         }
         return finishedTweets;
+    }
+
+    public Map<Tweet, TweetStatus> getTweetMap() {
+        return tweetMap;
     }
 }
 

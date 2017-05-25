@@ -4,30 +4,26 @@ import ch.uzh.ase.Util.Tweet;
 import com.neovisionaries.i18n.LanguageCode;
 import org.apache.tika.langdetect.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;
-import org.apache.tika.language.detect.LanguageResult;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by Silvio Fankhauser on 29.04.2017.
- */
 public class LanguageKSSlave extends Thread implements IKSSlave {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LanguageKSSlave.class);
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<Tweet>();
     private final AbstractKSMaster master;
     private boolean shutdown = false;
-    private static final Logger LOG = LoggerFactory.getLogger(LanguageKSSlave.class);
+    private final LanguageDetector detector = new OptimaizeLangDetector().loadModels();
 
-    public LanguageKSSlave(AbstractKSMaster master) throws IOException {
+    public LanguageKSSlave(final AbstractKSMaster master) throws IOException {
         this.master = master;
     }
-    LanguageDetector detector = new OptimaizeLangDetector().loadModels();
+
 
 
     @Override
@@ -49,7 +45,7 @@ public class LanguageKSSlave extends Thread implements IKSSlave {
     }
 
     @Override
-    public void subservice(List<Tweet> tasks) {
+    public void subservice(final List<Tweet> tasks) {
         taskQueue.addAll(tasks);
     }
 

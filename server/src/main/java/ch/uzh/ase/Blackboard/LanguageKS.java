@@ -1,8 +1,8 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.WorkloadObserver;
-import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.MasterWorkload;
+import ch.uzh.ase.Util.Tweet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created by Silvio Fankhauser on 29.04.2017.
+ * This knowledge source detects the language of the {@link Tweet}s.
  */
 public class LanguageKS extends AbstractKSMaster {
 
@@ -21,11 +21,11 @@ public class LanguageKS extends AbstractKSMaster {
     private final ConcurrentLinkedQueue<Tweet> untreatedTweets;
     private final ConcurrentLinkedQueue<Tweet> treatedTweets;
 
-    //These variables are needed for monitoring
+    //Monitoring variables
     private long outTweetCount = 0;
     private long inTweetCount = 0;
 
-    public  LanguageKS(Blackboard blackboard){
+    public  LanguageKS(final Blackboard blackboard){
         super(blackboard);
         this.untreatedTweets = new ConcurrentLinkedQueue<Tweet>();
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
@@ -37,12 +37,12 @@ public class LanguageKS extends AbstractKSMaster {
     }
 
     @Override
-    public boolean execCondition(Tweet tweet) {
+    public boolean execCondition(final Tweet tweet) {
         return tweet.getIso() == null;
     }
 
     @Override
-    public void execAction(Tweet tweet) {
+    public void execAction(final Tweet tweet) {
         untreatedTweets.add(tweet);
         inTweetCount++;
     }
@@ -59,7 +59,7 @@ public class LanguageKS extends AbstractKSMaster {
     }
 
     @Override
-    public void reportResult(Tweet tweet) {
+    public void reportResult(final Tweet tweet) {
         this.treatedTweets.add(tweet);
         outTweetCount++;
     }
@@ -67,13 +67,13 @@ public class LanguageKS extends AbstractKSMaster {
 
     @Override
     public MasterWorkload reportWorkload() {
-        MasterWorkload workload  = createWorkload(inTweetCount, outTweetCount, slaveList, untreatedTweets);
-        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/min
+        MasterWorkload workload  = createMasterWorkload(inTweetCount, outTweetCount, slaveList);
+        outTweetCount = 0; //we need to reset the tweetCount for the aggregated tweets/MIN_SENTIMENT
         inTweetCount = 0;
         return workload;    }
 
     @Override
-    public void generateSlaves(int numberOfSlaves) {
+    public void generateSlaves(final int numberOfSlaves) {
         List<IKSSlave> newSlaves = new ArrayList<>(numberOfSlaves);
         for (int i = 0; i < numberOfSlaves; i++) {
             LanguageKSSlave slave = null;
@@ -88,18 +88,18 @@ public class LanguageKS extends AbstractKSMaster {
         }
     }
 
+    /**
+     * This method seems to be duplicated by {@link SentimentEnglishKS}, but it needs to access it's own slavelist.
+     * @param numberOfSlaves
+     */
     @Override
-    public void shutdownSlavesGracefully(int numberOfSlaves) {
+    public void shutdownSlavesGracefully(final int numberOfSlaves) {
         for (int i = 0; i < numberOfSlaves; i++) {
             LOG.warn("graceful shutdown of slave initiated!");
             IKSSlave shutdownSlave = getLeastBusySlave(slaveList);
             slaveList.remove(shutdownSlave);
-            while (shutdownSlave.getUncompletedTasks() > 0) {
-                //wait
-            }
             shutdownSlave.kill();
         }
-
     }
 
 

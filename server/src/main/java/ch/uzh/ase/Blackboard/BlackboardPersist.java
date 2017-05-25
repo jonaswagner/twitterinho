@@ -7,13 +7,13 @@ import ch.uzh.ase.data.DB;
 import java.util.List;
 
 /**
- * Created by jonas on 26.04.2017.
+ * This class is responsible for persisting evaluted {@link Tweet}s
  */
 public class BlackboardPersist extends Thread {
 
     private final Blackboard blackboard;
 
-    public BlackboardPersist(Blackboard blackboard) {
+    public BlackboardPersist(final Blackboard blackboard) {
         this.blackboard = blackboard;
     }
 

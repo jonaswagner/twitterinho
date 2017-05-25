@@ -8,15 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by jonas on 24.04.2017.
- */
 public class BlackboardControl extends Thread {
     private final Blackboard blackboard;
     private List<IKS> iksList;
     private boolean shutdown = false;
 
-    public BlackboardControl(Blackboard blackboard, List<IKS> iksList) {
+    public BlackboardControl(final Blackboard blackboard, final List<IKS> iksList) {
         this.blackboard = blackboard;
         this.iksList = iksList;
     }
@@ -33,7 +30,7 @@ public class BlackboardControl extends Thread {
      * Additionally it evaluates the next {@link IKS} source.
      */
     private void inspectBlackboard() {
-        Map<Tweet, TweetStatus> map = blackboard.getTweetMap(); //TODO jwa we migth need to avoid the passing of the reference of the entire tweetMap
+        Map<Tweet, TweetStatus> map = blackboard.getTweetMap();
         List<Tweet> discardedTweets = new ArrayList<>();
 
         for (Map.Entry<Tweet, TweetStatus> element : map.entrySet()) {

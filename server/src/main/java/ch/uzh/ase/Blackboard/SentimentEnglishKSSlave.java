@@ -1,13 +1,8 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Util.Tweet;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
-import edu.stanford.nlp.pipeline.Annotation;
+import ch.uzh.ase.config.Configuration;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.CoreMap;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,23 +14,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by jonas on 25.04.2017.
  */
-public class SentimentEnglishKSSlave extends AbstractLanguageSlave implements IKSSlave {
+public class SentimentEnglishKSSlave extends AbstractSentimentSlave implements IKSSlave {
 
+    public static final String TOKENIZE_SSPLIT_PARSE_SENTIMENT = "tokenize, ssplit, parse, sentiment"; //see also https://stanfordnlp.github.io/CoreNLP/annotators.html
     private final LinkedBlockingQueue<Tweet> taskQueue = new LinkedBlockingQueue<>();
     private final AbstractKSMaster master;
     private final StanfordCoreNLP pipeline;
     private boolean shutdown = false;
+    private Properties prop = Configuration.getInstance().getProp();
     private static final Logger LOG = LoggerFactory.getLogger(SentimentEnglishKSSlave.class);
 
-    public SentimentEnglishKSSlave(AbstractKSMaster master) {
+    public SentimentEnglishKSSlave(final AbstractKSMaster master) {
         super();
         this.master = master;
 
         //these properties are needed specify the NLP process
-        //TODO jwa put properties in properties file
-        Properties properties = new Properties();
-        properties.setProperty("annotators", NLP_ANNOTATORS);
-        pipeline = new StanfordCoreNLP(properties);
+        prop.setProperty("annotators", TOKENIZE_SSPLIT_PARSE_SENTIMENT);
+        pipeline = new StanfordCoreNLP(prop);
     }
 
     @Override

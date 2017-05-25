@@ -27,7 +27,7 @@ public class Configuration {
     private void loadProperties() {
         InputStream input = null;
         try {
-            File file = new File("D:\\home\\site\\wwwroot\\config.properties"); //this is the absolute path on Azure
+            File file = new File("C:\\Users\\jonas\\IdeaProjects\\twitterbot\\twitterinho\\server\\src\\main\\java\\ch\\uzh\\ase\\config\\config.properties"); //this is the absolute path on Azure
             input = new FileInputStream(file);
 
             prop.load(input);

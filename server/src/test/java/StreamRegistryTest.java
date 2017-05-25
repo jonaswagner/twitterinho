@@ -39,7 +39,6 @@ public class StreamRegistryTest {
     @After
     public void after() {
         registry = null;
-        Blackboard.shutdown = true;
         input = null;
         prop = null;
     }
