@@ -3,7 +3,7 @@ package ch.uzh.ase.Util;
 import java.util.Map;
 
 /**
- * Created by jonas on 15.05.2017.
+ * This class holds monitoring data of the {@link ch.uzh.ase.TweetRetrieval.TweetStream} and the system running the stream.
  */
 public class SystemWorkload {
 

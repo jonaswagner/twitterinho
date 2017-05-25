@@ -9,12 +9,11 @@ import java.util.Random;
 /**
  * Created by jonas on 24.04.2017.
  */
-
-//TODO jwa RENAME THIS CLASS BECAUSE OF DUPLICATE CLASS NAME
 public enum Sentiment {
     FULLY_NEGATIVE, NEGATIVE, NEUTRAL, POSITIVE, FULLY_POSITIVE;
 
     private static final Random RAND = new Random(DateTime.now().getMillisOfDay());
+    public static final int BLACKBOARD_OVERFLOW_PROTECTION = 100000;
 
     public static Sentiment assignSentiment(int rawSentiment) {
         Sentiment assignedSentiment = null;
@@ -39,7 +38,8 @@ public enum Sentiment {
                 assignedSentiment = FULLY_POSITIVE;
                 break;
             }
-            default: assignedSentiment = NEUTRAL;
+            default:
+                assignedSentiment = NEUTRAL;
         }
 
         return assignedSentiment;
@@ -70,13 +70,13 @@ public enum Sentiment {
 
     public static List<Tweet> generateTweets(int numberOfTweets, String streamId) throws IllegalArgumentException {
 
-        if (numberOfTweets < 1 || numberOfTweets > 100000) {
-            throw new IllegalArgumentException("Tweet generator can only generate tweets between 1 and 100000");
+        if (numberOfTweets < 1 || numberOfTweets > BLACKBOARD_OVERFLOW_PROTECTION) {
+            throw new IllegalArgumentException("Tweet generator can only generate tweets between 1 and " + BLACKBOARD_OVERFLOW_PROTECTION);
         }
 
         List<Tweet> tweetList = new ArrayList<>(numberOfTweets);
 
-        for (int i = 0; i<numberOfTweets; i++) {
+        for (int i = 0; i < numberOfTweets; i++) {
             tweetList.add(Sentiment.generateTweet(Sentiment.assignSentiment(RAND.nextInt(5)), streamId));
         }
 

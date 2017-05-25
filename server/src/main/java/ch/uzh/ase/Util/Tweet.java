@@ -13,8 +13,6 @@ import java.util.Random;
  */
 public class Tweet {
 
-    //TODO jwa remove the test searchterm
-    public static final String TEST_SEARCH_TERM = "1234";
     public static final double INIT_SENTIMENT_SCORE = -1d;
 
     private LanguageCode iso = null;
