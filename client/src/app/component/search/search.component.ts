@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   private addedTerm: Term;
   private addedTermName: string;
   private sentimentSubscription: Subscription;
-  private status: string;
+  status: string;
   private alreadyUsed: string;
 
   constructor(private sentimentService: SentimentService) {

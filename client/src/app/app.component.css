@@ -16,9 +16,14 @@
   margin-left: 50px;
   vertical-align: middle;
 }
+.twt-header img{
+  max-height: 50px;
+  max-width: 50px;
+}
 .twt-component-container{
   margin-top: 40px;
 }
+
 .twt-panel {
   border-left: 1px solid var(--twitterblue);
   border-top: 1px solid var(--twitterblue);

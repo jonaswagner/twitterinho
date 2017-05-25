@@ -15,12 +15,29 @@
     </div>
     <div class="row performance-row">
       <h4 class="performance-header">Current CPU load: {{monitorData.loadAverage}}</h4>
-      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.loadAverage" [monitorMax]="1"></monitor-chart>
+      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.loadAverage"
+                     [monitorMax]="1"></monitor-chart>
     </div>
     <div class="row performance-row">
-      <h4 class="performance-header">Current RAM used: {{monitorData.totalSwapSize-monitorData.freeSwapSize}}</h4>
-      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.totalSwapSize-monitorData.freeSwapSize"
-                     [monitorMax]="monitorData.totalSwapSize"></monitor-chart>
+      <h4 class="performance-header">Current RAM used: {{monitorData.swapUsage}}</h4>
+      <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.swapUsage"
+                     [monitorMax]="1"></monitor-chart>
+    </div>
+    <div class="row performance-row">
+      <div class="col-xs-6">
+        <p>Nr. of slaves</p>
+      </div>
+      <div class="col-xs-6">
+        <p class="performance-number">{{monitorData.slaveCount}}</p>
+      </div>
+    </div>
+    <div class="row performance-row">
+      <div class="col-xs-6">
+        <p>Avg. load of slaves</p>
+      </div>
+      <div class="col-xs-6">
+        <p class="performance-number">{{monitorData.systemAvgSlavesLoad}}</p>
+      </div>
     </div>
     <div class="row performance-row">
       <div class="col-xs-12">

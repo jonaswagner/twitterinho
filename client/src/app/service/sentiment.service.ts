@@ -3,6 +3,8 @@ import 'rxjs/add/operator/map';
 import {Observable, Subject} from "rxjs";
 import {Injectable} from "@angular/core";
 import {Term} from "../model/term";
+import { environment } from '../../environments/environment.prod';
+
 /**
  * Created by flaviokeller on 20.03.17.
  */
@@ -16,12 +18,11 @@ export class SentimentService {
   private isStreamStopped: boolean = false;
 
   constructor(private http: Http) {
-
   }
 
   getTerms(): Observable<Term[]> {
 
-    return this.http.get("/twt/terms")
+    return this.http.get(environment.host + "/twt/terms")
       .map((response: Response) => <Term[]>response.json())
       .catch(
         (error: any) => Observable.throw(error.json().error || 'Server error')
@@ -29,26 +30,27 @@ export class SentimentService {
   }
 
   deleteTerm(term: string): any {
-    return this.http.delete("/twt/term/" + term)
+
+    return this.http.delete(environment.host + "/twt/term/" + term)
       .map((response: Response) => response.status)
       .catch((error: any) => Observable.throw(error.json().error || "Server error"))
   }
 
   deleteAllTerms(): any {
-    return this.http.delete("/twt/terms");
+    return this.http.delete(environment.host + "/twt/terms");
   }
 
   startStream(term: Term): any {
     let headers = new Headers({'Content-Type': 'application/json'});
     let options = new RequestOptions({headers: headers});
-    return this.http.post("/twt/term/" + term.name, options);
+    return this.http.post(environment.host + "/twt/term/" + term.name, options);
   }
 
   getStream(term: Term): Observable<number[]> {
     this.subscription = Observable
       .interval(10000).takeWhile(x => !term.isStopped).flatMap(
         () =>
-          this.http.get("/twt/term/" + term.name + "/stream")
+          this.http.get(environment.host + "/twt/term/" + term.name + "/stream")
             .map((response: Response) => <number[]>response.json())
             .catch((error: any) => Observable.throw(error.json().error || "Server error"))
       );
@@ -56,14 +58,15 @@ export class SentimentService {
   }
 
   stopStream(term: Term): any {
+    term.isStopped = true;
     let headers = new Headers({'Content-Type': 'application/json'});
     let options = new RequestOptions({headers: headers});
 
-    return this.http.put("/twt/term/" + term.name + "/stream", options);
+    return this.http.put(environment.host + "/twt/term/" + term.name + "/stream", options);
   }
 
   generateArtificialTweets(term: Term): any {
-    return this.http.get('/twt/generate/' + term.name);
+    return this.http.get(environment.host + '/twt/generate/' + term.name);
   }
 
 

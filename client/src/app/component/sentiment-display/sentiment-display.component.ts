@@ -35,15 +35,4 @@ export class SentimentDisplayComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  cancelStream() {
-    this.sentimentService.setStopStream(true);
-    this.sentimentService.stopStream(this.selectedTerm).subscribe(
-      data => {
-        console.log("canceled current term: " + data);
-      },
-      err => console.log(err),
-      () => console.log("done")
-    )
-  }
-
 }
