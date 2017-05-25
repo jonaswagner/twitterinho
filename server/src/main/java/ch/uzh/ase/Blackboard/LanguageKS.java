@@ -31,7 +31,7 @@ public class LanguageKS extends AbstractKSMaster {
         this.treatedTweets = new ConcurrentLinkedQueue<Tweet>();
 
         this.slaveList = new ArrayList<>();
-        generateSlaves(AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES);
+        generateSlaves(1);
 
         WorkloadObserver.getInstance().register(this);
     }

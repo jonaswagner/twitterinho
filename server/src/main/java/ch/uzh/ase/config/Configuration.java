@@ -8,8 +8,6 @@ import java.util.Properties;
 
 /**
  * Created by Silvio Fankhauser on 17.05.2017.
- *
- * This class is is a
  */
 public class Configuration {
 
@@ -27,8 +25,10 @@ public class Configuration {
     private void loadProperties() {
         InputStream input = null;
         try {
-            File file = new File("D:\\home\\site\\wwwroot\\config.properties"); //this is the absolute path on Azure
+            //File file = new File("D:\\home\\site\\wwwroot\\config.properties");
+            File file = new File("C:\\Users\\jonas\\IdeaProjects\\twitterbot\\twitterinho\\server\\src\\main\\java\\ch\\uzh\\ase\\config\\config.properties");
             input = new FileInputStream(file);
+            System.out.println(file.getAbsolutePath());
 
             prop.load(input);
         } catch (IOException e) {

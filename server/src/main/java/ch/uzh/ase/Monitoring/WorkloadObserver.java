@@ -7,8 +7,6 @@ import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.config.Configuration;
 import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
