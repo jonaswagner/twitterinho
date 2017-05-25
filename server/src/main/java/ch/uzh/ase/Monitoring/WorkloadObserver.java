@@ -41,6 +41,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     //static monitoring
     private MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
     private OperatingSystemMXBean osMBean;
+    private final CPU cpu;
     private String arch = "";
     private String name = "";
     private long totalSwapSize = -1;
@@ -60,18 +61,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private WorkloadObserver() {
         timeSlot = DateTime.now();
         subjects = Collections.synchronizedList(new ArrayList<>());
-        start();
-    }
-
-    public static WorkloadObserver getInstance() {
-        return instance;
-    }
-
-    /**
-     * This method loops through all registered {@link IWorkloadSubject}s within a given time interval.
-     */
-    @Override
-    public void run() {
+        cpu = new CPU();
 
         try {
             osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
@@ -86,6 +76,19 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             LOG.error(e.getMessage());
             e.printStackTrace();
         }
+
+        start();
+    }
+
+    public static WorkloadObserver getInstance() {
+        return instance;
+    }
+
+    /**
+     * This method loops through all registered {@link IWorkloadSubject}s within a given time interval.
+     */
+    @Override
+    public void run() {
 
         long currentTweetsPerTenSec = 0;
         while (!Blackboard.isShutdown()) {
@@ -114,8 +117,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     evaluateAction(workloadMap);
                 }
 
-                //loadAverage = osMBean.getProcessCpuLoad();
-                loadAverage = getProcessCpuLoad();
+                //loadAverage = osMBean.getProcessCpuLoad(); this does not work in Windows 10 and Windows Server 2012, which is used on Azure
+                loadAverage = cpu.getCurrentUsage();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
 
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
