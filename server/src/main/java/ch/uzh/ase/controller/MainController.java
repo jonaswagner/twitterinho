@@ -94,7 +94,7 @@ public class MainController {
      */
     @RequestMapping(value = "/twt/monitor", method = RequestMethod.GET)
     public ResponseEntity<SystemWorkload> getMonitorData() {
-        SystemWorkload wl = WorkloadObserver.getInstance().getSystemWorkload();
+        SystemWorkload wl = WorkloadObserver.getInstance().retrieveSystemWorkload();
         wl.addStatistics(Application.getDatabase().getTermStatistics());
         return new ResponseEntity<SystemWorkload>(wl, HttpStatus.OK);
     }

@@ -4,6 +4,7 @@ import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Util.MasterWorkload;
 import ch.uzh.ase.Util.SystemWorkload;
+import ch.uzh.ase.config.Configuration;
 import com.sun.management.OperatingSystemMXBean;
 import javafx.util.Pair;
 import org.joda.time.DateTime;
@@ -18,8 +19,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 /**
- * Created by jonas on 26.04.2017.
- * <p>
  * This class is a Singleton. It is a {@link Thread}, which periodically retrieves monitoring data from all registered {@link IWorkloadSubject}s.
  * This data is used to decide if a {@link IWorkloadSubject} should aquire or release resources (Slaves).
  */
@@ -28,10 +27,16 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private static final Logger LOG = LoggerFactory.getLogger(WorkloadObserver.class);
     private static final WorkloadObserver instance = new WorkloadObserver();
 
-    private static final int MIN_DIV_BY_TEN_SEC = 6;
     private final List<IWorkloadSubject> subjects;
-    private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
-    private final DecimalFormat df = new DecimalFormat("#.##");
+
+    //Performance configuration
+    private static Properties props = Configuration.getInstance().getProp();
+
+    public static final long LOAD_THRESHHOLD = Long.parseLong(props.getProperty("load_threshold"));
+    public static final int DEFAULT_SLAVE_THRESHHOLD = Integer.parseInt(props.getProperty("default_slave_threshold"));
+    public static final double IN_OUT_PARITY = Double.parseDouble(props.getProperty("in_out_parity"));
+    public static final double IN_OUT_UPPER_THRESHHOLD = Double.parseDouble(props.getProperty("in_out_upper_threshold"));
+    public static final int TIME_SLOT_DURATION_SEC = Integer.parseInt(props.getProperty("time_slot_duration_slot"));
 
     //static monitoring
     private final MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
@@ -40,10 +45,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private String name = "";
     private long totalSwapSize = -1;
     private long totalPhysicalSize = -1;
-
+    private static final int MIN_DIV_BY_TEN_SEC = 6;
+    private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
+    private final DecimalFormat df = new DecimalFormat("#.##");
 
     //Monitoring variables
-    private final DefaultPerformanceConfiguration configuration;
     private DateTime timeSlot;
     private long systemAvgSlavesLoad = 0;
     private long systemTweetsPerMin = 0;
@@ -53,8 +59,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private long slaveCount = 0;
 
     private WorkloadObserver() {
-        //this.configuration = configuration; TODO jwa check config
-        configuration = new DefaultPerformanceConfiguration();
         timeSlot = DateTime.now();
         subjects = Collections.synchronizedList(new ArrayList<>());
         try {
@@ -87,7 +91,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         long currentTweetsPerTenSec = 0;
         while (!Blackboard.shutdown) { //FIXME jwa replace with shutdownGracefully
             DateTime current = DateTime.now();
-            if (current.minusSeconds(configuration.TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
+            if (current.minusSeconds(TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
 
                 //get all Workloads from all slaves
                 Map<IWorkloadSubject, MasterWorkload> workloadMap = new HashMap<>(subjects.size());
@@ -123,6 +127,11 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
+    /**
+     * This method calculates the number of slaves, which are currently alive.
+     * @param workloadMap
+     * @return
+     */
     private long calcSlaves(Map<IWorkloadSubject, MasterWorkload> workloadMap) {
         long sum = 0;
         for (Map.Entry<IWorkloadSubject, MasterWorkload> element : workloadMap.entrySet()) {
@@ -131,6 +140,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         return sum;
     }
 
+    //TODO jwa MXBEAN does not work!
     /**
      * Given an amount of bytes, this method converts the value to gigabytes.
      */
@@ -146,7 +156,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
      * </p>
      * The generation of additional resources is done mulitplicative (Example: Additional Resources (Slaves) = (Existing Resources) * generation rate.
      * The release of resources is done in a linear way by simply decreasing the amount of slaves by 1.
-      * @param workloadMap
+     *
+     * @param workloadMap
      */
     public void evaluateAction(Map<IWorkloadSubject, MasterWorkload> workloadMap) { //this is public for testing reasons
         for (IWorkloadSubject subject : subjects) {
@@ -154,15 +165,15 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             MasterWorkload currentWorkload = workloadMap.get(subject);
             double inOutRatio = (double) currentWorkload.getInTweetCount() / (double) currentWorkload.getOutTweetCount();
 
-            if (currentWorkload.getAvgSlaveLoad() > configuration.LOAD_THRESHHOLD) {
-                if (inOutRatio > configuration.IN_OUT_PARITY) {
+            if (currentWorkload.getAvgSlaveLoad() > LOAD_THRESHHOLD) {
+                if (inOutRatio > IN_OUT_PARITY) {
                     generateSlaves(subject, inOutRatio);
                 } else {
-                    LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
+                    LOG.warn(subject.getClass().getName() + ": " + "Hold number of Slaves");
                 }
             } else {
-                if (inOutRatio > configuration.IN_OUT_PARITY) {
-                    LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
+                if (inOutRatio > IN_OUT_PARITY) {
+                    LOG.warn(subject.getClass().getName() + ": " + "Hold number of Slaves");
                 } else {
                     releaseSlaves(subject, inOutRatio);
                 }
@@ -173,28 +184,34 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private void releaseSlaves(IWorkloadSubject subject, double inOutRatio) {
         if (subject.getNumberOfSlaves() > AbstractKSMaster.DEFAULT_NUMBER_OF_SLAVES) {
             subject.shutdownSlavesGracefully(1);
-            LOG.warn(subject.getClass().getName() + ": "+"Release 1 slave");
+            LOG.warn(subject.getClass().getName() + ": " + "Release 1 slave");
         } else {
-            LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
+            LOG.warn(subject.getClass().getName() + ": " + "Hold number of Slaves");
         }
     }
 
     private void generateSlaves(IWorkloadSubject subject, double inOutRatio) {
-        if (subject.getNumberOfSlaves() < configuration.DEFAULT_SLAVE_THRESHHOLD) {
+        if (subject.getNumberOfSlaves() < DEFAULT_SLAVE_THRESHHOLD) {
 
-            if (inOutRatio > configuration.IN_OUT_UPPER_THRESHHOLD) {
+            if (inOutRatio > IN_OUT_UPPER_THRESHHOLD) {
                 subject.generateSlaves(calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()));
-                LOG.warn(subject.getClass().getName() + ": "+"generating " + calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()) + " additional slaves");
+                LOG.warn(subject.getClass().getName() + ": " + "generating " + calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()) + " additional slaves");
             } else {
                 subject.generateSlaves(1);
-                LOG.warn(subject.getClass().getName() + ": "+"generating 1 additional slave");
+                LOG.warn(subject.getClass().getName() + ": " + "generating 1 additional slave");
             }
         } else {
-            LOG.warn(subject.getClass().getName() + ": "+"Hold number of Slaves");
+            LOG.warn(subject.getClass().getName() + ": " + "Hold number of Slaves");
 
         }
     }
 
+    /**
+     * This method evaluates the number of slaves, which need to be generated or released
+     * @param inOutRatio
+     * @param numberOfSlaves
+     * @return
+     */
     private int calcSlavesRatio(double inOutRatio, double numberOfSlaves) {
         int minNumberOfSlaves = 1;
         double current = inOutRatio * numberOfSlaves;
@@ -239,11 +256,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         }
     }
 
-    public int getNumberOfSubjects() {
-        return subjects.size();
-    }
-
-    public SystemWorkload getSystemWorkload() {
+    public SystemWorkload retrieveSystemWorkload() {
         return new SystemWorkload(arch,
                 name,
                 loadAverage,
