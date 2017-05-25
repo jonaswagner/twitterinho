@@ -36,7 +36,7 @@ public abstract class AbstractLanguageSlave extends Thread implements IKSSlave {
 
         double mainSentiment = 2; //this is the neutral sentiment value (see also:
 
-        tweetText = tweetText.replaceAll("https?://\\S+\\s?", "").replaceAll("@", "");
+        tweetText = tweetText.replaceAll("http?://\\S+\\s?", "").replaceAll("@", "");
         LOG.info(this.getName() + "; " +tweetText + ", " + nextTweet.getSentimentScore());
 
         List<Integer> results = new ArrayList<>();
