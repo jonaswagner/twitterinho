@@ -118,7 +118,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 loadAverage = osMBean.getSystemCpuLoad();
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-                LOG.warn("Free RAM (MAX_SENTIMENT " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
+                LOG.warn("Free RAM (max " + df.format(bytesToGigaBytes(totalSwapSize)) + "GB): " + df.format(bytesToGigaBytes(freeSwapSize)) + "GB");
 
                 //reset counter & currentTweets/10s
                 timeSlot = current;

@@ -1,8 +1,8 @@
 package ch.uzh.ase.Blackboard;
 
 import ch.uzh.ase.Monitoring.WorkloadObserver;
-import ch.uzh.ase.Util.MasterWorkload;
 import ch.uzh.ase.Util.Tweet;
+import ch.uzh.ase.Util.MasterWorkload;
 import com.neovisionaries.i18n.LanguageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class SentimentEnglishKS extends AbstractKSMaster {
         return tweet.getIso() != null && checkSupportedLang(tweet);
     }
 
-    private boolean checkSupportedLang(final Tweet tweet) {
+    private boolean checkSupportedLang(Tweet tweet) {
         boolean isSupportedLang = false;
 
         if (tweet.getIso().equals(LanguageCode.en)){
