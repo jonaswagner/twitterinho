@@ -5,6 +5,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.util.Properties;
+
 /**
  * Created by flaviokeller on 24.04.17.
  */
@@ -14,8 +16,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class WebMVCConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        Properties prop = ch.uzh.ase.config.Configuration.getInstance().getProp();
         registry.addMapping("/**")
-                .allowedOrigins(ch.uzh.ase.config.Configuration.getInstance().getProp().getProperty("clienturl"), "http://localhost:4200")
+                .allowedOrigins(prop.getProperty("clienturl"), prop.getProperty("localclienturl"))
                 .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
 }

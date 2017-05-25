@@ -8,6 +8,8 @@ import java.util.Properties;
 
 /**
  * Created by Silvio Fankhauser on 17.05.2017.
+ *
+ * This class is a Singleton. It is responsible for the system properties.
  */
 public class Configuration {
 
@@ -25,9 +27,8 @@ public class Configuration {
     private void loadProperties() {
         InputStream input = null;
         try {
-            File file = new File("D:\\home\\site\\wwwroot\\config.properties");
+            File file = new File("D:\\home\\site\\wwwroot\\config.properties"); //this is the absolute path on Azure
             input = new FileInputStream(file);
-            System.out.println(file.getAbsolutePath());
 
             prop.load(input);
         } catch (IOException e) {

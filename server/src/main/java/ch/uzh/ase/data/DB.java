@@ -17,6 +17,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by Silvio Fankhauser on 26.04.2017.
+ *
+ * This class holds the database connection and queries.
  */
 public class DB {
 
@@ -89,6 +91,10 @@ public class DB {
         return interval;
     }
 
+    /**
+     * If lastPersistedTweets is full, then discard the oldest {@link Tweet} and insert the new one.
+     * @param doc
+     */
     private void insertInTweetQueue(Document doc) {
         if (lastPersistedTweets.size() >= QUEUE_SIZE){
             lastPersistedTweets.poll();
@@ -96,6 +102,12 @@ public class DB {
         lastPersistedTweets.add(doc);
     }
 
+    /**
+     * This method retrieves all {@link Tweet}s for the corresponding {@link ch.uzh.ase.domain.Term} and calculates the average Sentiment.
+     *
+     * @param searchId
+     * @return
+     */
     public double getAverageSentiment(String searchId) {
         double sum = 0.0;
         int numberOfTweets = 0;
@@ -127,7 +139,11 @@ public class DB {
         lastTweetSentMap.get(searchId).add(sent);
     }
 
-
+    /**
+     * This method calculates the average sentiment of the retrieved {@link Tweet}s given the {@link ch.uzh.ase.domain.Term}.
+     * @param searchId
+     * @return
+     */
     public double getCurrentSentiment(String searchId) {
         Queue<Double> queue = lastTweetSentMap.get(searchId);
         Double average = 0.0;
@@ -137,7 +153,11 @@ public class DB {
         return average/QUEUE_SIZE;
     }
 
-
+    /**
+     * This method retrieves the entire {@link MongoCollection}, because Microsoft Azure does not support the distinct search operation
+     * (see also https://stackoverflow.com/questions/30089803/how-could-i-go-about-getting-distinct-field-counts-in-azure-search).
+     * @return {@link Set<String>} searchIds
+     */
     public Set<String> getDistinctSearchIDs() {
         Set<String> searchIDs = new HashSet<>();
         MongoCursor<Document> cursor = mc.find().iterator();
@@ -170,6 +190,10 @@ public class DB {
         mc.deleteMany(query);
     }
 
+    /**
+     * This method calculates monitoring values needed by the client.
+     * @return {@link Map<String, Long> termStatistics}
+     */
     public Map<String, Long> getTermStatistics()  {
         Map<String, Long> resultMap = new HashMap<>();
         long langDetTime = 0;
@@ -191,9 +215,11 @@ public class DB {
             sentDetTime = sentDetTime + sentDetTimeList.get(i);
             procTime = procTime + procTimeList.get(i);
         }
-        resultMap.put(LANGUAGE_DETECTION_DURATION, langDetTime/10);
-        resultMap.put(SENTIMENT_DETECTION_DURATION, sentDetTime/10);
-        resultMap.put(PROCESSING_TIME, procTime/10);
+        if (!lastPersistedTweets.isEmpty()) {
+            resultMap.put(LANGUAGE_DETECTION_DURATION, langDetTime / lastPersistedTweets.size());
+            resultMap.put(SENTIMENT_DETECTION_DURATION, sentDetTime / lastPersistedTweets.size());
+            resultMap.put(PROCESSING_TIME, procTime / lastPersistedTweets.size());
+        }
         return resultMap;
     }
 
