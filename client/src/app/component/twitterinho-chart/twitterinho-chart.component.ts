@@ -30,7 +30,7 @@ export class TwitterinhoChartComponent implements OnChanges {
         if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
           this.data.datasets[0].data.shift();
         }
-        if (this.data.labels.length === this.data.datasets[0].data.length - 1) {
+        if (this.data.labels.length === this.data.datasets[1].data.length - 1) {
           this.data.datasets[1].data.shift();
         }
         this.chart.refresh();

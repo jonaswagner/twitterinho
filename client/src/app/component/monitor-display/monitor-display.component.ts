@@ -18,7 +18,7 @@ export class MonitorDisplayComponent implements OnInit, OnDestroy {
   monitorData: MonitorData = new MonitorData();
   private monitorSubscription: Subscription;
   private statisticsSubscription: Subscription;
-  private requestCount = 0;
+  requestCount = 0;
 
   ngOnInit(): void {
     this.getMonitorData();

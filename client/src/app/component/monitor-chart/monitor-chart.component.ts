@@ -1,8 +1,5 @@
 import {Message, UIChart} from "primeng/primeng";
-import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from "@angular/core";
-import {Term} from "../../model/term";
-import {Subscription} from "rxjs";
-import {SentimentService} from "../../service/sentiment.service";
+import {Component, Input, OnChanges, SimpleChanges, ViewChild} from "@angular/core";
 import {MonitorService} from "../../service/monitor.service";
 /**
  * Created by flaviokeller on 29.03.17.
@@ -42,7 +39,6 @@ export class MonitorChartComponent implements OnChanges {
     }, 100);
   }
 
-
   constructor(private monitorService: MonitorService) {
     let bodyStyles = window.getComputedStyle(document.body);
     let twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
@@ -64,14 +60,19 @@ export class MonitorChartComponent implements OnChanges {
         }
       ]
     };
-  }
+    // this.options = {
+    //   scales: {
+    //     yAxes: [{
+    //       display: true,
+    //       ticks: {
+    //         beginAtZero: true,
+    //         steps: 20,
+    //         stepValue: 0.05,
+    //         max: 1.0
+    //       }
+    //     }]
+    //   }
+    //}
 
-  // selectData(event) {
-  //   this.msgs = [];
-  //   this.msgs.push({
-  //     severity: 'info',
-  //     summary: 'Data Selected',
-  //     'detail': this.data.datasets[event.element._datasetIndex].data[event.element._index]
-  //   });
-  // }
+  }
 }
