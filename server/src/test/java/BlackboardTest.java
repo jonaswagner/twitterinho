@@ -2,6 +2,7 @@ import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.Tweet;
 import ch.uzh.ase.Util.TweetStatus;
+import ch.uzh.ase.config.Configuration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +23,7 @@ public class BlackboardTest {
     public static final int INITIAL_NUMBER_OF_TWEETS = 100;
     public static final int ADDITIONAL_NUMBER_OF_TWEETS = 20;
     private final Blackboard blackboard = new Blackboard();
+    private Configuration config = Configuration.getInstance();
 
     @Before
     public void before(){

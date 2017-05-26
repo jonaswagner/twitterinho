@@ -34,8 +34,8 @@ public class Application {
 
         Blackboard blackboard = new Blackboard();
         AbstractKSMaster iks1 = new SentimentEnglishKS(blackboard);
-        iks1.start();
         AbstractKSMaster iks2 = new LanguageKS(blackboard);
+        iks1.start();
         iks2.start();
         BlackboardControl blackboardControl = new BlackboardControl(blackboard, Arrays.asList(iks1, iks2));
         blackboardControl.start();

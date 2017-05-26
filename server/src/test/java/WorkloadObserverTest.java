@@ -16,17 +16,13 @@ import java.util.*;
  */
 public class WorkloadObserverTest {
 
-    private static final long DEFAULT_TWEET_COUNT = 100;
-    private static final int DEFAULT_SLAVES_COUNT = 1;
+    private static final int DEFAULT_SLAVES_COUNT = 2;
     private static final long DEFAULT_HIGH_LOAD = 200;
     private static final long DEFAULT_IN_TWEET_COUNT = 20;
     private static final long DEFAULT_OUT_TWEET_COUNT = 20;
     private static final long DEFAULT_NEUTRAL_LOAD = 50;
     private static final long DEFAULT_LOW_LOAD = 5;
-    private static final long DEFAULT_TWEET_FACTOR = 20;
-    private static final int DEFAULT_SLAVE_FACTOR = 2;
-    private static final int MAX_NR_OF_SLAVES = 21;
-
+    private static final long DEFAULT_TWEET_FACTOR = 5;
 
     Configuration config = Configuration.getInstance();
     WorkloadObserver observer = WorkloadObserver.getInstance();
@@ -49,23 +45,20 @@ public class WorkloadObserverTest {
 
         Map<IWorkloadSubject, MasterWorkload> workloadMap = new HashMap<>();
         workloadMap.put(subject, generateNeutralWorkload());
-        Assert.assertEquals(subject.getNumberOfSlaves(), DEFAULT_SLAVES_COUNT);
+        Assert.assertEquals(1,subject.getNumberOfSlaves());
 
+        int currentNumberOfSlaves = subject.getNumberOfSlaves();
         workloadMap.put(subject, generateHighWorkload());
         observer.evaluateAction(workloadMap);
-        Assert.assertEquals(MAX_NR_OF_SLAVES, subject.getNumberOfSlaves());
+        Assert.assertEquals(currentNumberOfSlaves+DEFAULT_TWEET_FACTOR, subject.getNumberOfSlaves());
 
-        observer.evaluateAction(workloadMap);
-        Assert.assertTrue(MAX_NR_OF_SLAVES < subject.getNumberOfSlaves());
-
-        for (int i = 0; i<MAX_NR_OF_SLAVES-DEFAULT_SLAVES_COUNT; i++) {
+        for (int i = 0; i<subject.getNumberOfSlaves(); i++) {
             workloadMap.put(subject, generateLowWorkload());
             observer.evaluateAction(workloadMap);
-            Assert.assertEquals(MAX_NR_OF_SLAVES-i-1, subject.getNumberOfSlaves());
         }
 
         observer.evaluateAction(workloadMap);
-        Assert.assertEquals(DEFAULT_SLAVES_COUNT, subject.getNumberOfSlaves());
+        Assert.assertEquals(2, subject.getNumberOfSlaves());
     }
 
     private MasterWorkload generateNeutralWorkload() {
@@ -82,7 +75,7 @@ public class WorkloadObserverTest {
         MasterWorkload workload = new MasterWorkload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT*DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
-        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT);
         workload.setAvgSlaveLoad(DEFAULT_HIGH_LOAD);
 
         return workload;
@@ -92,7 +85,7 @@ public class WorkloadObserverTest {
         MasterWorkload workload = new MasterWorkload();
         workload.setInTweetCount(DEFAULT_IN_TWEET_COUNT/DEFAULT_TWEET_FACTOR);
         workload.setOutTweetCount(DEFAULT_OUT_TWEET_COUNT);
-        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT*DEFAULT_SLAVE_FACTOR);
+        workload.setNumberOfSlaves(DEFAULT_SLAVES_COUNT);
         workload.setAvgSlaveLoad(DEFAULT_LOW_LOAD);
 
         return workload;

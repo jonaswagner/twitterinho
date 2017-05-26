@@ -43,7 +43,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     //static monitoring
     private MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
     private OperatingSystemMXBean osMBean;
-    private final CPU cpu;
     private String arch = "";
     private String name = "";
     private long totalSwapSize = -1;
@@ -61,7 +60,6 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private WorkloadObserver() {
         timeSlot = DateTime.now();
         subjects = Collections.synchronizedList(new ArrayList<>());
-        cpu = new CPU();
 
         try {
             osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
@@ -88,6 +86,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     public void run() {
 
         long currentTweetsPerTenSec = 0;
+
         while (!Blackboard.isShutdown()) {
             DateTime current = DateTime.now();
             if (current.minusSeconds(TIME_SLOT_DURATION_SEC).isAfter(timeSlot)) {
@@ -114,44 +113,20 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     evaluateAction(workloadMap);
                 }
 
-                //reset counter & currentTweets/10s
+                loadAverage = osMBean.getSystemCpuLoad();
+                LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
+
+                freeSwapSize = osMBean.getFreeSwapSpaceSize();
+                totalSwapSize = osMBean.getTotalSwapSpaceSize();
+
+                if (freeSwapSize > 0 && totalSwapSize > 0) {
+                    swapUsage = (double) freeSwapSize/ (double) totalSwapSize;
+                }
+                LOG.warn("Free RAM: " + swapUsage * 100d + "%" );
+
                 timeSlot = current;
                 currentTweetsPerTenSec = 0; //reset
-
-                retrieveSwapData();
-                retrieveCPUData();
             }
-        }
-    }
-
-    private void retrieveCPUData() {
-        try {
-            //loadAverage = osMBean.getSystemCpuLoad();
-            LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-
-            if (loadAverage < 0) {
-                loadAverage = 0.85d;
-            }
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-            e.printStackTrace();
-            loadAverage = 0.95d;
-        }
-    }
-
-    private void retrieveSwapData() {
-        try {
-            //freeSwapSize = osMBean.getFreeSwapSpaceSize();
-            //totalSwapSize = osMBean.getTotalSwapSpaceSize();
-            swapUsage = 0.6;
-            if (freeSwapSize > 0 && totalSwapSize > 0) {
-                swapUsage = (double) freeSwapSize / (double) totalSwapSize;
-            }
-            LOG.warn("Free RAM: " + swapUsage * 100d + "%");
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-            e.printStackTrace();
-            swapUsage = 0.6d;
         }
     }
 
@@ -216,10 +191,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
 
             if (inOutRatio > IN_OUT_UPPER_THRESHHOLD) {
                 subject.generateSlaves(calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()));
-                LOG.warn(subject.getClass().getName() + ": " + "generating " + calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()) + " additional slaves");
             } else {
                 subject.generateSlaves(1);
-                LOG.warn(subject.getClass().getName() + ": " + "generating 1 additional slave");
             }
         } else {
             LOG.warn(subject.getClass().getName() + ": " + "Hold number of Slaves");

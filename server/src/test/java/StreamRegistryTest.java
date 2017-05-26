@@ -1,6 +1,7 @@
 import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.TweetRetrieval.TweetStream;
+import ch.uzh.ase.config.Configuration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,21 +27,17 @@ public class StreamRegistryTest {
     private StreamRegistry registry = null;
     private Blackboard board = null;
     private InputStream input = null;
-    private Properties prop = new Properties();
+    private Configuration configuration = Configuration.getInstance();
 
     @Before
     public void before() throws IOException {
         registry = StreamRegistry.getInstance();
-        input = new FileInputStream("server/config.properties");
-        prop.load(input);
-        //FIXME jwa init Properties for Twitter API
     }
 
     @After
     public void after() {
         registry = null;
         input = null;
-        prop = null;
     }
 
     @Test
@@ -50,25 +47,22 @@ public class StreamRegistryTest {
         TweetStream stream = registry.locateStream(STREAM_ID_1);
         Blackboard blackboard = registry.getBlackBoard();
         Assert.assertNotNull(stream);
-        Assert.assertNotNull(blackboard);
+        Assert.assertNull(blackboard);
+        registry.setBlackBoard(blackboard);
 
         registry.register(STREAM_ID_1);
-        Assert.assertEquals(stream, registry.locateStream(STREAM_ID_1));
-        Assert.assertEquals(blackboard, registry.getBlackBoard());
+        Assert.assertNotNull(registry.locateStream(STREAM_ID_1));
+        Assert.assertNull(registry.locateStream(STREAM_ID_2));
 
         registry.register(STREAM_ID_2);
-        Assert.assertEquals(stream, registry.locateStream(STREAM_ID_2));
-        Assert.assertEquals(blackboard,  registry.getBlackBoard());
+        Assert.assertNotNull(registry.locateStream(STREAM_ID_2));
 
-        Assert.assertNull( registry.getBlackBoard());
         Assert.assertNull(registry.locateStream(NON_EXISTENT_STREAM_ID));
 
         registry.unRegister(STREAM_ID_1);
         registry.unRegister(STREAM_ID_2);
         Assert.assertNull(registry.locateStream(STREAM_ID_1));
-        Assert.assertNull( registry.getBlackBoard());
         Assert.assertNull(registry.locateStream(STREAM_ID_2));
-        Assert.assertNull( registry.getBlackBoard());
 
 
     }
