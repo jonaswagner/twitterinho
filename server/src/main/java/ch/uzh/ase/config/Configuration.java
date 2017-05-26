@@ -25,8 +25,7 @@ public class Configuration {
     private void loadProperties() {
         InputStream input = null;
         try {
-            File file = new File("C:\\Users\\jonas\\IdeaProjects\\twitterbot\\twitterinho\\server\\src\\main\\java\\ch\\uzh\\ase\\config\\config.properties");
-            //File file = new File("D:\\home\\site\\wwwroot\\config.properties");
+            File file = new File("D:\\home\\site\\wwwroot\\config.properties");
             input = new FileInputStream(file);
             System.out.println(file.getAbsolutePath());
 
