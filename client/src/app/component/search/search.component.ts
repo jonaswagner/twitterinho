@@ -99,7 +99,20 @@ export class SearchComponent implements OnInit, OnDestroy {
   sendToDisplay(term: Term) {
     this.sentimentService.displaySentiment(term);
   }
+cancelStream(){
+    if(this.currentTerm){
+      this.alreadyUsed = ''
+      this.sentimentService.stopStream(this.currentTerm).subscribe(
+        data => {
 
+        },
+        err => console.log(err),
+        () => console.log('done')
+      )
+    }else {
+      this.alreadyUsed = 'No term currently running'
+    }
+}
   activateStream(term: Term) {
     this.status = 'loading';
     if (this.currentTerm) {

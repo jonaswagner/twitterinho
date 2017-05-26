@@ -11,8 +11,8 @@
             <input name="termSearch" id="termSearch" [(ngModel)]="addedTermName" type="text" class="form-control">
           </div>
           <div class="form-group pull-right">
-            <label for="evalBtn"></label>
             <button id="evalBtn" (click)="addTerm()" class="btn btn-success btn-block form-control">Evaluate</button>
+            <button id="stopEvalBtn" (click)="cancelStream()" class="btn btn-warning btn-block form-control">Stop Evaluating current term</button>
             <div class="clearfix"></div>
           </div>
         </div>

@@ -23,18 +23,20 @@ export class MonitorChartComponent implements OnChanges {
   lineData: any;
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.doughnutData.datasets[0].data = [this.monitorData, this.monitorMax - this.monitorData];
-    if (this.lineData.datasets[0].data[0] === undefined) {
-      this.lineData.datasets[0].data.pop();
-    }
-    this.lineData.datasets[0].data.push(this.monitorData);
-    setTimeout(() => {
-      if (this.lineData.labels.length === this.lineData.datasets[0].data.length - 1) {
-        this.lineData.datasets[0].data.shift();
+    if (this.monitorData) {
+      this.doughnutData.datasets[0].data = [(this.monitorData*100).toFixed(2), ((this.monitorMax - this.monitorData)*100).toFixed(2)];
+      if (this.lineData.datasets[0].data[0] === undefined) {
+        this.lineData.datasets[0].data.pop();
       }
-      this.doughnutChart.refresh();
-      this.lineChart.refresh();
-    }, 100);
+      this.lineData.datasets[0].data.push((this.monitorData*100).toFixed(2));
+      setTimeout(() => {
+        if (this.lineData.labels.length === this.lineData.datasets[0].data.length - 1) {
+          this.lineData.datasets[0].data.shift();
+        }
+        this.doughnutChart.refresh();
+        this.lineChart.refresh();
+      }, 100);
+    }
   }
 
   constructor() {
@@ -68,8 +70,8 @@ export class MonitorChartComponent implements OnChanges {
           ticks: {
             beginAtZero: true,
             steps: 20,
-            stepValue: 0.05,
-            max: 1.0
+            stepValue: 5,
+            max: 100
           }
         }]
       }
