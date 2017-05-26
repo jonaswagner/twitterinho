@@ -108,8 +108,6 @@ public class MainController {
     public void generateArtificialTweets(@PathVariable String term) {
         Blackboard board = StreamRegistry.getInstance().getBlackBoard();
         int artificialTweetsNumber = Integer.valueOf(Configuration.getInstance().getProp().getProperty("artificialtweetsnumber"));
-        for (int i = 0; i < artificialTweetsNumber; i++) {
-            board.addNewTweets(Sentiment.generateTweets(artificialTweetsNumber, term));
-        }
+        board.addNewTweets(Sentiment.generateTweets(artificialTweetsNumber, term));
     }
 }
