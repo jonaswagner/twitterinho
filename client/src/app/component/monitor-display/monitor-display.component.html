@@ -7,10 +7,10 @@
     </div>
     <div class="row performance-row">
       <div class="col-xs-6">
-        <p class="text-center">CPU type: {{monitorData.arch}}</p>
+        <p class="text-center">CPU architecture: {{monitorData.arch}}</p>
       </div>
       <div class="col-xs-6">
-        <p class="text-center">Name: {{monitorData.name}}</p>
+        <p class="text-center">Operating System: {{monitorData.name}}</p>
       </div>
     </div>
     <div class="row performance-row">
@@ -33,7 +33,7 @@
     </div>
     <div class="row performance-row">
       <div class="col-xs-6">
-        <p>Avg. load of slaves</p>
+        <p>Avg. load of slaves (tweets in queue)</p>
       </div>
       <div class="col-xs-6">
         <p class="performance-number">{{monitorData.systemAvgSlavesLoad}}</p>
@@ -46,26 +46,26 @@
     </div>
     <div class="row performance-row">
       <div class="col-xs-6">
-        <p>Tweet processing time</p>
+        <p>Tweet processing time (millisecs):</p>
       </div>
       <div class="col-xs-6">
-        <p class="performance-number">{{monitorData.processingTime}}</p>
-      </div>
-    </div>
-    <div class="row performance-row">
-      <div class="col-xs-6">
-        <p>Time for sentiment analysis:</p>
-      </div>
-      <div class="col-xs-6">
-        <p class="performance-number">{{monitorData.sentimentDetectionDuration}}</p>
+        <p class="performance-number">{{monitorData.processingTime}}ms</p>
       </div>
     </div>
     <div class="row performance-row">
       <div class="col-xs-6">
-        <p>Time for language detection</p>
+        <p>Time for sentiment analysis (millisec.):</p>
       </div>
       <div class="col-xs-6">
-        <p class="performance-number">{{monitorData.languageDetectionDuration}}</p>
+        <p class="performance-number">{{monitorData.sentimentDetectionDuration}}ms</p>
+      </div>
+    </div>
+    <div class="row performance-row">
+      <div class="col-xs-6">
+        <p>Time for language detection (millisec.):</p>
+      </div>
+      <div class="col-xs-6">
+        <p class="performance-number">{{monitorData.languageDetectionDuration}}ms</p>
       </div>
     </div>
   </div>

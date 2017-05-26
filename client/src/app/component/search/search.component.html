@@ -24,9 +24,9 @@
     <div class="row">
       <div class="col-xs-12">
         <ul class="active-terms">
-          <li *ngFor="let s of activeTerms">
-            <div class="pull-left">
-              <a (click)="activateStream(s)">{{s.name}}
+          <li *ngFor="let s of activeTerms" (click)="activateStream(s)">
+            <div class="pull-left term-link">
+              <a>{{s.name}}
               </a></div>
             <div class="pull-right">
               <span>{{s.totalAvg[s.totalAvg.length-1]}}</span>
