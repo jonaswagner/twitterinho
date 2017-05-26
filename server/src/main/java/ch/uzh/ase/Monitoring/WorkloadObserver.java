@@ -118,7 +118,7 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                 }
 
                 //loadAverage = osMBean.getProcessCpuLoad(); this does not work in Windows 10 and Windows Server 2012, which is used on Azure
-                loadAverage = cpu.getCurrentUsage();
+//                loadAverage = cpu.getCurrentUsage();
                 LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
 
                 freeSwapSize = osMBean.getFreeSwapSpaceSize();

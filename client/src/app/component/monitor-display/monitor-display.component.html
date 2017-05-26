@@ -14,12 +14,12 @@
       </div>
     </div>
     <div class="row performance-row">
-      <h4 class="performance-header">Current CPU load: {{monitorData.loadAverage}}</h4>
+      <h4 class="performance-header">Current CPU load: {{monitorData.loadAverage | percent}}</h4>
       <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.loadAverage"
                      [monitorMax]="1"></monitor-chart>
     </div>
     <div class="row performance-row">
-      <h4 class="performance-header">Current RAM used: {{monitorData.swapUsage}}</h4>
+      <h4 class="performance-header">Current RAM used: {{monitorData.swapUsage | percent}}</h4>
       <monitor-chart [requestCount]="requestCount" [monitorData]="monitorData.swapUsage"
                      [monitorMax]="1"></monitor-chart>
     </div>

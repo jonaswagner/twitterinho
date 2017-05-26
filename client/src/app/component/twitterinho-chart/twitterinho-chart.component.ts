@@ -1,8 +1,6 @@
 import {Message, UIChart} from "primeng/primeng";
-import {Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild} from "@angular/core";
+import {Component, Input, OnChanges, SimpleChanges, ViewChild} from "@angular/core";
 import {Term} from "../../model/term";
-import {Subscription} from "rxjs";
-import {SentimentService} from "../../service/sentiment.service";
 /**
  * Created by flaviokeller on 29.03.17.
  */

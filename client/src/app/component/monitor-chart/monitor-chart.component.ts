@@ -1,6 +1,5 @@
 import {Message, UIChart} from "primeng/primeng";
 import {Component, Input, OnChanges, SimpleChanges, ViewChild} from "@angular/core";
-import {MonitorService} from "../../service/monitor.service";
 /**
  * Created by flaviokeller on 29.03.17.
  */
@@ -20,7 +19,6 @@ export class MonitorChartComponent implements OnChanges {
   @Input()
   requestCount: number;
   options: any;
-  msgs: Message[];
   doughnutData: any;
   lineData: any;
 
@@ -39,7 +37,7 @@ export class MonitorChartComponent implements OnChanges {
     }, 100);
   }
 
-  constructor(private monitorService: MonitorService) {
+  constructor() {
     let bodyStyles = window.getComputedStyle(document.body);
     let twitterblue = bodyStyles.getPropertyValue('--twitterblue').trim();
     let alterorange = bodyStyles.getPropertyValue('--alterorange').trim();
@@ -60,19 +58,22 @@ export class MonitorChartComponent implements OnChanges {
         }
       ]
     };
-    // this.options = {
-    //   scales: {
-    //     yAxes: [{
-    //       display: true,
-    //       ticks: {
-    //         beginAtZero: true,
-    //         steps: 20,
-    //         stepValue: 0.05,
-    //         max: 1.0
-    //       }
-    //     }]
-    //   }
-    //}
+    this.options = {
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          display: true,
+          ticks: {
+            beginAtZero: true,
+            steps: 20,
+            stepValue: 0.05,
+            max: 1.0
+          }
+        }]
+      }
+    }
 
   }
 }

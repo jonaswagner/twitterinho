@@ -55,7 +55,7 @@ public class SystemWorkload {
         return this.loadAverage;
     }
 
-    public double getFreePhysicalSize() {
+    public double getSwapUsage() {
         return this.swapUsage;
     }
 
@@ -77,6 +77,10 @@ public class SystemWorkload {
 
     public long getProcessingTime() {
         return processingTime;
+    }
+
+    public long getSlaveCount() {
+        return slaveCount;
     }
 
 }
