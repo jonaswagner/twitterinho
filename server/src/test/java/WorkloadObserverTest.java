@@ -3,6 +3,7 @@ import ch.uzh.ase.Blackboard.SentimentEnglishKS;
 import ch.uzh.ase.Monitoring.IWorkloadSubject;
 import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.Util.MasterWorkload;
+import ch.uzh.ase.config.Configuration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,17 +17,18 @@ import java.util.*;
 public class WorkloadObserverTest {
 
     private static final long DEFAULT_TWEET_COUNT = 100;
-    private static final int DEFAULT_SLAVES_COUNT = 2;
-    private static final long DEFAULT_HIGH_LOAD = 2000;
-    private static final long DEFAULT_IN_TWEET_COUNT = 200;
-    private static final long DEFAULT_OUT_TWEET_COUNT = 200;
-    private static final long DEFAULT_NEUTRAL_LOAD = 500;
-    private static final long DEFAULT_LOW_LOAD = 50;
+    private static final int DEFAULT_SLAVES_COUNT = 1;
+    private static final long DEFAULT_HIGH_LOAD = 200;
+    private static final long DEFAULT_IN_TWEET_COUNT = 20;
+    private static final long DEFAULT_OUT_TWEET_COUNT = 20;
+    private static final long DEFAULT_NEUTRAL_LOAD = 50;
+    private static final long DEFAULT_LOW_LOAD = 5;
     private static final long DEFAULT_TWEET_FACTOR = 20;
-    private static final int DEFAULT_SLAVE_FACTOR = 8;
-    private static final int MAX_NR_OF_SLAVES = 42; //FIXME jwa calculate this value
+    private static final int DEFAULT_SLAVE_FACTOR = 2;
+    private static final int MAX_NR_OF_SLAVES = 21;
 
 
+    Configuration config = Configuration.getInstance();
     WorkloadObserver observer = WorkloadObserver.getInstance();
     Blackboard blackboard = null;
     IWorkloadSubject subject;
@@ -43,11 +45,6 @@ public class WorkloadObserverTest {
     }
 
     @Test
-    public void registerDeRegisterTest() {
-        //TODO jwa implement this further
-    }
-
-    @Test
     public void montitoringTest() {
 
         Map<IWorkloadSubject, MasterWorkload> workloadMap = new HashMap<>();
@@ -59,7 +56,7 @@ public class WorkloadObserverTest {
         Assert.assertEquals(MAX_NR_OF_SLAVES, subject.getNumberOfSlaves());
 
         observer.evaluateAction(workloadMap);
-        Assert.assertEquals(MAX_NR_OF_SLAVES, subject.getNumberOfSlaves());
+        Assert.assertTrue(MAX_NR_OF_SLAVES < subject.getNumberOfSlaves());
 
         for (int i = 0; i<MAX_NR_OF_SLAVES-DEFAULT_SLAVES_COUNT; i++) {
             workloadMap.put(subject, generateLowWorkload());

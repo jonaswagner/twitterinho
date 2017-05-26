@@ -2,6 +2,7 @@ package ch.uzh.ase;
 
 
 import ch.uzh.ase.Blackboard.*;
+import ch.uzh.ase.Monitoring.WorkloadObserver;
 import ch.uzh.ase.TweetRetrieval.StreamRegistry;
 import ch.uzh.ase.config.Configuration;
 import ch.uzh.ase.data.DB;
@@ -21,6 +22,7 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         Configuration.getInstance();
+        WorkloadObserver.getInstance().start();
         SpringApplication.run(Application.class, args);
 
         InputStream input = null;

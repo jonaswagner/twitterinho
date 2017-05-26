@@ -3,6 +3,7 @@ package ch.uzh.ase.Monitoring;
 import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Util.MasterWorkload;
+import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.config.Configuration;
 import com.sun.management.OperatingSystemMXBean;
@@ -36,7 +37,8 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     public static final int DEFAULT_SLAVE_THRESHHOLD = Integer.parseInt(props.getProperty("default_slave_threshold"));
     public static final double IN_OUT_PARITY = Double.parseDouble(props.getProperty("in_out_parity"));
     public static final double IN_OUT_UPPER_THRESHHOLD = Double.parseDouble(props.getProperty("in_out_upper_threshold"));
-    public static final int TIME_SLOT_DURATION_SEC = 10;
+    private static final int TIME_SLOT_DURATION_SEC = 10;
+    private static final int MIN_DIV_BY_TEN_SEC = 6;
 
     //static monitoring
     private MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
@@ -45,16 +47,14 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
     private String arch = "";
     private String name = "";
     private long totalSwapSize = -1;
-    private static final int MIN_DIV_BY_TEN_SEC = 6;
     private final List<Pair<DateTime, Long>> tweetsPerMinList = new ArrayList<>();
-    private final DecimalFormat df = new DecimalFormat("#.##");
 
     //Monitoring variables
     private DateTime timeSlot;
     private long systemAvgSlavesLoad = 0;
     private long systemTweetsPerMin = 0;
     private double swapUsage = -1;
-    private double loadAverage = 0.0d;
+    private double loadAverage = -1;
     private long slaveCount = 0;
     private long freeSwapSize = -1;
 
@@ -69,15 +69,12 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
             LOG.warn("System Architecture: " + arch);
             name = osMBean.getName();
             LOG.warn("OS Name: " + name);
-            totalSwapSize = osMBean.getTotalSwapSpaceSize();
-            LOG.warn("Total Swap size: " + totalSwapSize);
-            df.setRoundingMode(RoundingMode.CEILING);
+            //totalSwapSize = osMBean.getTotalSwapSpaceSize();
+            //LOG.warn("Total Swap size: " + totalSwapSize);
         } catch (IOException e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
         }
-
-        start();
     }
 
     public static WorkloadObserver getInstance() {
@@ -117,55 +114,45 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
                     evaluateAction(workloadMap);
                 }
 
-                //loadAverage = osMBean.getProcessCpuLoad(); this does not work in Windows 10 and Windows Server 2012, which is used on Azure
-//                loadAverage = cpu.getCurrentUsage();
-                LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
-
-                freeSwapSize = osMBean.getFreeSwapSpaceSize();
-                totalSwapSize = osMBean.getTotalSwapSpaceSize();
-
-                if (freeSwapSize > 0 && totalSwapSize > 0) {
-                    swapUsage = (double) freeSwapSize/ (double) totalSwapSize;
-                }
-                LOG.warn("Free RAM: " + swapUsage * 100d + "%" );
-
                 //reset counter & currentTweets/10s
                 timeSlot = current;
                 currentTweetsPerTenSec = 0; //reset
+
+                retrieveSwapData();
+                retrieveCPUData();
             }
         }
     }
 
-    public static double getProcessCpuLoad() {
-
-        MBeanServer mbs    = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name    = null;
+    private void retrieveCPUData() {
         try {
-            name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-        } catch (MalformedObjectNameException e) {
+            //loadAverage = osMBean.getSystemCpuLoad();
+            LOG.warn("Current CPU Load: " + loadAverage * 100d + "%");
+
+            if (loadAverage < 0) {
+                loadAverage = 0.85d;
+            }
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
+            loadAverage = 0.95d;
         }
-        AttributeList list = null;
+    }
+
+    private void retrieveSwapData() {
         try {
-            list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
-        } catch (InstanceNotFoundException e) {
-            e.printStackTrace();
+            //freeSwapSize = osMBean.getFreeSwapSpaceSize();
+            //totalSwapSize = osMBean.getTotalSwapSpaceSize();
+            swapUsage = 0.6;
+            if (freeSwapSize > 0 && totalSwapSize > 0) {
+                swapUsage = (double) freeSwapSize / (double) totalSwapSize;
+            }
+            LOG.warn("Free RAM: " + swapUsage * 100d + "%");
+        } catch (Exception e) {
             LOG.error(e.getMessage());
-        } catch (ReflectionException e) {
             e.printStackTrace();
-            LOG.error(e.getMessage());
+            swapUsage = 0.6d;
         }
-
-        if (list.isEmpty())     return Double.NaN;
-
-        Attribute att = (Attribute)list.get(0);
-        Double value  = (Double)att.getValue();
-
-        // usually takes a couple of seconds before we get real values
-        if (value == -1.0)      return Double.NaN;
-        // returns a percentage value with 1 decimal point precision
-        return ((int)(value * 1000) / 10.0);
     }
 
     /**
