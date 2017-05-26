@@ -12,3 +12,9 @@
   background: #ddd;
   cursor: pointer;
 }
+.active-terms li a:hover{
+  text-decoration: none;
+}
+.term-link{
+  margin: 5px;
+}
