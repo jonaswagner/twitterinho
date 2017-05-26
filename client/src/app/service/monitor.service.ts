@@ -4,7 +4,7 @@ import {Observable, Subject} from "rxjs";
 import {Injectable} from "@angular/core";
 import {Term} from "../model/term";
 import {MonitorData} from "../model/monitorData";
-import {environment} from "../../environments/environment";
+import {environment} from "../../environments/environment.prod";
 /**
  * Created by flaviokeller on 20.03.17.
  */
