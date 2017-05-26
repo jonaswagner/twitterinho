@@ -3,7 +3,6 @@ package ch.uzh.ase.Monitoring;
 import ch.uzh.ase.Blackboard.AbstractKSMaster;
 import ch.uzh.ase.Blackboard.Blackboard;
 import ch.uzh.ase.Util.MasterWorkload;
-import ch.uzh.ase.Util.Sentiment;
 import ch.uzh.ase.Util.SystemWorkload;
 import ch.uzh.ase.config.Configuration;
 import com.sun.management.OperatingSystemMXBean;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import javax.management.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -190,7 +187,18 @@ public class WorkloadObserver extends Thread implements IWorkloadObserver {
         if (subject.getNumberOfSlaves() < DEFAULT_SLAVE_THRESHHOLD) {
 
             if (inOutRatio > IN_OUT_UPPER_THRESHHOLD) {
-                subject.generateSlaves(calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves()));
+                int maxSlavesCount = Integer.valueOf(props.getProperty("default_slave_threshold"));
+                int newSlaves = calcSlavesRatio(inOutRatio, subject.getNumberOfSlaves());
+
+                if ((newSlaves + subject.getNumberOfSlaves()) > maxSlavesCount) {
+                    newSlaves = maxSlavesCount - subject.getNumberOfSlaves();
+                }
+
+                if (newSlaves == 0) {
+                    return; //do nothing
+                } else {
+                    subject.generateSlaves(newSlaves);
+                }
             } else {
                 subject.generateSlaves(1);
             }
